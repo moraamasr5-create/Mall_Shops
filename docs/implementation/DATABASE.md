@@ -63,9 +63,11 @@ These are replaceable implementation choices.
 
 **Not Architecture-locked.**
 
-`Module` is a platform concept. Whether it is persisted as a database table is an Implementation choice for Vertical Slice 1.
+`Module` is a platform concept. Whether it is persisted as a database table is an Implementation choice.
 
-If a table is used, a provisional shape could be:
+**VS1 choice:** Module registry is implemented as **constants** in code (`src/core/module/registry.ts`). No `module` table.
+
+If a table is used later, a provisional shape could be:
 
 | Column | Type | Notes |
 |--------|------|-------|
@@ -74,13 +76,6 @@ If a table is used, a provisional shape could be:
 | `description` | TEXT | Nullable |
 | `status` | TEXT | `available`, `deprecated`, `retired` |
 | `created_at` | TIMESTAMPTZ | |
-
-Alternatives equally valid until implementation decides:
-
-- constants / code registry
-- config files
-- registry service
-- database table
 
 `tenant_module.module_key` must always reference a valid Module identity, regardless of storage form.
 

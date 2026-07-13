@@ -2,11 +2,11 @@
 
 ## Status
 
-**FINAL LOCKED**
+**FINAL LOCKED / FROZEN**
 
 Date: 2026-07-13
 
-The documentation layer is stable.
+The documentation layer is frozen.
 
 From this point forward:
 
