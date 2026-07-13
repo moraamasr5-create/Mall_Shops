@@ -54,6 +54,7 @@ X-Tenant-Id: <tenant-id>
 4. `POST /api/v1/salon/services` → Salon Reference Module operation
 5. `GET|POST /api/v1/salon/employees` → Salon employee management
 6. `GET|POST /api/v1/salon/customers` → Salon customer management
+7. `GET|POST /api/v1/restaurant/categories` → Restaurant module validation
 
 ### Authorization (mandatory)
 

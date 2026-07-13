@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 
 const root = process.cwd();
 const concreteModuleNames = [
@@ -171,6 +172,45 @@ function detectCrossBoundaryCycles(graph) {
   }
 }
 
+function gitOutput(command) {
+  try {
+    return execSync(command, {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
+function checkCoreFreeze() {
+  if (process.env.ARCH_ALLOW_CORE_CHANGES === "true") {
+    return;
+  }
+
+  const workingTreeCoreDiff = gitOutput("git diff --name-only HEAD -- src/core");
+  if (workingTreeCoreDiff) {
+    failures.push(
+      `Core freeze violation: src/core changed in working tree:\n${workingTreeCoreDiff}`,
+    );
+  }
+
+  const baseRef = process.env.ARCH_CHECK_BASE_REF ?? "origin/main";
+  const hasBaseRef = gitOutput(`git rev-parse --verify ${baseRef}`);
+  if (!hasBaseRef) {
+    return;
+  }
+
+  const committedCoreDiff = gitOutput(`git diff --name-only ${baseRef}...HEAD -- src/core`);
+  if (committedCoreDiff) {
+    failures.push(
+      `Core freeze violation: src/core changed relative to ${baseRef}. ` +
+        `Set ARCH_ALLOW_CORE_CHANGES=true only after Architecture Review:\n${committedCoreDiff}`,
+    );
+  }
+}
+
 const coreFiles = listFiles("src/core", [".ts", ".tsx"]);
 const coreRbacFiles = listFiles("src/core/rbac", [".ts", ".tsx"]);
 const moduleFiles = listFiles("src/modules", [".ts", ".tsx"]);
@@ -225,6 +265,7 @@ for (const coreModel of ["Tenant", "Membership", "TenantModule"]) {
 }
 
 detectCrossBoundaryCycles(buildImportGraph([...coreFiles, ...moduleFiles]));
+checkCoreFreeze();
 
 if (failures.length > 0) {
   console.error("Architecture regression check failed:\n");

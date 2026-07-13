@@ -1,5 +1,6 @@
 import { AppError } from "@/shared/errors";
 import type { ModuleDefinition } from "@/core/module/types";
+import { RESTAURANT_MODULE } from "@/modules/restaurant/module";
 import { SALON_MODULE } from "@/modules/salon/module";
 
 /**
@@ -7,6 +8,7 @@ import { SALON_MODULE } from "@/modules/salon/module";
  * Architecture treats Module as a concept — storage is not locked.
  */
 export const MODULE_REGISTRY: Record<string, ModuleDefinition> = {
+  [RESTAURANT_MODULE.moduleKey]: RESTAURANT_MODULE,
   [SALON_MODULE.moduleKey]: SALON_MODULE,
 };
 

@@ -10,6 +10,23 @@ The goal is to protect Architecture v1.0 from accidental coupling between Core a
 - [ ] `src/core` contains no concrete module names such as Salon, Restaurant, Clinic, Gym, Pharmacy, or Store.
 - [ ] Adding a new module does not require modifying existing files inside `src/core`.
 
+## Core Freeze
+
+For MVP, Core is feature-complete.
+
+Future `src/core` changes are allowed only for:
+
+1. Bug Fix
+2. Performance Improvement
+3. Security Improvement
+4. Architectural Defect
+
+Adding business functionality is not a valid reason to modify Core.
+
+- [ ] `git diff -- src/core` is empty unless the slice explicitly targets Core.
+- [ ] If `src/core` changed, work stopped for Architecture Review before merge.
+- [ ] `ARCH_ALLOW_CORE_CHANGES=true` was not used unless Architecture Review approved the Core change.
+
 ## Dependency Direction
 
 - [ ] Dependencies flow from Modules to Core, never from Core to Modules.
@@ -70,9 +87,10 @@ This executes:
 
 1. Architecture Regression Checklist automation
 2. Dependency direction checks
-3. Prisma Generate
-4. Type Check
-5. Test Suite
+3. Core freeze check
+4. Prisma Generate
+5. Type Check
+6. Test Suite
 
 ## Manual Check Commands
 
