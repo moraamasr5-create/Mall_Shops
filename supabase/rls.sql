@@ -5,6 +5,7 @@ ALTER TABLE tenant ENABLE ROW LEVEL SECURITY;
 ALTER TABLE membership ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenant_module ENABLE ROW LEVEL SECURITY;
 ALTER TABLE salon_service ENABLE ROW LEVEL SECURITY;
+ALTER TABLE salon_employee ENABLE ROW LEVEL SECURITY;
 
 -- tenant
 CREATE POLICY tenant_isolation_tenant
@@ -81,6 +82,26 @@ CREATE POLICY tenant_isolation_salon_service
     EXISTS (
       SELECT 1 FROM membership
       WHERE membership.tenant_id = salon_service.tenant_id
+        AND membership.identity_id = auth.uid()::text
+        AND membership.status = 'active'
+    )
+  );
+
+-- salon_employee (reference module)
+CREATE POLICY tenant_isolation_salon_employee
+  ON salon_employee FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM membership
+      WHERE membership.tenant_id = salon_employee.tenant_id
+        AND membership.identity_id = auth.uid()::text
+        AND membership.status = 'active'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM membership
+      WHERE membership.tenant_id = salon_employee.tenant_id
         AND membership.identity_id = auth.uid()::text
         AND membership.status = 'active'
     )

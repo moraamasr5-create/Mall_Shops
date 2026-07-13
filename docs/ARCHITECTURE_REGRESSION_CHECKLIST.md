@@ -10,6 +10,14 @@ The goal is to protect Architecture v1.0 from accidental coupling between Core a
 - [ ] `src/core` contains no concrete module names such as Salon, Restaurant, Clinic, Gym, Pharmacy, or Store.
 - [ ] Adding a new module does not require modifying existing files inside `src/core`.
 
+## Backward Architecture Compatibility
+
+- [ ] No existing Core abstraction was modified to support a module feature.
+- [ ] No existing module behavior was broken.
+- [ ] No architectural invariant was weakened.
+- [ ] New functionality was added by extension, not by changing Core.
+- [ ] If `src/core` changed, the slice explicitly targeted Core and received Architecture Review before merge.
+
 ## RBAC and Permissions
 
 - [ ] Core RBAC uses a generic permission model.
@@ -43,7 +51,22 @@ Adding a new module should require only:
 
 If adding a module requires editing existing files inside `src/core`, treat it as an architecture regression unless Core itself is intentionally evolving.
 
-## Suggested Automated Checks
+## Automated Gate
+
+Run this before every merge:
+
+```bash
+npm run verify
+```
+
+This executes:
+
+1. Architecture Regression Checklist automation
+2. Prisma Generate
+3. Type Check
+4. Test Suite
+
+## Manual Check Commands
 
 ```bash
 # No concrete module names inside Core

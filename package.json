@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "verify": "npm run check:architecture && npm run prisma:generate && npm run typecheck && npm test",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

@@ -77,3 +77,19 @@ model SalonService {
   @@index([tenantId])
   @@map("salon_service")
 }
+
+/// Salon Reference Module — employee entity owned by the Salon module.
+model SalonEmployee {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  title     String?
+  phone     String?
+  email     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@map("salon_employee")
+}

@@ -52,6 +52,7 @@ X-Tenant-Id: <tenant-id>
 2. `POST /api/v1/tenants` → Tenant + OWNER Membership + salon TenantModule
 3. `GET /api/v1/tenants/:id/modules` → activation relationship
 4. `POST /api/v1/salon/services` → Salon Reference Module operation
+5. `GET|POST /api/v1/salon/employees` → Salon employee management
 
 ### Authorization (mandatory)
 
