@@ -2,7 +2,6 @@ import { z } from "zod";
 import { prisma } from "@/infrastructure/prisma";
 import { AppError } from "@/shared/errors";
 import { slugify } from "@/shared/slug";
-import { assertModuleActivatable } from "@/core/module/registry";
 
 export const createTenantInputSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -11,11 +10,11 @@ export const createTenantInputSchema = z.object({
 
 export type CreateTenantInput = z.infer<typeof createTenantInputSchema>;
 
-/**
- * Creates Tenant + OWNER Membership + initial TenantModule activation.
- * MVP Decision: auto-enable salon.
- */
-export async function createTenant(identityId: string, input: CreateTenantInput) {
+export async function createTenant(
+  identityId: string,
+  input: CreateTenantInput,
+  initialModuleKeys: readonly string[]
+) {
   const name = input.name.trim();
   const slug = input.slug ? slugify(input.slug) : slugify(name);
 
@@ -23,7 +22,14 @@ export async function createTenant(identityId: string, input: CreateTenantInput)
     throw new AppError("VALIDATION_ERROR", "Unable to derive a valid tenant slug", 422);
   }
 
-  const initialModule = assertModuleActivatable("salon");
+  const uniqueInitialModuleKeys = [...new Set(initialModuleKeys)];
+  if (uniqueInitialModuleKeys.length === 0) {
+    throw new AppError(
+      "CONFIG_ERROR",
+      "At least one initial module must be supplied when creating a tenant",
+      500
+    );
+  }
 
   const existing = await prisma.tenant.findUnique({ where: { slug } });
   if (existing) {
@@ -48,15 +54,19 @@ export async function createTenant(identityId: string, input: CreateTenantInput)
       },
     });
 
-    const tenantModule = await tx.tenantModule.create({
-      data: {
-        tenantId: tenant.id,
-        moduleKey: initialModule.moduleKey,
-        enabled: true,
-      },
-    });
+    const tenantModules = await Promise.all(
+      uniqueInitialModuleKeys.map((moduleKey) =>
+        tx.tenantModule.create({
+          data: {
+            tenantId: tenant.id,
+            moduleKey,
+            enabled: true,
+          },
+        })
+      )
+    );
 
-    return { tenant, membership, tenantModule };
+    return { tenant, membership, tenantModules };
   });
 }
 

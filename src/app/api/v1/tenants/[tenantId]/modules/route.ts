@@ -6,6 +6,7 @@ import {
 import { jsonError, jsonOk } from "@/core/http/response";
 import { listTenantModules } from "@/core/tenant-module/service";
 import { AppError } from "@/shared/errors";
+import { getModule } from "@/modules/registry";
 
 type Params = { params: Promise<{ tenantId: string }> };
 
@@ -23,7 +24,10 @@ export async function GET(req: NextRequest, { params }: Params) {
     }
 
     requirePermission(ctx, "module:read");
-    const modules = await listTenantModules(tenantId);
+    const modules = (await listTenantModules(tenantId)).map((row) => ({
+      ...row,
+      module: getModule(row.moduleKey) ?? null,
+    }));
     return jsonOk(modules);
   } catch (error) {
     return jsonError(error);

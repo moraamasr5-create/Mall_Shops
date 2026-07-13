@@ -6,6 +6,7 @@ import {
   isRole,
   roleHasPermission,
   type Permission,
+  type PermissionGrantMap,
   type Role,
 } from "@/core/rbac/permissions";
 
@@ -83,8 +84,12 @@ export async function requireTenantContext(req: NextRequest): Promise<TenantScop
   };
 }
 
-export function requirePermission(ctx: TenantScopedRequest, permission: Permission): void {
-  if (!roleHasPermission(ctx.tenant.role, permission)) {
+export function requirePermission(
+  ctx: TenantScopedRequest,
+  permission: Permission,
+  additionalGrantMaps: readonly PermissionGrantMap[] = []
+): void {
+  if (!roleHasPermission(ctx.tenant.role, permission, additionalGrantMaps)) {
     throw new AppError("PERMISSION_DENIED", `Missing permission: ${permission}`, 403);
   }
 }

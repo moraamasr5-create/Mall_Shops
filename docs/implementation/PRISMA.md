@@ -110,14 +110,14 @@ model SalonEmployee {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
   @@index([tenantId])
   @@map("salon_employee")
 }
 ```
 
-Module models are added when each Module is implemented.
+Module models are added when each Module is implemented. Module models keep
+`tenantId` as module-owned tenant scope and do not add inverse relations to
+Core Prisma models.
 
 ---
 

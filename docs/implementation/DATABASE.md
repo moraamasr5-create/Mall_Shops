@@ -65,7 +65,7 @@ These are replaceable implementation choices.
 
 `Module` is a platform concept. Whether it is persisted as a database table is an Implementation choice.
 
-**VS1 choice:** Module registry is implemented as **constants** in code (`src/core/module/registry.ts`). No `module` table.
+**VS1 choice:** Module registry is implemented as **constants** outside Core (`src/modules/registry.ts`). No `module` table.
 
 If a table is used later, a provisional shape could be:
 

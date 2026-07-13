@@ -1,22 +1,14 @@
 import { prisma } from "@/infrastructure/prisma";
 import { AppError } from "@/shared/errors";
-import { assertModuleActivatable, getModule } from "@/core/module/registry";
 
 export async function listTenantModules(tenantId: string) {
-  const rows = await prisma.tenantModule.findMany({
+  return prisma.tenantModule.findMany({
     where: { tenantId },
     orderBy: { activatedAt: "asc" },
   });
-
-  return rows.map((row) => ({
-    ...row,
-    module: getModule(row.moduleKey) ?? null,
-  }));
 }
 
 export async function enableTenantModule(tenantId: string, moduleKey: string) {
-  assertModuleActivatable(moduleKey);
-
   return prisma.tenantModule.upsert({
     where: {
       tenantId_moduleKey: { tenantId, moduleKey },

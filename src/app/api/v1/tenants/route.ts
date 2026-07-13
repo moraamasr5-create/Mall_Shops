@@ -6,6 +6,7 @@ import {
   createTenantInputSchema,
   listTenantsForIdentity,
 } from "@/core/tenant/service";
+import { assertModuleActivatable, MVP_INITIAL_MODULE_KEYS } from "@/modules/registry";
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +22,11 @@ export async function POST(req: NextRequest) {
   try {
     const auth = await requireIdentity(req);
     const body = createTenantInputSchema.parse(await req.json());
-    const result = await createTenant(auth.identity.identityId, body);
+    const initialModuleKeys = MVP_INITIAL_MODULE_KEYS.map((moduleKey) => {
+      assertModuleActivatable(moduleKey);
+      return moduleKey;
+    });
+    const result = await createTenant(auth.identity.identityId, body, initialModuleKeys);
     return jsonOk(result, 201);
   } catch (error) {
     return jsonError(error);

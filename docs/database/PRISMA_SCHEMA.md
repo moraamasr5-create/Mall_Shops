@@ -53,7 +53,7 @@ Implements [Membership Contract](../contracts/MEMBERSHIP.md).
 ```prisma
 model Membership {
   id        String         @id @default(cuid())
-  userId    String
+  identityId String
   tenantId  String
   role      MembershipRole
   createdAt DateTime       @default(now())
@@ -61,19 +61,20 @@ model Membership {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, tenantId])
+  @@unique([identityId, tenantId])
   @@map("membership")
 }
 ```
 
 **Notes:**
 
-- `userId` references Supabase Auth `auth.users.id` (UUID). No Prisma relation to auth schema — enforced at application level.
-- The `@@unique([userId, tenantId])` constraint enforces the one-membership-per-user-per-tenant invariant.
+- `identityId` references the Identity Provider subject. No Prisma relation to auth schema — enforced at application level.
+- The `@@unique([identityId, tenantId])` constraint enforces the one-membership-per-identity-per-tenant invariant.
 
-### TenantModule
+### TenantModule (VS1 persistence choice)
 
-Implements [TenantModule Contract](../contracts/TENANT_MODULE.md).
+Persists the [TenantModule](../contracts/TENANT_MODULE.md) activation relationship for VS1.
+Architecture treats TenantModule as a relationship; persistence is intentionally not locked.
 
 ```prisma
 model TenantModule {
@@ -186,7 +187,7 @@ Module tables reference `tenantId` as a plain string column. Referential integri
 
 | Contract Invariant | Schema Enforcement |
 |--------------------|-------------------|
-| One membership per user per tenant | `@@unique([userId, tenantId])` on Membership |
+| One membership per identity per tenant | `@@unique([identityId, tenantId])` on Membership |
 | One module enablement per module per tenant | `@@unique([tenantId, moduleKey])` on TenantModule |
 | Tenant deletion cascades | `onDelete: Cascade` on Membership, TenantModule |
 | Module data is tenant-scoped | `tenantId` column on all module tables |
@@ -196,7 +197,7 @@ Module tables reference `tenantId` as a plain string column. Referential integri
 
 > **MVP Decision:** Only core platform models (Tenant, Membership, TenantModule) will be migrated first. Salon module models follow in a subsequent migration.
 
-> **MVP Decision:** User model is not in Prisma schema. User identity is managed by Supabase Auth; `userId` in Membership references `auth.users.id`.
+> **MVP Decision:** User model is not in Prisma schema. Identity is managed by the Identity Provider; `identityId` in Membership references the provider subject.
 
 ## Related Documents
 

@@ -19,7 +19,6 @@ model Tenant {
 
   memberships   Membership[]
   tenantModules TenantModule[]
-  salonServices SalonService[]
 
   @@map("tenant")
 }
@@ -74,8 +73,6 @@ model SalonService {
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@map("salon_service")
