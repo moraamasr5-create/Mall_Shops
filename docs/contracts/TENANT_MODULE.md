@@ -2,21 +2,23 @@
 
 ## Definition
 
-A **TenantModule** represents the **activation of a Module for a specific Tenant**.
+A **TenantModule** represents the **activation relationship** between a **Tenant** and a **Module**.
 
-It is the platform's generic mechanism for:
+It is the platform's generic capability for:
 
 - Controlling which Modules are active in a Tenant
 - Determining feature availability
-- Scoping module-specific operations to an enabled context
+- Supporting Tenants with one or more enabled Modules
 
-TenantModule is a **Core platform concept**. It is not owned by or specific to any single Module.
+TenantModule is a **Core platform relationship**. It is not owned by or specific to any single Module.
+
+**Architecture does not define persistence.** Whether activation is stored as a database table, configuration, feature flags, a registry service, or another mechanism is an Implementation decision.
 
 ---
 
 ## Responsibility
 
-- Record which Modules are enabled for a given Tenant
+- Express which Modules are enabled for a given Tenant
 - Gate access to module-specific business capabilities
 - Support Tenants running multiple Modules simultaneously
 
@@ -24,29 +26,32 @@ TenantModule is a **Core platform concept**. It is not owned by or specific to a
 
 ## Invariants
 
-1. **At most one TenantModule record per (Tenant, Module) pair**
-   - The combination of Tenant and `moduleKey` is unique.
-   - A Tenant cannot have duplicate activation records for the same Module.
+1. **At most one activation per (Tenant, Module) pair**
+   - A Tenant cannot have duplicate activations for the same Module.
 
-2. **TenantModule always references a valid Tenant**
-   - Every TenantModule belongs to exactly one Tenant.
-   - Orphan TenantModule records are forbidden.
+2. **TenantModule always belongs to a valid Tenant**
+   - Every activation is scoped to exactly one Tenant.
+   - Orphan activations are forbidden.
 
 3. **TenantModule always references a valid Module**
-   - `moduleKey` must match a Module in the platform catalog.
+   - `moduleKey` must match a Module known to the platform.
    - Unknown `moduleKey` values are rejected.
 
-4. **Every Tenant must have at least one enabled TenantModule**
-   - A Tenant with all Modules disabled cannot operate.
+4. **Every Tenant must have at least one enabled Module**
+   - A Tenant with no enabled Modules cannot operate.
    - Disabling the last enabled Module is forbidden.
 
 5. **Module enablement is explicit**
-   - A Module is available to a Tenant only when its TenantModule record exists and is enabled.
+   - A Module is available to a Tenant only when activation exists and is enabled.
    - Implicit or inferred activation is forbidden.
 
 6. **TenantModule does not own business data**
-   - TenantModule is an activation record, not a data container.
+   - TenantModule is an activation relationship, not a data container.
    - Module-specific entities are scoped by Tenant and governed by the activated Module's rules.
+
+7. **Persistence is not a business invariant**
+   - Contracts require the activation relationship to exist conceptually.
+   - Contracts do not require a specific storage or lifecycle technology.
 
 ---
 
@@ -55,13 +60,13 @@ TenantModule is a **Core platform concept**. It is not owned by or specific to a
 ```
 Tenant (1)
     │
-    │ (1:N)
+    │ (1:N) architectural relationship
     ▼
 TenantModule
     │
     │ references
     ▼
-Module (platform catalog)
+Module (platform concept)
     │
     │ governs
     ▼
@@ -80,20 +85,20 @@ Module-Specific Data (Tenant-scoped)
 
 | Attribute | Description |
 |-----------|-------------|
-| Identifier | Stable, unique TenantModule identifier |
 | Tenant reference | Target Tenant |
 | `moduleKey` | Reference to platform Module |
 | Enabled | Whether the Module is currently active for this Tenant |
 | Activated at | Point in time Module was first enabled |
-| Updated at | Point in time enablement status last changed |
+
+Identifiers and storage fields are Implementation concerns.
 
 ---
 
-## Lifecycle
+## Lifecycle (Business)
 
 ### Creation — Initial Activation
 
-When a Tenant is created, the platform enables one or more Modules by creating TenantModule records.
+When a Tenant is created, the platform enables one or more Modules by establishing TenantModule activations.
 
 The specific Modules activated at creation time are governed by [MVP Decisions](../mvp/MVP_DECISIONS.md).
 
@@ -101,7 +106,7 @@ The specific Modules activated at creation time are governed by [MVP Decisions](
 
 1. An authorized Identity requests activation of a Module for a Tenant.
 2. The platform validates the Module exists and is available.
-3. A TenantModule record is created with `enabled = true`.
+3. Activation is established with `enabled = true`.
 4. Module-specific setup (if any) runs within the Module boundary.
 
 ### Active Operation
@@ -112,19 +117,19 @@ The specific Modules activated at creation time are governed by [MVP Decisions](
 
 ### Disable
 
-- Sets `enabled = false` on the TenantModule record.
+- Marks the Module inactive for the Tenant.
 - Forbidden if it would leave the Tenant with zero enabled Modules.
 - Does not automatically delete module-specific data.
 
 ### Removal
 
-- Explicit deletion of the TenantModule record.
+- Explicit removal of the activation relationship.
 - Forbidden if it would leave the Tenant with zero enabled Modules.
 - Module-specific data cleanup follows Module deactivation policy.
 
 ### Tenant Deletion
 
-- Deleting a Tenant removes all associated TenantModule records.
+- Deleting a Tenant clears all associated Module activations.
 - Module-specific data cleanup is cascaded per retention policy.
 
 ---
@@ -159,7 +164,7 @@ A Tenant may have **multiple Modules enabled simultaneously**.
 
 **MVP Decision:** New Tenants automatically receive activation of the `salon` Module as their initial enabled Module.
 
-**MVP Decision:** Only the `salon` Module is implemented in the first vertical slice. Other Module keys exist in the catalog but are not yet activatable.
+**MVP Decision:** Only the `salon` Module is implemented in the first vertical slice. Other Module keys exist as examples but are not yet activatable.
 
 ---
 

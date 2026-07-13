@@ -84,19 +84,25 @@ Alternatives equally valid until implementation decides:
 
 `tenant_module.module_key` must always reference a valid Module identity, regardless of storage form.
 
-### `tenant_module`
+### `tenant_module` (VS1 Implementation choice)
+
+**Architecture:** TenantModule is an activation **relationship** only — persistence is not locked.
+
+**VS1 choice:** persist activation in table `tenant_module`.
 
 | Column | Type | Notes |
 |--------|------|-------|
 | `id` | TEXT (CUID) | Primary key |
 | `tenant_id` | TEXT | FK → `tenant.id` ON DELETE CASCADE |
-| `module_key` | TEXT | FK → `module.module_key` |
+| `module_key` | TEXT | Validated against Module registry concept |
 | `enabled` | BOOLEAN | Default `true` |
 | `activated_at` | TIMESTAMPTZ | |
 | `created_at` | TIMESTAMPTZ | |
 | `updated_at` | TIMESTAMPTZ | |
 
 **Unique constraint:** `(tenant_id, module_key)`
+
+Alternatives remain valid for future slices: config, feature flags, registry service, etc.
 
 ---
 

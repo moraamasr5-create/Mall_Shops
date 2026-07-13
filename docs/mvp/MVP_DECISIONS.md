@@ -206,11 +206,12 @@ These are **permanent platform invariants** defined in Contracts — not tempora
 
 | Date | Decision | Status |
 |------|----------|--------|
-| 2026-07 | Architecture Lock v1.0 FINAL | **FINAL LOCKED** |
+| 2026-07 | Architecture Lock v1.0 FINAL | **FINAL LOCKED / FROZEN** |
 | 2026-07 | BusinessUnit removed | **LOCKED** |
 | 2026-07 | JWT = Identity only; Tenant via `X-Tenant-Id` | **LOCKED** |
 | 2026-07 | Explicit RBAC mapping (no inheritance) | **LOCKED** |
-| 2026-07 | Module Registry = concept only; storage undecided | **LOCKED** |
-| 2026-07 | Authorization = RLS + Application Permissions | **LOCKED** |
+| 2026-07 | Module = concept only; storage undecided | **LOCKED** |
+| 2026-07 | TenantModule = relationship only; persistence undecided | **LOCKED** |
+| 2026-07 | Authorization = Layer1 Isolation + Layer2 Business Auth | **LOCKED** |
 | 2026-07 | Salon as Reference Module | **Active** |
 | 2026-07 | Auto-enable salon on Tenant creation | **Active** |

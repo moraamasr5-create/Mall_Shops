@@ -65,8 +65,8 @@ These rules span multiple contracts and must never be violated:
 4. **Multi-tenant from day one** — One Identity may belong to many Tenants; one Tenant may enable many Modules.
 5. **TenantModule is generic** — It is the platform mechanism for module activation, not a module-specific concept.
 6. **Data isolation is per Tenant** — All business data is scoped to a Tenant.
-7. **Authorization has two layers** — Database Isolation (RLS or equivalent) **and** Business Permissions (Application). Neither alone is sufficient.
-8. **Module storage is not a Contract concern** — Module is a platform concept; persistence form is Implementation.
+7. **Authorization has two layers** — Layer 1 Database Isolation (RLS or equivalent) for Tenant isolation only; Layer 2 Business Authorization for Roles/Permissions in the application. Neither alone is sufficient; Layer 1 must not encode business permissions; Layer 2 must not rely solely on the client.
+8. **Module and TenantModule persistence are not Contract concerns** — Module is a platform concept; TenantModule is an activation relationship; storage forms are Implementation.
 
 ---
 

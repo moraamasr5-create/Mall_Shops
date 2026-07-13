@@ -25,9 +25,10 @@ From this point forward:
 | 2 | JWT Strategy | JWT = Identity only; Tenant via `X-Tenant-Id`; Roles/Permissions loaded per request |
 | 3 | RBAC | Explicit Permission mapping only — no implicit inheritance |
 | 4 | Module Registry | **Architectural concept only** — storage mechanism is **not** locked |
-| 5 | ADR style | ADRs explain *why*; implementation examples live under `docs/implementation/` |
-| 6 | Contracts | Generic platform; Module names are examples; Salon is Reference Module only |
-| 7 | Authorization | **Two mandatory layers** — Database Isolation (RLS) + Business Permissions (Application) |
+| 5 | TenantModule | **Architectural relationship only** — persistence/lifecycle mechanism is **not** locked |
+| 6 | ADR style | ADRs explain *why*; implementation examples live under `docs/implementation/` |
+| 7 | Contracts | Generic platform; Module names are examples; Salon is Reference Module only |
+| 8 | Authorization | **Two mandatory layers** — Database Isolation (RLS) + Business Authorization (Application) |
 
 ---
 
@@ -43,7 +44,9 @@ Identity
 
 Architecture knows these concepts and their relationships.
 
-Architecture does **not** decide how `Module` is stored (table, constants, config, registry service, etc.). That is an Implementation decision for Vertical Slice 1 when a real need appears.
+Architecture does **not** decide how `Module` or `TenantModule` are persisted
+(table, constants, config, feature flags, registry service, etc.).
+Those are Implementation decisions made during Vertical Slices when a real need appears.
 
 No BusinessUnit. No User table. No `owner_id` on Tenant.
 
@@ -51,36 +54,46 @@ No BusinessUnit. No User table. No `owner_id` on Tenant.
 
 ## Authorization (Locked)
 
-Authorization has **two layers**. Neither may be relied on alone.
+Authorization has **two layers**. Both are permanent architectural invariants. Neither may be relied on alone.
 
-| Layer | Responsibility | Owner |
-|-------|----------------|-------|
-| **Layer 1 — Database Isolation** | Tenant boundary enforcement (RLS or equivalent) | Data / Infrastructure |
-| **Layer 2 — Business Permissions** | Role → explicit Permission evaluation | Application |
+| Layer | Responsibility | Owner | Must Not |
+|-------|----------------|-------|----------|
+| **Layer 1 — Database Isolation** | Tenant data isolation only | Data / Infrastructure (RLS or equivalent) | Encode business permissions |
+| **Layer 2 — Business Authorization** | Roles and Permissions evaluation | Application | Rely solely on the client |
+
+Rules:
 
 - Layer 1 prevents cross-Tenant data access even if application code fails
 - Layer 2 decides whether the Identity may perform the requested business operation
+- Layer 1 must never become a substitute for Roles/Permissions
+- Layer 2 must never trust the client as the sole authority
 - Skipping either layer is an architecture violation
 
 ---
 
-## Module Registry (Locked Concept / Unlocked Storage)
+## Module & TenantModule (Locked Concepts / Unlocked Persistence)
 
 **Locked:**
 
 - `Module` is a first-class platform concept
-- Tenants activate Modules through `TenantModule`
+- `TenantModule` is the architectural relationship: Tenant ↔ Module activation
+- A Tenant can enable one or more Modules
+- A Module can be enabled for many Tenants
+- Module activation is part of the platform capability model
 - Core never depends on a specific business Module (e.g. Salon)
 
-**Not locked (Implementation — decide in Vertical Slice 1):**
+**Not locked (Implementation — decide in Vertical Slices):**
+
+How Module registry or TenantModule activation is realized:
 
 - Database table
-- Constants
+- Constants / code registry
 - Config files
+- Feature flags
 - Registry service
-- Any other storage form
+- Any other mechanism
 
-Do not treat “Module Catalog table” as an Architecture decision.
+Do not treat “Module Catalog table” or “TenantModule table” as Architecture decisions.
 
 ---
 

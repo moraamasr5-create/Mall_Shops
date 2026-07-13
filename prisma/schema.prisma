@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// Organizational isolation boundary. No owner_id — ownership via Membership(role=OWNER).
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memberships   Membership[]
+  tenantModules TenantModule[]
+  salonServices SalonService[]
+
+  @@map("tenant")
+}
+
+/// Links Identity Provider UID to a Tenant with an explicit Role.
+model Membership {
+  id         String   @id @default(cuid())
+  identityId String   @map("identity_id")
+  tenantId   String   @map("tenant_id")
+  role       String
+  status     String   @default("active")
+  invitedBy  String?  @map("invited_by")
+  joinedAt   DateTime @default(now()) @map("joined_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([identityId, tenantId])
+  @@index([identityId])
+  @@index([tenantId])
+  @@map("membership")
+}
+
+/// VS1 Implementation choice: TenantModule activation persisted as a table.
+/// Architecture treats TenantModule as a relationship only — storage is not locked.
+model TenantModule {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  moduleKey   String   @map("module_key")
+  enabled     Boolean  @default(true)
+  activatedAt DateTime @default(now()) @map("activated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, moduleKey])
+  @@index([tenantId])
+  @@map("tenant_module")
+}
+
+/// Salon Reference Module — minimum entity for Vertical Slice 1.
+model SalonService {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String
+  description String?
+  durationMin Int      @map("duration_min")
+  priceCents  Int      @map("price_cents")
+  currency    String   @default("SAR")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("salon_service")
+}
