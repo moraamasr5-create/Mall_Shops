@@ -5,6 +5,22 @@ import { SALON_PERMISSIONS, SALON_ROLE_PERMISSIONS } from "@/modules/salon/permi
 import { SALON_MODULE } from "@/modules/salon/module";
 
 describe("Salon module permissions", () => {
+  it("grants salon customer writes through module-owned mapping", () => {
+    expect(
+      roleHasPermission("MANAGER", SALON_PERMISSIONS.customerWrite, [
+        SALON_ROLE_PERMISSIONS,
+      ])
+    ).toBe(true);
+  });
+
+  it("denies salon customer reads for CUSTOMER role", () => {
+    expect(
+      roleHasPermission("CUSTOMER", SALON_PERMISSIONS.customerRead, [
+        SALON_ROLE_PERMISSIONS,
+      ])
+    ).toBe(false);
+  });
+
   it("grants salon employee writes through module-owned mapping", () => {
     expect(
       roleHasPermission("MANAGER", SALON_PERMISSIONS.employeeWrite, [

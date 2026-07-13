@@ -10,6 +10,13 @@ The goal is to protect Architecture v1.0 from accidental coupling between Core a
 - [ ] `src/core` contains no concrete module names such as Salon, Restaurant, Clinic, Gym, Pharmacy, or Store.
 - [ ] Adding a new module does not require modifying existing files inside `src/core`.
 
+## Dependency Direction
+
+- [ ] Dependencies flow from Modules to Core, never from Core to Modules.
+- [ ] Core imports no Module code, types, permissions, services, or implementation files.
+- [ ] Core imports no Module-owned Prisma models.
+- [ ] No circular dependencies exist between `src/core` and `src/modules`.
+
 ## Backward Architecture Compatibility
 
 - [ ] No existing Core abstraction was modified to support a module feature.
@@ -62,15 +69,19 @@ npm run verify
 This executes:
 
 1. Architecture Regression Checklist automation
-2. Prisma Generate
-3. Type Check
-4. Test Suite
+2. Dependency direction checks
+3. Prisma Generate
+4. Type Check
+5. Test Suite
 
 ## Manual Check Commands
 
 ```bash
 # No concrete module names inside Core
 rg -n "salon|restaurant|clinic|gym|pharmacy|store" src/core -i
+
+# No Core -> Modules imports
+rg -n "from ['\"]@/modules/" src/core
 
 # No module-specific permission strings in Core RBAC
 rg -n "^[^#]*[a-z]+:[a-z]+:" src/core/rbac

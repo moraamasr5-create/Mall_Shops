@@ -69,8 +69,111 @@ function extractPrismaModel(schema, modelName) {
   return "";
 }
 
+function extractImportSpecifiers(file) {
+  const text = readText(file);
+  const specifiers = [];
+  const patterns = [
+    /import\s+(?:type\s+)?(?:[\s\S]*?\s+from\s+)?["']([^"']+)["']/g,
+    /export\s+(?:type\s+)?[\s\S]*?\s+from\s+["']([^"']+)["']/g,
+  ];
+
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      specifiers.push(match[1]);
+    }
+  }
+
+  return specifiers;
+}
+
+function resolveInternalImport(fromFile, specifier) {
+  if (!specifier.startsWith("@/") && !specifier.startsWith(".")) {
+    return null;
+  }
+
+  const basePath = specifier.startsWith("@/")
+    ? path.join(root, "src", specifier.slice(2))
+    : path.resolve(path.dirname(path.join(root, fromFile)), specifier);
+
+  const candidates = [
+    basePath,
+    `${basePath}.ts`,
+    `${basePath}.tsx`,
+    `${basePath}.js`,
+    `${basePath}.mjs`,
+    path.join(basePath, "index.ts"),
+    path.join(basePath, "index.tsx"),
+  ];
+
+  const resolved = candidates.find((candidate) => fs.existsSync(candidate));
+  return resolved ? path.relative(root, resolved) : null;
+}
+
+function fileArea(file) {
+  if (file.startsWith("src/core/")) return "core";
+  if (file.startsWith("src/modules/")) return "modules";
+  return "other";
+}
+
+function buildImportGraph(files) {
+  const graph = new Map();
+  const fileSet = new Set(files);
+
+  for (const file of files) {
+    const edges = [];
+    for (const specifier of extractImportSpecifiers(file)) {
+      const resolved = resolveInternalImport(file, specifier);
+      if (resolved && fileSet.has(resolved)) {
+        edges.push(resolved);
+      }
+    }
+    graph.set(file, edges);
+  }
+
+  return graph;
+}
+
+function detectCrossBoundaryCycles(graph) {
+  const visited = new Set();
+  const stack = new Set();
+  const pathStack = [];
+
+  function visit(file) {
+    if (stack.has(file)) {
+      const cycleStart = pathStack.indexOf(file);
+      const cycle = pathStack.slice(cycleStart).concat(file);
+      const areas = new Set(cycle.map(fileArea));
+      if (areas.has("core") && areas.has("modules")) {
+        failures.push(`Core/Modules circular dependency: ${cycle.join(" -> ")}`);
+      }
+      return;
+    }
+
+    if (visited.has(file)) {
+      return;
+    }
+
+    visited.add(file);
+    stack.add(file);
+    pathStack.push(file);
+
+    for (const edge of graph.get(file) ?? []) {
+      visit(edge);
+    }
+
+    pathStack.pop();
+    stack.delete(file);
+  }
+
+  for (const file of graph.keys()) {
+    visit(file);
+  }
+}
+
 const coreFiles = listFiles("src/core", [".ts", ".tsx"]);
 const coreRbacFiles = listFiles("src/core/rbac", [".ts", ".tsx"]);
+const moduleFiles = listFiles("src/modules", [".ts", ".tsx"]);
 const rlsFiles = [
   ...listFiles("supabase", [".sql"]),
   "docs/implementation/RLS.md",
@@ -82,6 +185,17 @@ assertNoMatch(
   coreFiles,
   /from\s+["']@\/modules\//,
 );
+
+for (const file of coreFiles) {
+  for (const specifier of extractImportSpecifiers(file)) {
+    const resolved = resolveInternalImport(file, specifier);
+    if (resolved?.startsWith("src/modules/")) {
+      failures.push(
+        `Dependency direction violation: ${file} imports ${resolved} via "${specifier}"`,
+      );
+    }
+  }
+}
 
 assertNoMatch(
   "Core must not mention concrete module names",
@@ -109,6 +223,8 @@ for (const coreModel of ["Tenant", "Membership", "TenantModule"]) {
     failures.push(`Core Prisma model ${coreModel} references a concrete module`);
   }
 }
+
+detectCrossBoundaryCycles(buildImportGraph([...coreFiles, ...moduleFiles]));
 
 if (failures.length > 0) {
   console.error("Architecture regression check failed:\n");
