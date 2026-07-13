@@ -1,104 +1,136 @@
 # Tenant Contract
 
+## Definition
+
+A **Tenant** represents an independent business organization using the platform.
+
+It is the primary **isolation boundary** for data, configuration, and operational context.
+
+---
+
 ## Responsibility
 
-A **Tenant** represents a business organization that operates on the platform.
+- Provide organizational context for all business operations
+- Scope Membership, module activation, and module-specific data
+- Enforce data isolation between different businesses on the platform
 
-A tenant is the primary isolation boundary for:
-
-- Business data
-- User access
-- Module enablement
-- Operational configuration
-
-Every piece of business data belongs to exactly one tenant. Users interact with the platform through memberships in one or more tenants.
+---
 
 ## Invariants
 
-1. **Unique identity**
-   - Every tenant has a globally unique identifier that never changes for the lifetime of the tenant.
+1. **Every business entity belongs to exactly one Tenant**
+   - Module-specific data, configuration, and operational records are always Tenant-scoped.
+   - Cross-Tenant data access is forbidden at the business rule level.
 
-2. **Human-readable name**
-   - Every tenant has a display name that identifies the organization to its members and customers.
+2. **A Tenant has no `owner_id` field**
+   - Ownership is never stored as a direct reference on Tenant.
+   - Tenant ownership is expressed exclusively through [Membership](./MEMBERSHIP.md) with `role = OWNER`.
 
-3. **At least one member with owner authority**
-   - A tenant must always have at least one member holding the owner role.
-   - A tenant cannot exist without an accountable owner.
+3. **A Tenant must have at least one OWNER Membership**
+   - At creation time, the creating Identity must receive an OWNER Membership.
+   - A Tenant cannot exist without at least one active OWNER at any point in its operational lifetime.
 
-4. **At least one enabled module**
-   - A tenant must have at least one business module enabled to perform business operations.
-   - A tenant with no enabled modules is in an invalid operational state.
+4. **A Tenant must have at least one enabled Module**
+   - A Tenant with no enabled Modules cannot perform business operations.
+   - Disabling the last enabled Module is forbidden.
 
-5. **Data isolation**
-   - All business data is scoped to a single tenant.
-   - Data from one tenant must never be visible or modifiable by members of another tenant.
+5. **Tenant identity is independent of any Module**
+   - Tenant name, slug, and organizational metadata are Core concerns.
+   - Module-specific branding or configuration lives within the activated Module scope.
 
-6. **Deletion is destructive**
-   - Removing a tenant removes all associated memberships, module enablements, and business data belonging to that tenant.
+6. **Tenant deletion is a destructive, explicit operation**
+   - Deleting a Tenant removes or archives all associated Memberships, TenantModules, and module-specific data.
+   - Tenant deletion requires OWNER authorization.
+
+---
 
 ## Relationships
 
 ```
-User
-  └── Membership (N per user, one per tenant)
-        └── Tenant (1)
-              ├── Membership (N)
-              └── TenantModule (N)
-                    └── Business Module (logical)
+Identity
+    │
+    │ (via Membership)
+    ▼
+ Tenant ──────► Membership (1:N)
+    │
+    │ (via TenantModule)
+    ▼
+  Module activation (1:N)
 ```
 
-| Related concept | Relationship |
-|-----------------|--------------|
-| **Membership** | A tenant has many memberships. Each membership links exactly one user to the tenant. |
-| **TenantModule** | A tenant has many module enablements. Each enablement activates one business module for the tenant. |
-| **Business Module data** | All module-specific entities are scoped to the tenant through the module enablement. |
+| Related Entity | Relationship | Contract |
+|---------------|--------------|----------|
+| Membership | Identity's association with Tenant | [MEMBERSHIP.md](./MEMBERSHIP.md) |
+| TenantModule | Module enabled for this Tenant | [TENANT_MODULE.md](./TENANT_MODULE.md) |
+| Module | Business capability catalog | [MODULE.md](./MODULE.md) |
 
-A user may belong to multiple tenants simultaneously through separate memberships. Each membership is independent.
+---
+
+## Attributes (Business)
+
+| Attribute | Description |
+|-----------|-------------|
+| Identifier | Stable, unique platform identifier |
+| Name | Human-readable business name |
+| Slug | URL-safe unique identifier for routing and display |
+| Status | Operational state (e.g., active, suspended, archived) |
+| Created at | Point in time Tenant was provisioned |
+
+Additional attributes may be added without changing isolation semantics.
+
+---
 
 ## Lifecycle
 
 ### Creation
 
-1. A user initiates tenant creation and becomes the initial owner through an automatically created membership.
-2. The platform assigns a unique identity and records the tenant's display name.
-3. At least one business module is enabled for the new tenant (see TenantModule contract).
+1. An authenticated Identity initiates Tenant creation.
+2. The platform creates the Tenant record.
+3. The initiating Identity receives an OWNER Membership.
+4. Initial Module activation follows [TenantModule lifecycle](./TENANT_MODULE.md#creation).
 
 ### Active Operation
 
-- Members perform business operations within the tenant according to their roles.
-- The tenant's enabled modules determine which business capabilities are available.
-- Configuration and data accumulate under the tenant's scope.
+- Members operate within the Tenant through their Membership Roles.
+- Enabled Modules determine available business capabilities.
+- All operations are evaluated against Tenant scope.
 
-### Mutation
+### Suspension
 
-- The display name may be updated by authorized members.
-- Module enablement may be changed according to the TenantModule contract.
-- Memberships may be added, updated, or removed according to the Membership contract.
+- A suspended Tenant blocks new business operations.
+- Existing data is retained.
+- Only platform administrators or OWNERs (per policy) may suspend or restore.
 
-### Removal
+### Deletion
 
-- Only an owner may initiate tenant removal.
-- Removal is irreversible and cascades to all memberships, module enablements, and tenant-scoped business data.
+- Requires OWNER authorization (and may require platform administrator confirmation).
+- Cascades to Memberships, TenantModules, and module-specific data.
+- Deletion is irreversible or subject to a defined retention policy.
+
+---
 
 ## Ownership
 
-| Aspect | Owner |
-|--------|-------|
-| Tenant existence | Members with the **owner** role |
-| Tenant configuration | Members with **owner** or **admin** roles (per Membership contract) |
-| Business data within tenant | Governed by role-based permissions within the tenant |
-| Platform-level tenant management | Platform operator |
+| Question | Answer |
+|----------|--------|
+| Who owns a Tenant? | One or more Identities with `Membership.role = OWNER` |
+| Is ownership stored on Tenant? | **No** |
+| Can ownership transfer? | Yes — by granting OWNER to another Identity and optionally revoking the previous OWNER |
+| Can a Tenant have multiple OWNERs? | Yes |
 
-The tenant itself does not own users. Users exist independently and gain access through memberships.
+---
 
-## Access Rules
+## Multi-Tenancy
 
-- Users may access tenant data only for tenants they belong to.
-- Users may perform actions only within the permissions granted by their membership role.
-- Cross-tenant data access is never permitted.
+- One Identity may hold Memberships in **multiple Tenants**.
+- Each Membership is independent — Roles and Permissions do not carry across Tenants.
+- The active Tenant context must be explicit for every operation.
 
-## MVP Decisions
+---
 
-> **MVP Decision:** New tenants automatically enable the Salon business module as the first reference implementation. This is a product default, not a permanent platform rule. Future tenants may choose or be assigned a different initial module.
+## Related Contracts
 
-> **MVP Decision:** Only one business module may be active per tenant during the initial release. The data model supports multiple modules, but multi-module operation is deferred.
+- [MEMBERSHIP.md](./MEMBERSHIP.md) — User access and ownership
+- [TENANT_MODULE.md](./TENANT_MODULE.md) — Module activation
+- [MODULE.md](./MODULE.md) — Available business modules
+- [IDENTITY.md](./IDENTITY.md) — External identity reference

@@ -1,121 +1,138 @@
 # Membership Contract
 
+## Definition
+
+A **Membership** links an **Identity** to a **Tenant** and assigns a **Role** within that Tenant.
+
+It is the sole mechanism by which an Identity gains access to Tenant resources.
+
+---
+
 ## Responsibility
 
-A **Membership** represents a user's association with a tenant, including the role that defines what the user may do within that tenant.
+- Establish which Identities belong to which Tenants
+- Assign Role-based access within a Tenant
+- Express Tenant ownership (via `role = OWNER`)
+- Support multi-Tenant participation for a single Identity
 
-Membership is the mechanism for:
-
-- Granting users access to a tenant's data and operations
-- Assigning role-based authority within a tenant
-- Supporting users who belong to multiple tenants with different roles in each
-
-A user's platform identity is separate from their tenant memberships. Roles and permissions are always evaluated in the context of a specific tenant.
+---
 
 ## Invariants
 
-1. **One membership per user per tenant**
-   - A user may have at most one membership in any given tenant.
-   - Duplicate memberships for the same user and tenant are not permitted.
+1. **Membership is the only path to Tenant access**
+   - No Identity may access Tenant data or Module operations without an active Membership.
 
-2. **Role is required**
-   - Every membership must have exactly one role assigned.
-   - A membership without a role is invalid.
+2. **One Membership per (Identity, Tenant) pair**
+   - An Identity cannot hold duplicate Memberships in the same Tenant.
+   - Role changes update the existing Membership; they do not create a second record.
 
-3. **Role belongs to membership, not user**
-   - A user's role is determined by their membership in a specific tenant.
-   - A user may hold different roles in different tenants.
+3. **Role is always Tenant-scoped**
+   - A Role assigned in Tenant A has no effect in Tenant B.
+   - Roles are never stored on Identity or Tenant directly.
 
-4. **Valid tenant reference**
-   - Every membership must reference an existing tenant.
-   - A membership cannot exist without a tenant.
+4. **Every Tenant must have at least one OWNER Membership**
+   - At Tenant creation, the creator receives OWNER Membership.
+   - Removing the last OWNER Membership is forbidden.
 
-5. **Valid user reference**
-   - Every membership must reference an existing platform user.
-   - A membership cannot exist without a user.
+5. **Membership status gates access**
+   - Only active Memberships grant access.
+   - Suspended or revoked Memberships deny access regardless of Role.
 
-6. **At least one owner per tenant**
-   - A tenant must always retain at least one member with the owner role.
-   - The last owner of a tenant cannot be removed or demoted without transferring ownership first.
+6. **Membership does not imply Module access by itself**
+   - Module availability is determined by [TenantModule](./TENANT_MODULE.md).
+   - Role and Permissions determine what operations are allowed within enabled Modules.
 
-7. **Tenant-scoped authority**
-   - A membership grants authority only within its tenant.
-   - Membership in tenant A grants no access to tenant B.
-
-## Roles
-
-Membership roles define the level of authority within a tenant:
-
-| Role | Authority |
-|------|-----------|
-| **Owner** | Full control over the tenant, including deletion, member management, and module configuration |
-| **Admin** | Administrative access to tenant settings, members, and business data |
-| **Manager** | Operational management of business activities within enabled modules |
-| **Staff** | Limited access to assigned resources and day-to-day operations |
-| **Customer** | Read-only or self-service access to public or personal data |
-
-Roles are assigned at the tenant level. The same user may be an owner in one tenant and staff in another.
+---
 
 ## Relationships
 
 ```
-User (1)
-  └── Membership (N, one per tenant)
-        └── Tenant (1)
+Identity ──────► Membership ◄────── Tenant
+                      │
+                      ▼
+                    Role
+                      │
+                      ▼
+               Permissions (via RBAC)
 ```
 
-| Related concept | Relationship |
-|-----------------|--------------|
-| **User** | A user may have many memberships across different tenants. |
-| **Tenant** | A tenant has many memberships. Each membership links exactly one user. |
-| **TenantModule** | A member's access to module data is governed by their role and the tenant's enabled modules. |
+| Related Entity | Relationship | Contract |
+|---------------|--------------|----------|
+| Identity | The member | [IDENTITY.md](./IDENTITY.md) |
+| Tenant | The organization | [TENANT.md](./TENANT.md) |
+| Role | Access level within Tenant | [RBAC.md](./RBAC.md) |
+
+---
+
+## Attributes (Business)
+
+| Attribute | Description |
+|-----------|-------------|
+| Identifier | Stable, unique Membership identifier |
+| Identity reference | Opaque identifier from Identity Provider |
+| Tenant reference | Target Tenant |
+| Role | Assigned Role within this Tenant |
+| Status | Active, suspended, or revoked |
+| Invited by | Optional reference to inviting Identity |
+| Joined at | Point in time Membership became active |
+
+---
 
 ## Lifecycle
 
-### Creation
+### Creation — Owner at Tenant Birth
 
-1. A membership is created when a user is invited to or joins a tenant, or when a user creates a new tenant (becoming the initial owner).
-2. The membership is assigned a role at creation time.
-3. The user gains access to the tenant immediately upon membership activation.
+When a Tenant is created, the initiating Identity automatically receives Membership with `role = OWNER`.
 
-### Active Operation
+### Creation — Invitation
 
-- The member operates within the tenant according to their assigned role.
-- Role changes take effect immediately and alter the member's permitted actions.
-- A user may switch between tenants they belong to; each context uses the role from the corresponding membership.
+1. An authorized Identity (typically OWNER or ADMIN) invites a new member.
+2. The invited Identity accepts the invitation.
+3. Membership is created with the assigned Role.
 
-### Mutation
+### Role Change
 
-- An authorized member (owner or admin) may change another member's role.
-- Ownership may be transferred from one member to another.
-- A member's role may be upgraded or downgraded, subject to the owner invariant.
+- An authorized Identity updates the Membership Role.
+- An Identity cannot elevate its own Role unless policy explicitly allows self-service elevation (default: **not allowed**).
+- OWNER Role assignment requires existing OWNER authorization.
 
-### Removal
+### Suspension
 
-- An authorized member (owner or admin) may remove a membership, revoking the user's access to the tenant.
-- A member may leave a tenant voluntarily, unless they are the sole owner.
-- Removing a membership does not delete the user from the platform.
-- Removing a membership does not affect the user's memberships in other tenants.
+- Temporarily blocks access without deleting the Membership record.
+- Suspended members retain their Role but cannot perform operations.
+
+### Revocation
+
+- Permanently removes access.
+- Revoked Memberships are retained for audit or hard-deleted per retention policy.
+- Revoking the last OWNER Membership is forbidden.
+
+---
 
 ## Ownership
 
-| Aspect | Owner |
-|--------|-------|
-| Membership creation | Owners and admins of the tenant |
-| Role assignment | Owners and admins of the tenant |
-| Membership removal | Owners and admins of the tenant; members may remove themselves |
-| Ownership transfer | Current owner only |
+**Tenant ownership is defined exclusively through Membership.**
 
-A membership does not own business data. It grants the user permission to interact with tenant-scoped data according to their role.
+| Rule | Detail |
+|------|--------|
+| How is an Owner expressed? | `Membership.role = OWNER` |
+| Where is ownership stored? | On Membership — never on Tenant |
+| Minimum Owners | At least one active OWNER per Tenant at all times |
+| Ownership transfer | Grant OWNER to target Identity; optionally revoke from source |
 
-## Access Rules
+---
 
-- Users may access data only for tenants where they hold an active membership.
-- Users may perform actions only within the permissions of their role in the active tenant context.
-- Permission evaluation always requires both a valid membership and a matching role.
+## Multi-Tenant Membership
 
-## MVP Decisions
+- A single Identity may hold active Memberships in multiple Tenants simultaneously.
+- Each Membership is evaluated independently.
+- The platform must require explicit Tenant context selection before operations.
 
-> **MVP Decision:** Permission granularity is role-based only. Fine-grained per-resource permissions are deferred to a future release.
+---
 
-> **MVP Decision:** User invitation flows are limited to email-based invitations. Additional invitation channels are deferred.
+## Related Contracts
+
+- [TENANT.md](./TENANT.md) — Organizational context
+- [IDENTITY.md](./IDENTITY.md) — External identity
+- [RBAC.md](./RBAC.md) — Role definitions and hierarchy
+- [PERMISSION.md](./PERMISSION.md) — Fine-grained grants

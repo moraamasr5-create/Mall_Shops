@@ -1,129 +1,198 @@
 # Module System
 
-This document describes how business modules integrate with the platform. It is an architectural guide — not a business contract.
+## Definition
 
-For module enablement rules, see [TenantModule Contract](../contracts/TENANT_MODULE.md).
+The **Module System** is the architectural pattern that allows Mall Shops to support multiple independent business domains within a single platform.
 
-## Purpose
+Each Module is a **vertical slice** — complete business capability from authorization through data — that plugs into the Core platform.
 
-Mall Shops is a **multi-tenant, multi-module SaaS platform**. Business modules provide domain-specific capabilities (scheduling, ordering, inventory, etc.) while the platform core handles cross-cutting concerns (identity, tenancy, access control).
+---
 
-The platform is designed so that:
+## Design Goals
 
-- New modules can be added without changing core contracts
-- Modules never depend on each other
-- Each tenant enables only the modules it needs
-- The first module (Salon) serves as a reference implementation, not a platform assumption
+1. **Independence** — Modules never import from each other
+2. **Consistency** — Every Module follows the same structural pattern
+3. **Isolation** — Module data is Tenant-scoped and Module-namespaced
+4. **Extensibility** — New Modules are added without modifying Core
+5. **Replaceability** — A Module can be deprecated or retired without affecting others
 
-## Module Types
+---
 
-| Module | Status | Domain |
-|--------|--------|--------|
-| Salon | Reference implementation (MVP) | Appointment-based service businesses |
-| Restaurant | Planned | Food service |
-| Clinic | Planned | Healthcare |
-| Gym | Planned | Fitness |
-| Pharmacy | Planned | Pharmaceutical retail |
-| Store | Planned | General retail |
+## Module vs Core Boundary
 
-## Platform vs. Module Responsibilities
+| Concern | Owner |
+|---------|-------|
+| Who is the user? | Core (Identity) |
+| Which Tenant? | Core (Tenant + Membership) |
+| Is Module X enabled? | Core (TenantModule) |
+| What Role does the user have? | Core (RBAC) |
+| May this user perform action Y? | Core (Permissions) |
+| What is an Appointment / Order / Treatment? | **Module** |
+| Business rules for scheduling, ordering, etc. | **Module** |
+| Module-specific data and configuration | **Module** |
 
-### Platform Core (not a module)
+---
 
-Handles concerns shared by all tenants and all modules:
+## Module Structure (Logical)
 
-- User authentication and identity
-- Tenant management
-- Membership and role-based access
-- Module enablement (TenantModule)
-- Cross-cutting validation and error handling
+Each Module is organized as an independent unit:
 
-The platform core has no knowledge of any specific business module.
+```
+Module: {moduleKey}
+├── Domain          Business entities, rules, and services
+├── Application     Use cases and orchestration
+├── Infrastructure  Data access and external adapters
+└── Presentation    API handlers and validation
+```
 
-### Business Modules
+This follows Domain-Driven Design principles (see [ADR-003](../adr/ADR-003-Domain-Driven-Design-Adoption.md)).
 
-Each module is a self-contained domain:
+Physical directory layout and code patterns are implementation concerns — see [DDD_MODULE_PATTERN.md](../implementation/DDD_MODULE_PATTERN.md).
 
-- Defines its own entities, rules, and workflows
-- Manages its own data within the tenant boundary
-- Exposes its own capabilities to authorized tenant members
-- Follows platform contracts for tenancy and access but owns its business logic
+---
 
-## Module Independence Rules
+## Module Registry
 
-1. **No cross-module imports** — a module must not reference types, services, or data from another module.
-2. **No core-to-module imports** — the platform core must not import from any business module.
-3. **Shared abstractions only** — common concepts (time slots, addresses, money) live in a shared layer, not in any module.
-4. **Tenant-scoped data** — all module data belongs to a tenant and is isolated accordingly.
-5. **Independent lifecycle** — enabling, disabling, or removing a module does not affect other modules.
+Architecture recognizes a **Module Registry concept**: the set of Modules the platform can offer.
 
-## Module Activation
+| Example moduleKey | Status | Description |
+|-------------------|--------|-------------|
+| `salon` | MVP — Reference Module | Personal services |
+| `restaurant` | Planned | Hospitality |
+| `clinic` | Planned | Healthcare |
+| `gym` | Planned | Fitness |
+| `pharmacy` | Planned | Retail health |
+| `store` | Planned | General retail |
 
-Module activation is governed by the TenantModule contract:
+**Architecture Lock v1.0 FINAL:** Module is a first-class concept. Storage form is **not** locked.
+
+Implementation may later use a database table, constants, config files, a registry service, or another mechanism. That choice belongs to Vertical Slice implementation — not Architecture.
+
+Availability status is governed by [MVP_DECISIONS.md](../mvp/MVP_DECISIONS.md).
+
+---
+
+## Activation Flow
 
 ```
 Tenant created
-  → Initial module enabled (MVP: Salon)
-  → Module capabilities become available
-  → Module entities can be created and managed
-
-Future: additional modules
-  → Owner enables module via TenantModule
-  → New capabilities appear alongside existing modules
+      │
+      ▼
+TenantModule record(s) created     ◄── Core responsibility
+      │
+      ▼
+Module enabled for Tenant
+      │
+      ▼
+Module initialization (if any)     ◄── Module responsibility
+      │
+      ▼
+Module ready for operations
 ```
 
-### Activation States
+Activation is recorded in Core. Initialization logic lives in the Module.
 
-| State | Meaning |
-|-------|---------|
-| **Enabled** | Module capabilities are active; members can use module features |
-| **Disabled** | Module capabilities are suspended; data is retained but inaccessible |
+---
 
-## Module Structure (Recommended)
+## Data Isolation
 
-Each module should follow a consistent internal structure to support maintainability and team parallelism:
+Every Module follows these data rules:
+
+1. **All tables include Tenant reference** — no Module data exists without Tenant scope
+2. **Table naming uses Module prefix** — e.g., `{moduleKey}_entity_name`
+3. **No cross-Module foreign keys** — Modules do not reference each other's tables
+4. **RLS or equivalent enforces Tenant boundary** — see [RLS.md](../implementation/RLS.md)
 
 ```
-modules/<module-key>/
-├── domain/           # Business logic (framework-independent)
-├── application/      # Use cases and orchestration
-├── infrastructure/   # Persistence and external service adapters
-└── presentation/     # API and request handling
+Tenant A + salon Module
+  └── salon_appointment (tenant_id = A)
+  └── salon_employee   (tenant_id = A)
+
+Tenant A + restaurant Module
+  └── restaurant_order  (tenant_id = A)
+  └── restaurant_table  (tenant_id = A)
 ```
 
-Detailed layering guidance is in [ADR-003: Domain-Driven Design Adoption](../adr/ADR-003-Domain-Driven-Design-Adoption.md).
+---
 
-## Adding a New Module
+## Permission Namespace
 
-1. Define the module's domain entities and business rules.
-2. Register the module key in the platform's approved module list.
-3. Implement the module following the standard structure.
-4. Ensure all module data is tenant-scoped.
-5. Wire module routes into the application router.
-6. No changes to platform core contracts are required.
+Each Module defines Permissions prefixed with its `moduleKey`:
 
-## Reference Implementation: Salon
+```
+{moduleKey}:{resource}:{action}[:{scope}]
+```
 
-Salon is the first module and serves as the pattern for all future modules. It demonstrates:
+Examples of the pattern (not specific to any current Module):
 
-- Tenant-scoped entities (employees, services, appointments)
-- Role-based access within the module
-- Standard module structure and layering
-- Integration with platform core (tenant, membership, module enablement)
+- `{moduleKey}:appointment:read`
+- `{moduleKey}:appointment:write`
+- `{moduleKey}:employee:manage`
 
-Salon-specific details belong in module documentation, not in platform contracts or architecture documents.
+Core evaluates these using the same Permission engine as platform Permissions.
 
-## MVP Decisions
+---
 
-> **MVP Decision:** Salon is the only implemented module. All other module types are registered as valid keys but not yet built.
+## Adding a New Module (Checklist)
 
-> **MVP Decision:** Only one module may be active per tenant. Multi-module tenants are supported by the model but not yet in the product.
+1. **Register** `moduleKey` in the platform Module catalog
+2. **Define** Permission vocabulary for the Module
+3. **Map** Permissions to Core Roles
+4. **Implement** Module vertical slice (domain → application → infrastructure → presentation)
+5. **Add** data schema with Tenant scoping
+6. **Add** isolation policies
+7. **Enable** via TenantModule activation
+8. **Document** Module-specific contracts (future: `docs/contracts/modules/{moduleKey}/`)
 
-> **MVP Decision:** No plugin or dynamic loading system. Modules are compiled into the application as static dependencies.
+Steps 1–3 are design. Steps 4–7 are implementation. Step 8 extends the contract layer.
+
+**No changes to Core are required** beyond catalog registration.
+
+---
+
+## Module Independence Rules
+
+| Rule | Rationale |
+|------|-----------|
+| Modules never import from other Modules | Prevents coupling and deployment dependencies |
+| Modules only import from Core and Shared | Clear dependency direction |
+| Modules do not modify Core entities | Core stability |
+| Modules do not share database tables | Independent schema evolution |
+| Cross-Module workflows use application orchestration | No direct Module-to-Module calls |
+
+---
+
+## Reference Module
+
+The first Module implemented serves as the **reference pattern** for all future Modules.
+
+The reference Module validates:
+
+- Directory structure
+- DDD layer separation
+- Permission registration
+- TenantModule activation flow
+- Data isolation approach
+- Testing strategy
+
+Which Module serves as the reference is an MVP decision — see [MVP_DECISIONS.md](../mvp/MVP_DECISIONS.md).
+
+---
+
+## Deprecation and Retirement
+
+| Stage | Behavior |
+|-------|----------|
+| **Deprecated** | No new activations; existing Tenants continue |
+| **Disabled** | TenantModule set to `enabled = false`; data retained |
+| **Retired** | Module removed from catalog; all activations cleared; data archived or migrated |
+
+---
 
 ## Related Documents
 
-- [TenantModule Contract](../contracts/TENANT_MODULE.md)
-- [Domain Model](./DOMAIN_MODEL.md)
-- [Platform Architecture](./PLATFORM_ARCHITECTURE.md)
-- [ADR-003: Domain-Driven Design Adoption](../adr/ADR-003-Domain-Driven-Design-Adoption.md)
+- [PLATFORM.md](./PLATFORM.md) — Core platform design
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — System overview
+- [MODULE Contract](../contracts/MODULE.md) — Business definition
+- [TENANT_MODULE Contract](../contracts/TENANT_MODULE.md) — Activation mechanism
+- [MVP_DECISIONS.md](../mvp/MVP_DECISIONS.md) — First Module scope

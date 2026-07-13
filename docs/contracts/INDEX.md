@@ -1,50 +1,91 @@
-# Business Contracts
+# Business Contracts — Index
 
-Business contracts are the **permanent source of truth** for the Mall Shops platform. They describe what the platform guarantees at the business level — independent of database, framework, or hosting choices.
+## Purpose
 
-## What Contracts Describe
+This directory is the **single source of truth** for Mall Shops business rules.
 
-Each contract documents:
+Contracts describe **what the platform must guarantee** — not how it is built.
 
-- **Responsibility** — what the concept represents and why it exists
-- **Invariants** — rules that must always hold true
-- **Relationships** — how the concept connects to other concepts
-- **Lifecycle** — creation, operation, mutation, and removal
-- **Ownership** — who controls or is accountable for the concept
+They are:
 
-## What Contracts Do Not Contain
+- Technology-independent (no database, ORM, framework, or cloud provider)
+- Permanent (valid across implementation changes)
+- The authority for all architecture and implementation decisions
 
-Contracts intentionally exclude implementation details. The following belong in separate documentation:
+If implementation conflicts with a contract, **implementation is wrong**.
 
-| Topic | Location |
-|-------|----------|
-| Database schema (Prisma) | [PRISMA_SCHEMA.md](../database/PRISMA_SCHEMA.md) |
-| Migrations | [MIGRATION_PLAN.md](../database/MIGRATION_PLAN.md) |
-| Row-level security policies | [RLS_STRATEGY.md](../security/RLS_STRATEGY.md) |
-| Platform layers and module structure | [PLATFORM_ARCHITECTURE.md](../architecture/PLATFORM_ARCHITECTURE.md) |
-| Domain entity relationships | [DOMAIN_MODEL.md](../architecture/DOMAIN_MODEL.md) |
-| Module activation mechanics | [MODULE_SYSTEM.md](../architecture/MODULE_SYSTEM.md) |
-
-## Contract Index
-
-| Contract | Summary |
-|----------|---------|
-| [TENANT](./TENANT.md) | A business organization that operates on the platform |
-| [MEMBERSHIP](./MEMBERSHIP.md) | A user's association with a tenant, including their role |
-| [TENANT_MODULE](./TENANT_MODULE.md) | The enablement of a business module for a specific tenant |
-
-## Design Principles
-
-1. **Implementation-agnostic** — contracts remain valid if Supabase, Prisma, Next.js, or PostgreSQL are replaced.
-2. **Module-neutral** — contracts describe the platform core; individual business modules (Salon, Restaurant, Clinic, etc.) are extensions, not platform assumptions.
-3. **MVP decisions are explicit** — temporary product choices are labeled **MVP Decision** and are not treated as permanent invariants.
+---
 
 ## Reading Order
 
-For a new contributor:
+Read contracts in this order to build a complete mental model:
 
-1. [TENANT](./TENANT.md) — understand the organizational boundary
-2. [MEMBERSHIP](./MEMBERSHIP.md) — understand who can act within a tenant
-3. [TENANT_MODULE](./TENANT_MODULE.md) — understand which business capabilities a tenant has enabled
+| Order | Contract | Summary |
+|-------|----------|---------|
+| 1 | [IDENTITY.md](./IDENTITY.md) | Who acts on the platform (external Identity Provider) |
+| 2 | [TENANT.md](./TENANT.md) | Organizational context for a business |
+| 3 | [MEMBERSHIP.md](./MEMBERSHIP.md) | Links Identity to Tenant with a Role |
+| 4 | [MODULE.md](./MODULE.md) | Platform-level business module catalog |
+| 5 | [TENANT_MODULE.md](./TENANT_MODULE.md) | Module activation per Tenant |
+| 6 | [RBAC.md](./RBAC.md) | Role-based access within a Tenant |
+| 7 | [PERMISSION.md](./PERMISSION.md) | Fine-grained authorization grants |
 
-Then consult architecture and implementation documents as needed.
+---
+
+## Entity Relationship Overview
+
+```
+Identity Provider
+       │
+       ▼
+   Identity ─────────────────────────────────────┐
+       │                                        │
+       │ (via Membership)                       │
+       ▼                                        │
+    Tenant ◄───────────────────────────────────┘
+       │
+       ├── Membership (1:N) ──► Role
+       │
+       └── TenantModule (1:N) ──► Module
+                                        │
+                                        ▼
+                              Module-Specific Data
+                              (scoped by Tenant)
+```
+
+---
+
+## Core Invariants (Platform-Wide)
+
+These rules span multiple contracts and must never be violated:
+
+1. **No User entity in the application domain** — Identity is external.
+2. **No `owner_id` on Tenant** — Ownership is expressed only via `Membership(role = OWNER)`.
+3. **Core is module-agnostic** — Core knows Tenant, Membership, Module, Identity, and Authorization only.
+4. **Multi-tenant from day one** — One Identity may belong to many Tenants; one Tenant may enable many Modules.
+5. **TenantModule is generic** — It is the platform mechanism for module activation, not a module-specific concept.
+6. **Data isolation is per Tenant** — All business data is scoped to a Tenant.
+7. **Authorization has two layers** — Database Isolation (RLS or equivalent) **and** Business Permissions (Application). Neither alone is sufficient.
+8. **Module storage is not a Contract concern** — Module is a platform concept; persistence form is Implementation.
+
+---
+
+## What Does NOT Belong Here
+
+| Belongs in Contracts | Belongs Elsewhere |
+|---------------------|-------------------|
+| Business rules and invariants | Database schema → [implementation/DATABASE.md](../implementation/DATABASE.md) |
+| Entity definitions and relationships | ORM models → [implementation/PRISMA.md](../implementation/PRISMA.md) |
+| Lifecycle and ownership rules | Auth provider setup → [implementation/SUPABASE.md](../implementation/SUPABASE.md) |
+| Authorization semantics | RLS policies → [implementation/RLS.md](../implementation/RLS.md) |
+| | API design → [implementation/API.md](../implementation/API.md) |
+| | Temporary MVP choices → [mvp/MVP_DECISIONS.md](../mvp/MVP_DECISIONS.md) |
+
+---
+
+## Related Documentation
+
+- [Architecture Overview](../architecture/ARCHITECTURE.md)
+- [Platform Design](../architecture/PLATFORM.md)
+- [Module System](../architecture/MODULE_SYSTEM.md)
+- [MVP Decisions](../mvp/MVP_DECISIONS.md)

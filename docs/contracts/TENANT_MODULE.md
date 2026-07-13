@@ -1,115 +1,171 @@
 # TenantModule Contract
 
+## Definition
+
+A **TenantModule** represents the **activation of a Module for a specific Tenant**.
+
+It is the platform's generic mechanism for:
+
+- Controlling which Modules are active in a Tenant
+- Determining feature availability
+- Scoping module-specific operations to an enabled context
+
+TenantModule is a **Core platform concept**. It is not owned by or specific to any single Module.
+
+---
+
 ## Responsibility
 
-A **TenantModule** represents the enablement of a business module for a specific tenant.
+- Record which Modules are enabled for a given Tenant
+- Gate access to module-specific business capabilities
+- Support Tenants running multiple Modules simultaneously
 
-TenantModule is the mechanism for:
-
-- Controlling which business modules are active for a tenant
-- Determining which business capabilities and features are available
-- Supporting tenants that operate with one or more business domains
-- Isolating module-specific data within the tenant boundary
-
-A business module is a self-contained domain of functionality (for example, appointment scheduling, order management, or inventory tracking). The platform supports multiple module types; each tenant enables the modules relevant to its business.
+---
 
 ## Invariants
 
-1. **One enablement record per module per tenant**
-   - A tenant may have at most one enablement record for any given module type.
-   - Duplicate enablements for the same module are not permitted.
+1. **At most one TenantModule record per (Tenant, Module) pair**
+   - The combination of Tenant and `moduleKey` is unique.
+   - A Tenant cannot have duplicate activation records for the same Module.
 
-2. **Module keys are predefined**
-   - Module types are identified by stable keys determined at platform design time.
-   - Valid module keys include: `salon`, `restaurant`, `clinic`, `gym`, `pharmacy`, `store`, and future additions.
-   - Module keys are immutable once assigned to an enablement record.
+2. **TenantModule always references a valid Tenant**
+   - Every TenantModule belongs to exactly one Tenant.
+   - Orphan TenantModule records are forbidden.
 
-3. **At least one enabled module per tenant**
-   - A tenant must always have at least one module in the enabled state.
-   - Disabling the last enabled module is not permitted.
+3. **TenantModule always references a valid Module**
+   - `moduleKey` must match a Module in the platform catalog.
+   - Unknown `moduleKey` values are rejected.
 
-4. **Enablement is persistent**
-   - Once a module is enabled for a tenant, it remains enabled until explicitly disabled.
-   - Disabling a module suspends its capabilities but does not immediately destroy its data.
+4. **Every Tenant must have at least one enabled TenantModule**
+   - A Tenant with all Modules disabled cannot operate.
+   - Disabling the last enabled Module is forbidden.
 
-5. **Valid tenant reference**
-   - Every module enablement must belong to an existing tenant.
-   - A module enablement cannot exist without a tenant.
+5. **Module enablement is explicit**
+   - A Module is available to a Tenant only when its TenantModule record exists and is enabled.
+   - Implicit or inferred activation is forbidden.
 
-6. **Module data is tenant-scoped**
-   - All data created under a module enablement belongs to the tenant.
-   - Module data is accessible only to members of the tenant, subject to their roles.
+6. **TenantModule does not own business data**
+   - TenantModule is an activation record, not a data container.
+   - Module-specific entities are scoped by Tenant and governed by the activated Module's rules.
+
+---
 
 ## Relationships
 
 ```
 Tenant (1)
-  └── TenantModule (N, one per module type)
-        └── Business Module (logical)
-              └── Module-specific entities (scoped to tenant)
+    │
+    │ (1:N)
+    ▼
+TenantModule
+    │
+    │ references
+    ▼
+Module (platform catalog)
+    │
+    │ governs
+    ▼
+Module-Specific Data (Tenant-scoped)
 ```
 
-| Related concept | Relationship |
-|-----------------|--------------|
-| **Tenant** | A tenant has many module enablements. Each enablement activates one module type. |
-| **Membership** | Members access module data through their tenant membership and role. |
-| **Business Module** | A module type may be enabled across many tenants. Each tenant's enablement is independent. |
+| Related Entity | Relationship | Contract |
+|---------------|--------------|----------|
+| Tenant | Organization enabling the Module | [TENANT.md](./TENANT.md) |
+| Module | Platform capability being activated | [MODULE.md](./MODULE.md) |
+| Membership | Determines who may operate within the Module | [MEMBERSHIP.md](./MEMBERSHIP.md) |
 
-A tenant may enable multiple module types. Each enabled module operates independently within the tenant boundary.
+---
+
+## Attributes (Business)
+
+| Attribute | Description |
+|-----------|-------------|
+| Identifier | Stable, unique TenantModule identifier |
+| Tenant reference | Target Tenant |
+| `moduleKey` | Reference to platform Module |
+| Enabled | Whether the Module is currently active for this Tenant |
+| Activated at | Point in time Module was first enabled |
+| Updated at | Point in time enablement status last changed |
+
+---
 
 ## Lifecycle
 
-### Creation
+### Creation — Initial Activation
 
-1. **Initial module (tenant creation)**
-   - When a tenant is created, the platform enables at least one business module.
-   - The initial module makes the tenant immediately operational.
+When a Tenant is created, the platform enables one or more Modules by creating TenantModule records.
 
-2. **Additional modules**
-   - An authorized member may enable additional module types for the tenant.
-   - Once enabled, the module's capabilities become available to tenant members.
+The specific Modules activated at creation time are governed by [MVP Decisions](../mvp/MVP_DECISIONS.md).
+
+### Creation — Additional Module
+
+1. An authorized Identity requests activation of a Module for a Tenant.
+2. The platform validates the Module exists and is available.
+3. A TenantModule record is created with `enabled = true`.
+4. Module-specific setup (if any) runs within the Module boundary.
 
 ### Active Operation
 
-- Enabled modules provide their business capabilities within the tenant.
-- Module-specific data is created and managed under the tenant's scope.
-- Members interact with enabled modules according to their roles.
+- Enabled Modules are available for business operations within the Tenant.
+- Disabled Modules are not accessible for new operations.
+- Existing data from a disabled Module is retained unless a deactivation policy specifies otherwise.
 
-### Mutation
+### Disable
 
-- **Enable:** An authorized member activates a module type that was previously disabled or not yet enabled.
-- **Disable:** An authorized member deactivates a module, suspending its capabilities. The last enabled module cannot be disabled.
+- Sets `enabled = false` on the TenantModule record.
+- Forbidden if it would leave the Tenant with zero enabled Modules.
+- Does not automatically delete module-specific data.
 
 ### Removal
 
-- Removing a module enablement is a destructive operation that affects the module's data within the tenant.
-- When a tenant is removed, all of its module enablements are removed as a consequence.
+- Explicit deletion of the TenantModule record.
+- Forbidden if it would leave the Tenant with zero enabled Modules.
+- Module-specific data cleanup follows Module deactivation policy.
 
-## Ownership
+### Tenant Deletion
 
-| Aspect | Owner |
-|--------|-------|
-| Module enablement and disablement | Members with **owner** role in the tenant |
-| Module-specific business data | Governed by membership roles within the tenant |
-| Module type definitions | Platform operator |
+- Deleting a Tenant removes all associated TenantModule records.
+- Module-specific data cleanup is cascaded per retention policy.
 
-A TenantModule does not own business entities directly. It represents the availability of a module's capabilities for the tenant. Data ownership flows through membership and role-based access within the tenant.
+---
 
-## Access Rules
+## Authorization
 
-- Users may interact with module data only for tenants they belong to.
-- Users may enable or disable modules only if they hold the owner role in the tenant.
-- Disabled modules must not expose their capabilities to tenant members.
+| Operation | Typical Authorization |
+|-----------|----------------------|
+| View enabled Modules | Any active Member of the Tenant |
+| Enable a Module | OWNER or ADMIN |
+| Disable a Module | OWNER |
+| Remove a Module activation | OWNER |
 
-## MVP Decisions
+Exact authorization is defined in [RBAC.md](./RBAC.md) and [PERMISSION.md](./PERMISSION.md).
 
-> **MVP Decision:** New tenants automatically enable the Salon module as the initial reference implementation. This default applies only during the MVP phase and will be replaced with module selection when additional modules are available.
+---
 
-> **MVP Decision:** Only one module may be active per tenant during the initial release. The platform model supports multiple simultaneous modules, but multi-module operation is not yet exposed in the product.
+## Multi-Module Tenants
 
-> **MVP Decision:** Disabling a module does not archive or delete its data. Data retention policies for disabled modules are deferred to a future release.
+A Tenant may have **multiple Modules enabled simultaneously**.
+
+- Each Module operates within the same Tenant isolation boundary.
+- Modules do not share internal entities.
+- Cross-Module workflows (if ever needed) must be orchestrated at the application layer without violating Module independence.
+
+---
+
+## MVP Decision
+
+> The following applies to the first product release only. It is **not** a permanent platform rule.
+> See [MVP_DECISIONS.md](../mvp/MVP_DECISIONS.md) for the authoritative list.
+
+**MVP Decision:** New Tenants automatically receive activation of the `salon` Module as their initial enabled Module.
+
+**MVP Decision:** Only the `salon` Module is implemented in the first vertical slice. Other Module keys exist in the catalog but are not yet activatable.
+
+---
 
 ## Related Contracts
 
-- [Tenant](./TENANT.md) — organizational context
-- [Membership](./MEMBERSHIP.md) — user access within a tenant
+- [TENANT.md](./TENANT.md) — Organizational context
+- [MODULE.md](./MODULE.md) — Platform Module concept
+- [MEMBERSHIP.md](./MEMBERSHIP.md) — Access within Tenant
+- [RBAC.md](./RBAC.md) — Who may enable or disable Modules
