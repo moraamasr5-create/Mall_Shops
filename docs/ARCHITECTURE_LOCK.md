@@ -127,9 +127,10 @@ Business Contract
 
 ## Next Work
 
-**Vertical Slice 1**
+Architecture is **Proven by Implementation** after Vertical Slices 1–5
+and [ARCHITECTURE_AUDIT_V1.md](./architecture/ARCHITECTURE_AUDIT_V1.md).
 
-`Identity → Tenant → Membership → TenantModule → Salon (Reference Module)`
+Focus: platform features and production readiness via Vertical Slices.
 
 No further documentation expansion unless a critical implementation flaw is discovered.
 
@@ -137,6 +138,7 @@ No further documentation expansion unless a critical implementation flaw is disc
 
 ## Related Documents
 
+- [Architecture Audit v1.0](./architecture/ARCHITECTURE_AUDIT_V1.md)
 - [Contracts Index](./contracts/INDEX.md)
 - [Architecture Overview](./architecture/ARCHITECTURE.md)
 - [MVP Decisions](./mvp/MVP_DECISIONS.md)

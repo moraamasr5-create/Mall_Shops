@@ -107,10 +107,19 @@ Database, ORM, auth provider, and framework are implementation choices documente
 
 | From | May Import | Must Not Import |
 |------|-----------|-----------------|
-| Modules | Core, Shared | Other Modules |
-| Core | Shared | Modules |
-| Shared | — (built-ins only) | Core, Modules |
-| Infrastructure | Core interfaces | Module internals |
+| Presentation (`src/app`) | Core, Modules, Shared | Infrastructure vendor SDKs directly |
+| Modules | Core, Shared, Infrastructure adapters | Other Modules; vendor SDKs (`@prisma/client`, `@supabase/*`) |
+| Core | Shared, Infrastructure adapters | Modules; vendor SDKs directly |
+| Shared | Built-ins only | Core, Modules, Infrastructure |
+| Infrastructure | Shared; optionally Core interfaces | Module internals |
+
+Rules:
+
+- Dependencies point inward/downward only: Presentation → Modules/Core → Infrastructure → Shared.
+- Core never imports Modules (directly or indirectly).
+- Modules never import other Modules. The modules registry is the composition root and may list Module definitions.
+- Vendor SDKs live only under `src/infrastructure`. Core and Modules use thin adapters from that layer.
+- This matrix is proven by implementation — see [ARCHITECTURE_AUDIT_V1.md](./ARCHITECTURE_AUDIT_V1.md).
 
 ---
 

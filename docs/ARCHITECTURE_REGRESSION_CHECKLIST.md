@@ -86,11 +86,15 @@ npm run verify
 This executes:
 
 1. Architecture Regression Checklist automation
-2. Dependency direction checks
-3. Core freeze check
-4. Prisma Generate
-5. Type Check
-6. Test Suite
+2. Dependency direction checks (Core ↛ Modules, Shared purity, no cross-module imports)
+3. Vendor SDK confinement to `src/infrastructure`
+4. Full import-graph cycle detection
+5. Core freeze check
+6. Prisma Generate
+7. Type Check
+8. Test Suite
+
+Full audit baseline: [ARCHITECTURE_AUDIT_V1.md](./architecture/ARCHITECTURE_AUDIT_V1.md).
 
 ## Manual Check Commands
 
@@ -109,6 +113,9 @@ rg -n "salon|restaurant|clinic|gym|pharmacy|store" prisma/schema.prisma -i
 
 # RLS must not encode business roles
 rg -n "role IN|role = 'OWNER'|role = 'ADMIN'|role = 'MANAGER'" supabase docs/implementation/RLS.md docs/security/RLS_STRATEGY.md
+
+# Vendor SDKs only under infrastructure
+rg -n "@prisma/client|@supabase/" src --glob '!src/infrastructure/**'
 ```
 
 Expected result for these checks: no matches, except module-owned schema/model names outside Core when explicitly reviewing module files.

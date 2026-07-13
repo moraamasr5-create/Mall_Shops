@@ -6,11 +6,13 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 ## Status
 
-**Architecture v1.0 FINAL LOCKED / FROZEN**
+**Architecture v1.0 FINAL LOCKED / Proven by Implementation**
 
-Active work: **Vertical Slice 1**
+Completed slices: **VS1–VS5** (Identity → Tenant → Membership → TenantModule → Salon → Restaurant validation).
 
-`Identity → Tenant → Membership → TenantModule → Salon (Reference Module)`
+Active focus: platform features and production readiness via Vertical Slices — not architectural redesign.
+
+Audit: [docs/architecture/ARCHITECTURE_AUDIT_V1.md](./docs/architecture/ARCHITECTURE_AUDIT_V1.md)
 
 ---
 
@@ -19,6 +21,7 @@ Active work: **Vertical Slice 1**
 | Layer | Location |
 |-------|----------|
 | Architecture Lock | [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) |
+| Architecture Audit | [docs/architecture/ARCHITECTURE_AUDIT_V1.md](./docs/architecture/ARCHITECTURE_AUDIT_V1.md) |
 | Contracts | [docs/contracts/INDEX.md](./docs/contracts/INDEX.md) |
 | Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
 | Implementation (VS1) | [docs/implementation/VERTICAL_SLICE_1.md](./docs/implementation/VERTICAL_SLICE_1.md) |

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Draft — implementation layer.** Describes the intended Prisma schema. Not yet implemented in code.
+**Implementation layer.** Describes the Prisma schema used by Vertical Slices 1–5. Schema file: `prisma/schema.prisma`.
 
 ---
 

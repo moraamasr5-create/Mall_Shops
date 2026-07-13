@@ -34,6 +34,8 @@ Each decision is labeled **MVP Decision** and includes:
 
 **Expires when:** Salon vertical slice is complete and a second Module is approved for development.
 
+**Status:** **Superseded by VS5.** `salon` remains the Reference Module and the auto-enabled module for new tenants. `restaurant` is implemented and registry-available for second-module validation; it is not auto-enabled on tenant creation.
+
 ---
 
 ### MVP Decision: Auto-Enable Salon on Tenant Creation

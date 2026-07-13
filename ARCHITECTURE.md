@@ -7,6 +7,7 @@ This file has moved.
 ## Quick Links
 
 - [Architecture Lock v1.0 FINAL](./docs/ARCHITECTURE_LOCK.md) — **FINAL LOCKED**
+- [Architecture Audit v1.0](./docs/architecture/ARCHITECTURE_AUDIT_V1.md) — **Proven by Implementation**
 - [Business Contracts](./docs/contracts/INDEX.md) — source of truth
 - [Platform Design](./docs/architecture/PLATFORM.md)
 - [Module System](./docs/architecture/MODULE_SYSTEM.md)

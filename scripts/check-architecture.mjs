@@ -114,7 +114,15 @@ function resolveInternalImport(fromFile, specifier) {
 function fileArea(file) {
   if (file.startsWith("src/core/")) return "core";
   if (file.startsWith("src/modules/")) return "modules";
+  if (file.startsWith("src/shared/")) return "shared";
+  if (file.startsWith("src/infrastructure/")) return "infrastructure";
+  if (file.startsWith("src/app/")) return "app";
   return "other";
+}
+
+function moduleOwner(file) {
+  const match = file.match(/^src\/modules\/([^/]+)\//);
+  return match ? match[1] : null;
 }
 
 function buildImportGraph(files) {
@@ -135,18 +143,25 @@ function buildImportGraph(files) {
   return graph;
 }
 
-function detectCrossBoundaryCycles(graph) {
+function detectCycles(graph) {
   const visited = new Set();
   const stack = new Set();
   const pathStack = [];
+  const reported = new Set();
 
   function visit(file) {
     if (stack.has(file)) {
       const cycleStart = pathStack.indexOf(file);
       const cycle = pathStack.slice(cycleStart).concat(file);
-      const areas = new Set(cycle.map(fileArea));
-      if (areas.has("core") && areas.has("modules")) {
-        failures.push(`Core/Modules circular dependency: ${cycle.join(" -> ")}`);
+      const key = cycle.join(" -> ");
+      if (!reported.has(key)) {
+        reported.add(key);
+        const areas = new Set(cycle.map(fileArea));
+        if (areas.has("core") && areas.has("modules")) {
+          failures.push(`Core/Modules circular dependency: ${key}`);
+        } else {
+          failures.push(`Circular dependency: ${key}`);
+        }
       }
       return;
     }
@@ -169,6 +184,77 @@ function detectCrossBoundaryCycles(graph) {
 
   for (const file of graph.keys()) {
     visit(file);
+  }
+}
+
+function checkSharedPurity(sharedFiles) {
+  for (const file of sharedFiles) {
+    for (const specifier of extractImportSpecifiers(file)) {
+      const resolved = resolveInternalImport(file, specifier);
+      if (!resolved) {
+        continue;
+      }
+
+      if (
+        resolved.startsWith("src/core/") ||
+        resolved.startsWith("src/modules/") ||
+        resolved.startsWith("src/infrastructure/")
+      ) {
+        failures.push(
+          `Shared purity violation: ${file} imports ${resolved} via "${specifier}"`,
+        );
+      }
+    }
+  }
+}
+
+function checkNoCrossModuleImports(moduleFiles) {
+  for (const file of moduleFiles) {
+    if (file === "src/modules/registry.ts") {
+      continue;
+    }
+
+    const fromModule = moduleOwner(file);
+    if (!fromModule) {
+      continue;
+    }
+
+    for (const specifier of extractImportSpecifiers(file)) {
+      const resolved = resolveInternalImport(file, specifier);
+      if (!resolved?.startsWith("src/modules/")) {
+        continue;
+      }
+
+      if (resolved === "src/modules/registry.ts") {
+        continue;
+      }
+
+      const toModule = moduleOwner(resolved);
+      if (toModule && toModule !== fromModule) {
+        failures.push(
+          `Cross-module dependency: ${file} imports ${resolved} via "${specifier}"`,
+        );
+      }
+    }
+  }
+}
+
+function checkVendorSdkConfinement(srcFiles) {
+  const vendorPattern = /from\s+["'](@prisma\/client|@supabase\/[^"']+)["']/;
+
+  for (const file of srcFiles) {
+    if (file.startsWith("src/infrastructure/")) {
+      continue;
+    }
+
+    const lines = readText(file).split("\n");
+    lines.forEach((line, index) => {
+      if (vendorPattern.test(line)) {
+        failures.push(
+          `Vendor SDK must stay in infrastructure: ${file}:${index + 1}: ${line.trim()}`,
+        );
+      }
+    });
   }
 }
 
@@ -214,6 +300,8 @@ function checkCoreFreeze() {
 const coreFiles = listFiles("src/core", [".ts", ".tsx"]);
 const coreRbacFiles = listFiles("src/core/rbac", [".ts", ".tsx"]);
 const moduleFiles = listFiles("src/modules", [".ts", ".tsx"]);
+const sharedFiles = listFiles("src/shared", [".ts", ".tsx"]);
+const srcFiles = listFiles("src", [".ts", ".tsx"]);
 const rlsFiles = [
   ...listFiles("supabase", [".sql"]),
   "docs/implementation/RLS.md",
@@ -264,7 +352,10 @@ for (const coreModel of ["Tenant", "Membership", "TenantModule"]) {
   }
 }
 
-detectCrossBoundaryCycles(buildImportGraph([...coreFiles, ...moduleFiles]));
+checkSharedPurity(sharedFiles);
+checkNoCrossModuleImports(moduleFiles);
+checkVendorSdkConfinement(srcFiles);
+detectCycles(buildImportGraph(srcFiles));
 checkCoreFreeze();
 
 if (failures.length > 0) {

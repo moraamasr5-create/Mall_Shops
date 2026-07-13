@@ -57,8 +57,8 @@ Architecture recognizes a **Module Registry concept**: the set of Modules the pl
 
 | Example moduleKey | Status | Description |
 |-------------------|--------|-------------|
-| `salon` | MVP — Reference Module | Personal services |
-| `restaurant` | Planned | Hospitality |
+| `salon` | Implemented — Reference Module | Personal services |
+| `restaurant` | Implemented — second-module validation (VS5) | Hospitality |
 | `clinic` | Planned | Healthcare |
 | `gym` | Planned | Fitness |
 | `pharmacy` | Planned | Retail health |

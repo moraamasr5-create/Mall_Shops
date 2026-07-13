@@ -2,27 +2,42 @@
 
 ## Cursor Cloud specific instructions
 
-### Repository state: documentation-only (Phase 0)
+### Repository state: implemented platform (Architecture v1.0 Proven)
 
-This repository currently contains **no application code**. It is a "Phase 0"
-architecture/planning repository consisting entirely of Markdown documents
-(`README.md`, `ARCHITECTURE.md`, and files under `docs/`).
+This repository is a multi-tenant, multi-module Business Operating Platform
+(Next.js + Supabase Auth + Prisma + TypeScript).
 
-As a result, there is:
+Architecture v1.0 is **FINAL LOCKED** and **Proven by Implementation**
+(see `docs/architecture/ARCHITECTURE_AUDIT_V1.md`). Work proceeds via Vertical
+Slices and feature delivery — not architectural redesign.
 
-- **No dependency manifest** (no `package.json`, `requirements.txt`,
-  `pyproject.toml`, `go.mod`, etc.) and **nothing to install**.
-- **No build, lint, or test tooling** wired up, and no build/lint/test commands
-  to run.
-- **No runnable application or services** — the described platform (a Supabase +
-  Prisma + TypeScript modular "Business Operating Platform") has not been
-  implemented yet. Do not attempt to "start a dev server" or "run the app";
-  there is nothing to run.
+### Toolchain
 
-The documents describe the *intended* future stack (Supabase Auth/DB/RLS, Prisma
-ORM, modular TypeScript backend). Those are design intentions, not installed
-dependencies. When code is eventually added, update this section (and add an
-update script via the environment setup) to reflect the real toolchain.
+```bash
+npm install
+npm run verify              # architecture gate + prisma generate + typecheck + tests
+npm run check:architecture  # Core/Modules boundary + freeze + layer rules
+npm run dev                 # Next.js app (requires .env — see .env.example)
+```
 
-Until then, "development" means editing Markdown docs. The only meaningful
-verification is that Markdown files are well-formed and internal links are valid.
+Key paths:
+
+| Area | Path |
+|------|------|
+| Core | `src/core/` |
+| Modules | `src/modules/` |
+| Infrastructure | `src/infrastructure/` |
+| API routes | `src/app/api/` |
+| Prisma schema | `prisma/schema.prisma` |
+| RLS | `supabase/rls.sql` |
+| Architecture Lock | `docs/ARCHITECTURE_LOCK.md` |
+| Architecture Audit | `docs/architecture/ARCHITECTURE_AUDIT_V1.md` |
+
+### Hard rules for agents
+
+- Do **not** import Modules from Core.
+- Do **not** put module-specific permissions or module names in Core.
+- Do **not** import `@prisma/client` or `@supabase/*` outside `src/infrastructure`.
+- Do **not** encode business roles/permissions in RLS (tenant isolation only).
+- Prefer extending Modules over changing Core. Core changes require Architecture Review
+  and `ARCH_ALLOW_CORE_CHANGES=true` for the architecture gate.
