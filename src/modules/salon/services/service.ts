@@ -12,6 +12,14 @@ export const createSalonServiceInputSchema = z.object({
 
 export type CreateSalonServiceInput = z.infer<typeof createSalonServiceInputSchema>;
 
+export const updateSalonServiceInputSchema = createSalonServiceInputSchema
+  .partial()
+  .refine((input) => Object.keys(input).length > 0, {
+    message: "At least one field must be provided",
+  });
+
+export type UpdateSalonServiceInput = z.infer<typeof updateSalonServiceInputSchema>;
+
 export async function listSalonServices(tenantId: string) {
   return prisma.salonService.findMany({
     where: { tenantId, active: true },
@@ -41,4 +49,32 @@ export async function getSalonService(tenantId: string, serviceId: string) {
     throw new AppError("NOT_FOUND", "Salon service not found", 404);
   }
   return service;
+}
+
+export async function updateSalonService(
+  tenantId: string,
+  serviceId: string,
+  input: UpdateSalonServiceInput
+) {
+  await getSalonService(tenantId, serviceId);
+
+  return prisma.salonService.update({
+    where: { id: serviceId },
+    data: {
+      ...(input.name !== undefined ? { name: input.name } : {}),
+      ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.durationMin !== undefined ? { durationMin: input.durationMin } : {}),
+      ...(input.priceCents !== undefined ? { priceCents: input.priceCents } : {}),
+      ...(input.currency !== undefined ? { currency: input.currency.toUpperCase() } : {}),
+    },
+  });
+}
+
+export async function deactivateSalonService(tenantId: string, serviceId: string) {
+  await getSalonService(tenantId, serviceId);
+
+  return prisma.salonService.update({
+    where: { id: serviceId },
+    data: { active: false },
+  });
 }

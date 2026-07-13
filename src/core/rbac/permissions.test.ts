@@ -13,7 +13,7 @@ describe("RBAC explicit mapping", () => {
   });
 
   it("does not grant unknown module permissions from Core", () => {
-    expect(roleHasPermission("OWNER", "example:resource:read")).toBe(false);
+    expect(roleHasPermission("OWNER", "unknown-permission")).toBe(false);
   });
 });
 
