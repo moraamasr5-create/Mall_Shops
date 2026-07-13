@@ -2,198 +2,114 @@
 
 ## Responsibility
 
-A TenantModule represents **the enablement of a business module for a specific tenant**.
+A **TenantModule** represents the enablement of a business module for a specific tenant.
 
 TenantModule is the mechanism for:
-- Controlling which modules are active in a tenant
-- Determining feature availability
-- Supporting future multi-module tenants
-- Isolating module-specific data per tenant
+
+- Controlling which business modules are active for a tenant
+- Determining which business capabilities and features are available
+- Supporting tenants that operate with one or more business domains
+- Isolating module-specific data within the tenant boundary
+
+A business module is a self-contained domain of functionality (for example, appointment scheduling, order management, or inventory tracking). The platform supports multiple module types; each tenant enables the modules relevant to its business.
 
 ## Invariants
 
-1. **One module enabled at most once per tenant**
-   - Composite unique constraint on `(tenantId, moduleKey)`
-   - A tenant cannot have two rows for the same module
+1. **One enablement record per module per tenant**
+   - A tenant may have at most one enablement record for any given module type.
+   - Duplicate enablements for the same module are not permitted.
 
-2. **Module keys are predefined and immutable**
-   - Valid keys: "salon", "restaurant", "clinic", "gym"
-   - Keys are determined at platform design time
-   - New modules require application code change
+2. **Module keys are predefined**
+   - Module types are identified by stable keys determined at platform design time.
+   - Valid module keys include: `salon`, `restaurant`, `clinic`, `gym`, `pharmacy`, `store`, and future additions.
+   - Module keys are immutable once assigned to an enablement record.
 
-3. **Every tenant must have at least one enabled module**
-   - A tenant with all modules disabled cannot perform business operations
-   - Application logic must prevent disabling the last module
+3. **At least one enabled module per tenant**
+   - A tenant must always have at least one module in the enabled state.
+   - Disabling the last enabled module is not permitted.
 
-4. **Module enablement is persistent**
-   - Once enabled, a module remains enabled until explicitly toggled
-   - `enabled` flag can be true or false
-   - Future: Disabling a module should archive its data (not implemented)
+4. **Enablement is persistent**
+   - Once a module is enabled for a tenant, it remains enabled until explicitly disabled.
+   - Disabling a module suspends its capabilities but does not immediately destroy its data.
 
-5. **TenantModule never exists without a Tenant**
-   - `tenantId` is always valid and references an existing Tenant
-   - Enforced by Prisma foreign key constraint with onDelete: Cascade
+5. **Valid tenant reference**
+   - Every module enablement must belong to an existing tenant.
+   - A module enablement cannot exist without a tenant.
+
+6. **Module data is tenant-scoped**
+   - All data created under a module enablement belongs to the tenant.
+   - Module data is accessible only to members of the tenant, subject to their roles.
 
 ## Relationships
 
 ```
 Tenant (1)
-    ↓
-TenantModule (1:N)
-    ↓
-Module (logical)
-    ↓
-Module-Specific Tables (salon_employees, salon_services, etc.)
+  └── TenantModule (N, one per module type)
+        └── Business Module (logical)
+              └── Module-specific entities (scoped to tenant)
 ```
 
-**Key relationship constraints:**
-- One tenant can have many modules (1:N)
-- One module type can be enabled in many tenants (N:N at business level, but 1:1 in data model)
-- Deletion of a Tenant cascades to delete all its TenantModules
-- Deletion of a TenantModule should trigger cleanup of module-specific data (future: implement with caution)
+| Related concept | Relationship |
+|-----------------|--------------|
+| **Tenant** | A tenant has many module enablements. Each enablement activates one module type. |
+| **Membership** | Members access module data through their tenant membership and role. |
+| **Business Module** | A module type may be enabled across many tenants. Each tenant's enablement is independent. |
 
-## Ownership
-
-**A TenantModule does not "own" anything.** It represents:
-- The availability of a module for a tenant
-- The operational scope of the module
-
-**Ownership of module data is determined by Membership and RLS:**
-
-```
-Membership(userId=X, tenantId=Y, role=Z)
-    ↓
-User X with role Z has access to module M in Tenant Y
-    ↓
-Module M's data is isolated by tenantId
-```
+A tenant may enable multiple module types. Each enabled module operates independently within the tenant boundary.
 
 ## Lifecycle
 
 ### Creation
 
-1. **First Module (Tenant Creation)**
-   - When user creates a tenant via `createTenant()`, system auto-creates `TenantModule(tenantId, moduleKey="salon", enabled=true)`
-   - Module is immediately available
+1. **Initial module (tenant creation)**
+   - When a tenant is created, the platform enables at least one business module.
+   - The initial module makes the tenant immediately operational.
 
-2. **Additional Modules (Future)**
-   - When admin enables a new module for a tenant, system creates `TenantModule(tenantId, moduleKey=MODULE, enabled=true)`
-   - Module becomes immediately available
-   - *Multi-module support not implemented in MVP*
+2. **Additional modules**
+   - An authorized member may enable additional module types for the tenant.
+   - Once enabled, the module's capabilities become available to tenant members.
 
 ### Active Operation
 
-- Module remains enabled until toggled
-- Module-specific tables are isolated by `tenant_id`
-- All module operations are RLS-protected
+- Enabled modules provide their business capabilities within the tenant.
+- Module-specific data is created and managed under the tenant's scope.
+- Members interact with enabled modules according to their roles.
 
-### Mutation (Future)
+### Mutation
 
-- **Enable module**: `UPDATE tenant_module SET enabled = true WHERE tenant_id = Y AND module_key = M`
-- **Disable module**: `UPDATE tenant_module SET enabled = false WHERE tenant_id = Y AND module_key = M`
-  - Invariant: Cannot disable if it's the last enabled module
+- **Enable:** An authorized member activates a module type that was previously disabled or not yet enabled.
+- **Disable:** An authorized member deactivates a module, suspending its capabilities. The last enabled module cannot be disabled.
 
-### Deletion (Future)
+### Removal
 
-- Explicit removal: `DELETE tenant_module WHERE tenant_id = Y AND module_key = M`
-- Cascading: When tenant is deleted, all TenantModules cascade
-- Data cleanup: Module-specific tables must be cleaned (implement with caution)
+- Removing a module enablement is a destructive operation that affects the module's data within the tenant.
+- When a tenant is removed, all of its module enablements are removed as a consequence.
 
----
+## Ownership
 
-## Prisma Schema
+| Aspect | Owner |
+|--------|-------|
+| Module enablement and disablement | Members with **owner** role in the tenant |
+| Module-specific business data | Governed by membership roles within the tenant |
+| Module type definitions | Platform operator |
 
-```prisma
-model TenantModule {
-  id                String    @id @default(cuid())
-  tenantId          String
-  moduleKey         String    // "salon", "restaurant", "clinic", "gym"
-  enabled           Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  // One module per tenant
-  @@unique([tenantId, moduleKey])
-  
-  // Foreign key to Tenant (enforced)
-  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-}
-```
+A TenantModule does not own business entities directly. It represents the availability of a module's capabilities for the tenant. Data ownership flows through membership and role-based access within the tenant.
 
----
+## Access Rules
 
-## Invariant Enforcement
+- Users may interact with module data only for tenants they belong to.
+- Users may enable or disable modules only if they hold the owner role in the tenant.
+- Disabled modules must not expose their capabilities to tenant members.
 
-| Invariant | Enforced By |
-|-----------|------------|
-| One module instance per tenant | Database unique constraint |
-| TenantModule always references valid tenant | Prisma foreign key + database constraint |
-| Module key is valid | Application validation (must be in approved list) |
-| At least one enabled module | Application logic (check before disable) |
-| Immutable module key | Not enforced (future: design pattern) |
+## MVP Decisions
 
----
+> **MVP Decision:** New tenants automatically enable the Salon module as the initial reference implementation. This default applies only during the MVP phase and will be replaced with module selection when additional modules are available.
 
-## Supabase RLS Policies
+> **MVP Decision:** Only one module may be active per tenant during the initial release. The platform model supports multiple simultaneous modules, but multi-module operation is not yet exposed in the product.
 
-```sql
--- TenantModules table: Users can see modules of their tenants
-CREATE POLICY "users_see_tenant_modules"
-  ON public.tenant_module
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.membership
-      WHERE membership.tenant_id = tenant_module.tenant_id
-        AND membership.user_id = auth.uid()
-    )
-  );
-
--- TenantModules table: Only tenant OWNERs can enable/disable modules
-CREATE POLICY "owners_manage_modules"
-  ON public.tenant_module
-  FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.membership
-      WHERE membership.tenant_id = tenant_module.tenant_id
-        AND membership.user_id = auth.uid()
-        AND membership.role = 'OWNER'
-    )
-  );
-```
-
----
-
-## Module-Specific Data Isolation
-
-All module-specific tables must include `tenant_id` and have RLS policies:
-
-```sql
--- Example: Salon Employees table
-CREATE TABLE salon_employee (
-  id TEXT PRIMARY KEY,
-  tenant_id TEXT NOT NULL REFERENCES public.tenant(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  ...
-);
-
--- RLS: Users can see employees only in their tenants
-CREATE POLICY "users_see_tenant_employees"
-  ON public.salon_employee
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.membership
-      WHERE membership.tenant_id = salon_employee.tenant_id
-        AND membership.user_id = auth.uid()
-    )
-  );
-```
-
----
+> **MVP Decision:** Disabling a module does not archive or delete its data. Data retention policies for disabled modules are deferred to a future release.
 
 ## Related Contracts
 
-- [Tenant](./TENANT.md) — Organizational context
-- [Membership](./MEMBERSHIP.md) — User access to modules
+- [Tenant](./TENANT.md) — organizational context
+- [Membership](./MEMBERSHIP.md) — user access within a tenant
