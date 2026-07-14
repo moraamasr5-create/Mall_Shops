@@ -184,8 +184,28 @@ function gitOutput(command) {
   }
 }
 
+function isGitRepository() {
+  return gitOutput("git rev-parse --is-inside-work-tree") === "true";
+}
+
 function checkCoreFreeze() {
   if (process.env.ARCH_ALLOW_CORE_CHANGES === "true") {
+    return;
+  }
+
+  if (process.env.ARCH_SKIP_CORE_FREEZE === "true") {
+    console.error(
+      "WARNING: ARCH_SKIP_CORE_FREEZE=true — Core freeze check skipped by explicit exemption.",
+    );
+    return;
+  }
+
+  // Fail closed: Core freeze is meaningless without Git history.
+  if (!isGitRepository()) {
+    failures.push(
+      "Core freeze check requires a Git repository. " +
+        "Initialize Git, or set ARCH_SKIP_CORE_FREEZE=true only for an explicit exemption.",
+    );
     return;
   }
 
@@ -199,6 +219,10 @@ function checkCoreFreeze() {
   const baseRef = process.env.ARCH_CHECK_BASE_REF ?? "origin/main";
   const hasBaseRef = gitOutput(`git rev-parse --verify ${baseRef}`);
   if (!hasBaseRef) {
+    failures.push(
+      `Core freeze check requires base ref '${baseRef}'. ` +
+        `Fetch the base branch, set ARCH_CHECK_BASE_REF, or set ARCH_SKIP_CORE_FREEZE=true only for an explicit exemption.`,
+    );
     return;
   }
 

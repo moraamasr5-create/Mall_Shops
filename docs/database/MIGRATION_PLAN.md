@@ -12,26 +12,36 @@ Migrations are applied incrementally, aligned with development phases. Each migr
 - **Idempotent** in production (applied once via Prisma migrate)
 - **Contract-aligned** — every table maps to a business contract or module entity
 
-## Migration Phases
+## Current VS1 Migration
+
+VS1 ships a single reproducible migration:
+
+| Migration | Contents |
+|-----------|----------|
+| `20260714120000_vs1_init` | Core tables + Salon/Restaurant validation tables + RLS (`FORCE`) + grants |
+
+Apply with `npx prisma migrate deploy`. Do not maintain a parallel standalone `rls.sql`.
+
+## Migration Phases (historical plan → VS1 mapping)
 
 ### Phase 0: Core Platform Tables
 
 **Goal:** Establish tenant, membership, and module enablement.
 
-| Migration | Tables | Contract |
-|-----------|--------|----------|
-| `001_create_tenant` | `tenant` | [Tenant](../contracts/TENANT.md) |
-| `002_create_membership` | `membership` | [Membership](../contracts/MEMBERSHIP.md) |
-| `003_create_tenant_module` | `tenant_module` | [TenantModule](../contracts/TENANT_MODULE.md) |
+| Planned name | Tables | Contract | VS1 reality |
+|--------------|--------|----------|-------------|
+| `001_create_tenant` | `tenant` | [Tenant](../contracts/TENANT.md) | Included in `vs1_init` |
+| `002_create_membership` | `membership` | [Membership](../contracts/MEMBERSHIP.md) | Included in `vs1_init` |
+| `003_create_tenant_module` | `tenant_module` | [TenantModule](../contracts/TENANT_MODULE.md) | Included in `vs1_init` |
 
-**Steps:**
+**Steps (contract-aligned):**
 
-1. Create `tenant` table with `id`, `name`, timestamps.
-2. Create `membership` table with `userId`, `tenantId`, `role`, unique constraint on `(userId, tenantId)`.
-3. Create `tenant_module` table with `tenantId`, `moduleKey`, `enabled`, unique constraint on `(tenantId, moduleKey)`.
-4. Add foreign keys: `membership.tenantId → tenant.id`, `tenant_module.tenantId → tenant.id` (both `ON DELETE CASCADE`).
-5. Enable RLS on all three tables.
-6. Apply core RLS policies from [RLS_STRATEGY.md](../security/RLS_STRATEGY.md).
+1. Create `tenant` table with `id`, `name`, `slug`, `status`, timestamps. **No `owner_id`.**
+2. Create `membership` table with `identity_id`, `tenant_id`, `role`, unique constraint on `(identity_id, tenant_id)`.
+3. Create `tenant_module` table with `tenant_id`, `module_key`, `enabled`, unique constraint on `(tenant_id, module_key)`.
+4. Add foreign keys: `membership.tenant_id → tenant.id`, `tenant_module.tenant_id → tenant.id` (both `ON DELETE CASCADE`).
+5. Enable + FORCE RLS on all business tables in the same migration.
+6. Apply tenant-isolation policies from [RLS_STRATEGY.md](../security/RLS_STRATEGY.md) / [RLS.md](../implementation/RLS.md).
 
 **Seed data (development only):**
 

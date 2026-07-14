@@ -2,7 +2,7 @@
 
 ## Status
 
-**Draft — implementation layer.** RLS policies enforce Tenant isolation at the database level as **Authorization Layer 1**.
+**Active — VS1 Runnable.** Layer 1 RLS policies live in Prisma migrations and are enforced on the user-facing Prisma path via `withIdentityRls`.
 
 Authorization semantics for business operations are defined in [RBAC](../contracts/RBAC.md) and [PERMISSION](../contracts/PERMISSION.md) as **Authorization Layer 2**.
 

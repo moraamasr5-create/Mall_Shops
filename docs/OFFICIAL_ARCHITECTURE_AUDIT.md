@@ -7,7 +7,8 @@
 | Field | Value |
 |-------|-------|
 | Architecture version | v1.0 FINAL LOCKED |
-| Audit date | 2026-07-14 |
+| Audit date | 2026-07-15 |
+| Full compliance audit | ~96% Lock-weighted (see §13) |
 | Reopen Architecture? | Not warranted by current state |
 
 ---
@@ -216,6 +217,29 @@ These concerns are tracked independently.
 **Redesign: NOT REQUIRED**
 
 **Delivery Strategy:** Vertical Slices → Continuous Verification → Implementation Hardening → Production Readiness
+
+---
+
+## 13. Full Compliance Audit Snapshot (2026-07-15)
+
+Lock-weighted score: **~96%**.
+
+| Band | Finding |
+|------|---------|
+| RED | No hard Architecture Lock violations in executable code |
+| ORANGE | Privileged DB limited to `createTenant`; remaining ops hardening = non-BYPASSRLS login |
+| YELLOW | Thin DDD (Route → Service → Prisma); Membership last-OWNER revoke rules incomplete |
+| GREEN | JWT Identity-only, two-layer auth on user path, Core independence, module isolation, no User/`owner_id`/BusinessUnit |
+
+**Before claiming full “Architecture Compliant” (operational bar):**
+
+1. Core freeze gate fail-closed without Git/base ref — **done** (`check-architecture.mjs`)
+2. Lock-contradicting docs aligned (`DOMAIN_MODEL`, `PRISMA_SCHEMA`, `MIGRATION_PLAN`, `PLATFORM_ARCHITECTURE`) — **done**
+3. Cross-tenant penetration evidence on live Supabase
+4. Prefer non-superuser app DB role that can only `SET ROLE authenticated`
+5. Membership last-OWNER protection when revoke/delete membership is implemented
+
+VS1 Architecture Freeze commits already on history: Lock finalize + VS1 storage choices recorded. Branch `cursor/vs1-runnable-rls-bootstrap` is the runnable Layer-1 enforcement slice (Core Security Improvement), not an architecture redesign.
 
 ---
 
