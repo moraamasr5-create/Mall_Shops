@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 
 export const createSalonEmployeeInputSchema = z.object({
@@ -20,7 +20,7 @@ export const updateSalonEmployeeInputSchema = createSalonEmployeeInputSchema
 export type UpdateSalonEmployeeInput = z.infer<typeof updateSalonEmployeeInputSchema>;
 
 export async function listSalonEmployees(tenantId: string) {
-  return prisma.salonEmployee.findMany({
+  return getDb().salonEmployee.findMany({
     where: { tenantId, active: true },
     orderBy: { createdAt: "asc" },
   });
@@ -30,7 +30,7 @@ export async function createSalonEmployee(
   tenantId: string,
   input: CreateSalonEmployeeInput
 ) {
-  return prisma.salonEmployee.create({
+  return getDb().salonEmployee.create({
     data: {
       tenantId,
       name: input.name,
@@ -43,7 +43,7 @@ export async function createSalonEmployee(
 }
 
 export async function getSalonEmployee(tenantId: string, employeeId: string) {
-  const employee = await prisma.salonEmployee.findFirst({
+  const employee = await getDb().salonEmployee.findFirst({
     where: { id: employeeId, tenantId },
   });
 
@@ -61,7 +61,7 @@ export async function updateSalonEmployee(
 ) {
   await getSalonEmployee(tenantId, employeeId);
 
-  return prisma.salonEmployee.update({
+  return getDb().salonEmployee.update({
     where: { id: employeeId },
     data: {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -75,7 +75,7 @@ export async function updateSalonEmployee(
 export async function deactivateSalonEmployee(tenantId: string, employeeId: string) {
   await getSalonEmployee(tenantId, employeeId);
 
-  return prisma.salonEmployee.update({
+  return getDb().salonEmployee.update({
     where: { id: employeeId },
     data: { active: false },
   });

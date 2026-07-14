@@ -3,6 +3,7 @@ import {
   requireEnabledModule,
   requirePermission,
   requireTenantContext,
+  withAuthenticatedDb,
 } from "@/core/http/request-context";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
@@ -16,20 +17,17 @@ import { SALON_PERMISSIONS, SALON_ROLE_PERMISSIONS } from "@/modules/salon/permi
 
 type Params = { params: Promise<{ customerId: string }> };
 
-async function requireSalonModule(req: NextRequest) {
-  const ctx = await requireTenantContext(req);
-  await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
-  return ctx;
-}
-
 export async function GET(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireSalonModule(req);
-    requirePermission(ctx, SALON_PERMISSIONS.customerRead, [SALON_ROLE_PERMISSIONS]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+      requirePermission(ctx, SALON_PERMISSIONS.customerRead, [SALON_ROLE_PERMISSIONS]);
 
-    const { customerId } = await params;
-    const customer = await getSalonCustomer(ctx.tenant.tenantId, customerId);
-    return jsonOk(customer);
+      const { customerId } = await params;
+      const customer = await getSalonCustomer(ctx.tenant.tenantId, customerId);
+      return jsonOk(customer);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -37,13 +35,16 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireSalonModule(req);
-    requirePermission(ctx, SALON_PERMISSIONS.customerWrite, [SALON_ROLE_PERMISSIONS]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+      requirePermission(ctx, SALON_PERMISSIONS.customerWrite, [SALON_ROLE_PERMISSIONS]);
 
-    const { customerId } = await params;
-    const body = updateSalonCustomerInputSchema.parse(await req.json());
-    const customer = await updateSalonCustomer(ctx.tenant.tenantId, customerId, body);
-    return jsonOk(customer);
+      const { customerId } = await params;
+      const body = updateSalonCustomerInputSchema.parse(await req.json());
+      const customer = await updateSalonCustomer(ctx.tenant.tenantId, customerId, body);
+      return jsonOk(customer);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -51,12 +52,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireSalonModule(req);
-    requirePermission(ctx, SALON_PERMISSIONS.customerDelete, [SALON_ROLE_PERMISSIONS]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+      requirePermission(ctx, SALON_PERMISSIONS.customerDelete, [SALON_ROLE_PERMISSIONS]);
 
-    const { customerId } = await params;
-    const customer = await deactivateSalonCustomer(ctx.tenant.tenantId, customerId);
-    return jsonOk(customer);
+      const { customerId } = await params;
+      const customer = await deactivateSalonCustomer(ctx.tenant.tenantId, customerId);
+      return jsonOk(customer);
+    });
   } catch (error) {
     return jsonError(error);
   }

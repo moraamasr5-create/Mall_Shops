@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 
 export const createRestaurantCategoryInputSchema = z.object({
@@ -24,7 +24,7 @@ export type UpdateRestaurantCategoryInput = z.infer<
 >;
 
 export async function listRestaurantCategories(tenantId: string) {
-  return prisma.restaurantCategory.findMany({
+  return getDb().restaurantCategory.findMany({
     where: { tenantId, active: true },
     orderBy: { createdAt: "asc" },
   });
@@ -34,7 +34,7 @@ export async function createRestaurantCategory(
   tenantId: string,
   input: CreateRestaurantCategoryInput,
 ) {
-  return prisma.restaurantCategory.create({
+  return getDb().restaurantCategory.create({
     data: {
       tenantId,
       name: input.name,
@@ -45,7 +45,7 @@ export async function createRestaurantCategory(
 }
 
 export async function getRestaurantCategory(tenantId: string, categoryId: string) {
-  const category = await prisma.restaurantCategory.findFirst({
+  const category = await getDb().restaurantCategory.findFirst({
     where: { id: categoryId, tenantId },
   });
 
@@ -63,7 +63,7 @@ export async function updateRestaurantCategory(
 ) {
   await getRestaurantCategory(tenantId, categoryId);
 
-  return prisma.restaurantCategory.update({
+  return getDb().restaurantCategory.update({
     where: { id: categoryId },
     data: {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -80,7 +80,7 @@ export async function deactivateRestaurantCategory(
 ) {
   await getRestaurantCategory(tenantId, categoryId);
 
-  return prisma.restaurantCategory.update({
+  return getDb().restaurantCategory.update({
     where: { id: categoryId },
     data: { active: false },
   });

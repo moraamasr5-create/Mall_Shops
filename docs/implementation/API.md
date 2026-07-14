@@ -2,7 +2,7 @@
 
 ## Status
 
-**Draft — implementation layer.** Describes the intended API structure. Not yet implemented.
+**Draft — implementation layer.** Describes the API structure implemented for VS1.
 
 API shapes implement Contract semantics — they do not define business rules.
 
@@ -41,7 +41,16 @@ Replaceable without Contract changes.
 
 ---
 
-## Core Endpoints (Planned)
+## Auth Endpoints (VS1)
+
+| Method | Path | Permission | Description |
+|--------|------|-----------|-------------|
+| `POST` | `/api/v1/auth/signup` | public | Create Identity via Supabase Auth |
+| `POST` | `/api/v1/auth/login` | public | Sign in; returns access token |
+
+JWT remains Identity-only. No tenant/role/permission claims.
+
+## Core Endpoints
 
 ### Tenants
 

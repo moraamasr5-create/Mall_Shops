@@ -95,16 +95,14 @@ Identity (Supabase Auth)
 
 | Layer | Responsibility | Design | Primary runtime data access path |
 |-------|----------------|--------|----------------------------------|
-| Layer 1 | Database isolation | Defined (RLS policies present in `supabase/rls.sql`) | Not yet fully enforced |
+| Layer 1 | Database isolation | Defined (RLS in Prisma migrations) | Enforced on user path via `withIdentityRls` |
 | Layer 2 | Business authorization | Defined | Enforced (`requirePermission`) |
 
 Accurate statement for Layer 1:
 
-> **Layer 1 database isolation is defined but has not yet been fully enforced on the primary runtime data access path.**
+> **Layer 1 database isolation is defined in Prisma migrations and enforced on the primary user-facing Prisma path via JWT claim injection + `SET LOCAL ROLE authenticated`. Tenant bootstrap uses a restricted privileged path for `createTenant` only.**
 
-RLS exists. Policies exist. The gap is enforcement on the current execution path — a **Critical Production Implementation Gap**, not an architectural inconsistency.
-
-**Layer 2 business authorization is implemented and operational. Production readiness requires both layers to be effective simultaneously.**
+**Both layers are required simultaneously. Privileged bootstrap must not become the default data path.**
 
 ---
 
@@ -136,11 +134,7 @@ Not architectural inconsistencies. Not redesign signals.
 
 ### Critical Before Production
 
-**Layer 1 database isolation is defined but has not yet been fully enforced on the primary runtime data access path.**
-
-Before production: **ensure that Layer 1 database isolation is effectively enforced on the primary runtime data access path, regardless of the underlying implementation mechanism.**
-
-This does not prescribe Prisma, Supabase, or RLS specifically — only that Architecture Lock's two-layer authorization is effective at runtime.
+**Layer 1 is enforced on the VS1 user-facing Prisma path.** Remaining hardening: continuous cross-tenant penetration tests, connection-role hardening (prefer a non-superuser login that can only `SET ROLE authenticated`), and ops discipline so privileged bootstrap never spreads.
 
 ### Progressive Improvements
 
@@ -156,7 +150,7 @@ This does not prescribe Prisma, Supabase, or RLS specifically — only that Arch
 
 | Risk | Source | Impact |
 |------|--------|--------|
-| Cross-tenant exposure if app-level tenant filtering fails | Layer 1 not fully enforced on primary data path | High |
+| Cross-tenant exposure if privileged bootstrap spreads beyond createTenant | Ops / misuse of getPrivilegedDb | High |
 | False assumption that DB isolation auto-protects all API traffic | Ops / misunderstanding | High |
 | Architecture regression if Architecture Gate is bypassed | CI / Process | High |
 | Harder storage/backend swap later | Direct persistence in services | Medium at scale |
@@ -169,9 +163,8 @@ This does not prescribe Prisma, Supabase, or RLS specifically — only that Arch
 
 | Type | Item |
 |------|------|
-| Feature | `module:manage` POST/PATCH (services exist; routes not wired) |
-| Docs | README / AGENTS / MVP documentation drift |
-| Ops | Reliable migrations + RLS apply path |
+| Docs | Keep MVP_DECISIONS aligned as Salon remains the only auto-enabled module |
+| Ops | Prefer dedicated non-superuser DB login for app connections |
 | Product | Any unimplemented MVP product features |
 
 Incomplete product delivery ≠ architectural failure.

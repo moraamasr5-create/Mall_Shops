@@ -179,18 +179,47 @@ ALTER TABLE tenant_module ENABLE ROW LEVEL SECURITY;
 
 ---
 
-## Service Role Bypass
+## Runtime enforcement (VS1)
 
-Server-side operations using the Supabase service role key bypass RLS.
+User-facing API requests must not query as a BYPASSRLS role.
+
+Implementation:
+
+1. Authenticate JWT → Identity only (`sub`)
+2. Open a Prisma transaction
+3. `set_config('request.jwt.claims', …)` and `set_config('request.jwt.claim.sub', …)`
+4. `SET LOCAL ROLE authenticated`
+5. Run queries via request-scoped `getDb()`
+
+Canonical helpers: `src/infrastructure/db.ts`, `withAuthenticatedDb` in `src/core/http/request-context.ts`.
+
+Policies live in `prisma/migrations/**`. `FORCE ROW LEVEL SECURITY` is enabled on business tables.
+
+### Tenant bootstrap exception
+
+Creating a Tenant requires INSERT … RETURNING before an OWNER Membership exists.
+RLS SELECT policies cannot yet authorize that row, so `createTenant` uses the
+**privileged Prisma connection** for that transaction only.
+
+Rules:
+
+- Bootstrap path is limited to Tenant + OWNER Membership + initial TenantModule rows
+- Identity must already be verified via JWT (application Layer 2 entry)
+- All subsequent reads/writes use `withIdentityRls` / `getDb()`
+- Never expose privileged credentials to the client
+
+## Service Role / Privileged Bypass
+
+Server-side privileged DB access bypasses RLS.
 
 **Rules:**
 
-- Use service role only in trusted server context
+- Use privileged / service-role access only in trusted server context
 - Never expose service role key to client
-- Prefer user-scoped JWT for all user-facing operations
-- Service role reserved for: migrations, admin tasks, background jobs
+- Prefer user-scoped JWT + `authenticated` role for all user-facing operations
+- Privileged path reserved for: migrations, admin tasks, background jobs, **tenant bootstrap only**
 
-When using service role, **Layer 2 (Application Permissions) remains mandatory**.
+When using a privileged path, **Layer 2 (Application Permissions / Identity verification) remains mandatory**.
 
 ---
 

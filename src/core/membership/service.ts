@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 import { isRole, ROLES } from "@/core/rbac/permissions";
 
@@ -11,7 +11,8 @@ export const inviteMemberInputSchema = z.object({
 export type InviteMemberInput = z.infer<typeof inviteMemberInputSchema>;
 
 export async function listMembers(tenantId: string) {
-  return prisma.membership.findMany({
+  const db = getDb();
+  return db.membership.findMany({
     where: { tenantId },
     orderBy: { joinedAt: "asc" },
   });
@@ -22,15 +23,13 @@ export async function inviteMember(
   invitedBy: string,
   input: InviteMemberInput
 ) {
+  const db = getDb();
+
   if (!isRole(input.role)) {
     throw new AppError("VALIDATION_ERROR", "Invalid role", 422);
   }
 
-  if (input.role === "OWNER") {
-    // Only existing OWNERs may grant OWNER — enforced by caller permission + this guard.
-  }
-
-  const existing = await prisma.membership.findUnique({
+  const existing = await db.membership.findUnique({
     where: {
       identityId_tenantId: {
         identityId: input.identityId,
@@ -44,7 +43,7 @@ export async function inviteMember(
   }
 
   if (existing) {
-    return prisma.membership.update({
+    return db.membership.update({
       where: { id: existing.id },
       data: {
         role: input.role,
@@ -55,7 +54,7 @@ export async function inviteMember(
     });
   }
 
-  return prisma.membership.create({
+  return db.membership.create({
     data: {
       identityId: input.identityId,
       tenantId,

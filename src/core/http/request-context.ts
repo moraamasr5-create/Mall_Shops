@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { resolveIdentityFromAccessToken } from "@/infrastructure/supabase/auth";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb, withIdentityRls } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 import {
   isRole,
@@ -49,6 +49,18 @@ export async function requireIdentity(req: NextRequest): Promise<AuthenticatedRe
   };
 }
 
+/**
+ * Runs a user-facing handler under Layer 1 RLS (JWT Identity claims + authenticated role).
+ * All Prisma access inside `fn` must use `getDb()` via services.
+ */
+export async function withAuthenticatedDb<T>(
+  req: NextRequest,
+  fn: (auth: AuthenticatedRequest) => Promise<T>
+): Promise<T> {
+  const auth = await requireIdentity(req);
+  return withIdentityRls(auth.identity.identityId, () => fn(auth));
+}
+
 export async function requireTenantContext(req: NextRequest): Promise<TenantScopedRequest> {
   const auth = await requireIdentity(req);
   const tenantId = req.headers.get("x-tenant-id")?.trim();
@@ -57,7 +69,8 @@ export async function requireTenantContext(req: NextRequest): Promise<TenantScop
     throw new AppError("VALIDATION_ERROR", "X-Tenant-Id header is required", 422);
   }
 
-  const membership = await prisma.membership.findUnique({
+  const db = getDb();
+  const membership = await db.membership.findUnique({
     where: {
       identityId_tenantId: {
         identityId: auth.identity.identityId,
@@ -98,7 +111,8 @@ export async function requireEnabledModule(
   tenantId: string,
   moduleKey: string
 ): Promise<void> {
-  const activation = await prisma.tenantModule.findUnique({
+  const db = getDb();
+  const activation = await db.tenantModule.findUnique({
     where: {
       tenantId_moduleKey: {
         tenantId,

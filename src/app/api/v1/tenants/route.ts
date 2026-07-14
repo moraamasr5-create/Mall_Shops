@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireIdentity } from "@/core/http/request-context";
+import { requireIdentity, withAuthenticatedDb } from "@/core/http/request-context";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
   createTenant,
@@ -10,14 +10,19 @@ import { assertModuleActivatable, MVP_INITIAL_MODULE_KEYS } from "@/modules/regi
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await requireIdentity(req);
-    const tenants = await listTenantsForIdentity(auth.identity.identityId);
-    return jsonOk(tenants);
+    return await withAuthenticatedDb(req, async (auth) => {
+      const tenants = await listTenantsForIdentity(auth.identity.identityId);
+      return jsonOk(tenants);
+    });
   } catch (error) {
     return jsonError(error);
   }
 }
 
+/**
+ * Tenant bootstrap: Identity is verified via JWT; persistence uses the
+ * restricted privileged path (see createTenant) then normal RLS applies.
+ */
 export async function POST(req: NextRequest) {
   try {
     const auth = await requireIdentity(req);

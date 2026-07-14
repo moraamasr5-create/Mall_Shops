@@ -1,5 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * Privileged Prisma client (table owner / migration connection).
+ * Must NOT be used for user-facing request data access.
+ * User requests go through `withIdentityRls` in `@/infrastructure/db`.
+ */
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };

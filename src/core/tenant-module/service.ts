@@ -1,15 +1,17 @@
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 
 export async function listTenantModules(tenantId: string) {
-  return prisma.tenantModule.findMany({
+  const db = getDb();
+  return db.tenantModule.findMany({
     where: { tenantId },
     orderBy: { activatedAt: "asc" },
   });
 }
 
 export async function enableTenantModule(tenantId: string, moduleKey: string) {
-  return prisma.tenantModule.upsert({
+  const db = getDb();
+  return db.tenantModule.upsert({
     where: {
       tenantId_moduleKey: { tenantId, moduleKey },
     },
@@ -29,7 +31,8 @@ export async function setTenantModuleEnabled(
   moduleKey: string,
   enabled: boolean
 ) {
-  const existing = await prisma.tenantModule.findUnique({
+  const db = getDb();
+  const existing = await db.tenantModule.findUnique({
     where: { tenantId_moduleKey: { tenantId, moduleKey } },
   });
 
@@ -38,7 +41,7 @@ export async function setTenantModuleEnabled(
   }
 
   if (!enabled) {
-    const enabledCount = await prisma.tenantModule.count({
+    const enabledCount = await db.tenantModule.count({
       where: { tenantId, enabled: true },
     });
     if (enabledCount <= 1 && existing.enabled) {
@@ -50,7 +53,7 @@ export async function setTenantModuleEnabled(
     }
   }
 
-  return prisma.tenantModule.update({
+  return db.tenantModule.update({
     where: { id: existing.id },
     data: { enabled },
   });

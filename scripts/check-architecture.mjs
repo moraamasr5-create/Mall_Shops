@@ -215,6 +215,7 @@ const coreFiles = listFiles("src/core", [".ts", ".tsx"]);
 const coreRbacFiles = listFiles("src/core/rbac", [".ts", ".tsx"]);
 const moduleFiles = listFiles("src/modules", [".ts", ".tsx"]);
 const rlsFiles = [
+  ...listFiles("prisma/migrations", [".sql"]),
   ...listFiles("supabase", [".sql"]),
   "docs/implementation/RLS.md",
   "docs/security/RLS_STRATEGY.md",

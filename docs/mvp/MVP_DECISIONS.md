@@ -28,11 +28,11 @@ Each decision is labeled **MVP Decision** and includes:
 
 ### MVP Decision: Single Reference Module
 
-**What:** Only the `salon` Module is implemented in the first vertical slice. Other Module keys (`restaurant`, `clinic`, `gym`, `pharmacy`, `store`) exist in the platform catalog but are not activatable or implemented.
+**What:** Only the `salon` Module is the MVP product surface. `restaurant` may exist for architectural validation only and must not be expanded as a product module in MVP.
 
 **Why:** Validate the Core + Module architecture pattern with one complete domain before expanding.
 
-**Expires when:** Salon vertical slice is complete and a second Module is approved for development.
+**Expires when:** Salon vertical slice is complete and a second Module is approved for product development.
 
 ---
 

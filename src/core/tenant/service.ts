@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb, getPrivilegedDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 import { slugify } from "@/shared/slug";
 
@@ -10,11 +10,21 @@ export const createTenantInputSchema = z.object({
 
 export type CreateTenantInput = z.infer<typeof createTenantInputSchema>;
 
+/**
+ * Restricted bootstrap path (privileged DB role).
+ *
+ * Required because RLS SELECT policies cannot see a brand-new tenant row
+ * until OWNER membership exists, while Prisma INSERT ... RETURNING needs SELECT.
+ *
+ * Caller must have already authenticated the Identity via JWT (Layer 2 entry).
+ * Normal user-facing reads/writes must use `getDb()` under `withIdentityRls`.
+ */
 export async function createTenant(
   identityId: string,
   input: CreateTenantInput,
   initialModuleKeys: readonly string[]
 ) {
+  const db = getPrivilegedDb();
   const name = input.name.trim();
   const slug = input.slug ? slugify(input.slug) : slugify(name);
 
@@ -31,12 +41,12 @@ export async function createTenant(
     );
   }
 
-  const existing = await prisma.tenant.findUnique({ where: { slug } });
+  const existing = await db.tenant.findUnique({ where: { slug } });
   if (existing) {
     throw new AppError("CONFLICT", `Tenant slug already exists: ${slug}`, 409);
   }
 
-  return prisma.$transaction(async (tx) => {
+  return db.$transaction(async (tx) => {
     const tenant = await tx.tenant.create({
       data: {
         name,
@@ -71,7 +81,8 @@ export async function createTenant(
 }
 
 export async function listTenantsForIdentity(identityId: string) {
-  const memberships = await prisma.membership.findMany({
+  const db = getDb();
+  const memberships = await db.membership.findMany({
     where: {
       identityId,
       status: "active",
@@ -92,7 +103,8 @@ export async function listTenantsForIdentity(identityId: string) {
 }
 
 export async function getTenantById(tenantId: string) {
-  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+  const db = getDb();
+  const tenant = await db.tenant.findUnique({ where: { id: tenantId } });
   if (!tenant) {
     throw new AppError("NOT_FOUND", "Tenant not found", 404);
   }

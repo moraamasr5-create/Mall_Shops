@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 
 export const createSalonServiceInputSchema = z.object({
@@ -21,14 +21,14 @@ export const updateSalonServiceInputSchema = createSalonServiceInputSchema
 export type UpdateSalonServiceInput = z.infer<typeof updateSalonServiceInputSchema>;
 
 export async function listSalonServices(tenantId: string) {
-  return prisma.salonService.findMany({
+  return getDb().salonService.findMany({
     where: { tenantId, active: true },
     orderBy: { createdAt: "asc" },
   });
 }
 
 export async function createSalonService(tenantId: string, input: CreateSalonServiceInput) {
-  return prisma.salonService.create({
+  return getDb().salonService.create({
     data: {
       tenantId,
       name: input.name,
@@ -42,7 +42,7 @@ export async function createSalonService(tenantId: string, input: CreateSalonSer
 }
 
 export async function getSalonService(tenantId: string, serviceId: string) {
-  const service = await prisma.salonService.findFirst({
+  const service = await getDb().salonService.findFirst({
     where: { id: serviceId, tenantId },
   });
   if (!service) {
@@ -58,7 +58,7 @@ export async function updateSalonService(
 ) {
   await getSalonService(tenantId, serviceId);
 
-  return prisma.salonService.update({
+  return getDb().salonService.update({
     where: { id: serviceId },
     data: {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -73,7 +73,7 @@ export async function updateSalonService(
 export async function deactivateSalonService(tenantId: string, serviceId: string) {
   await getSalonService(tenantId, serviceId);
 
-  return prisma.salonService.update({
+  return getDb().salonService.update({
     where: { id: serviceId },
     data: { active: false },
   });

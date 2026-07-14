@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "@/infrastructure/prisma";
+import { getDb } from "@/infrastructure/db";
 import { AppError } from "@/shared/errors";
 
 export const createSalonCustomerInputSchema = z.object({
@@ -20,7 +20,7 @@ export const updateSalonCustomerInputSchema = createSalonCustomerInputSchema
 export type UpdateSalonCustomerInput = z.infer<typeof updateSalonCustomerInputSchema>;
 
 export async function listSalonCustomers(tenantId: string) {
-  return prisma.salonCustomer.findMany({
+  return getDb().salonCustomer.findMany({
     where: { tenantId, active: true },
     orderBy: { createdAt: "asc" },
   });
@@ -30,7 +30,7 @@ export async function createSalonCustomer(
   tenantId: string,
   input: CreateSalonCustomerInput
 ) {
-  return prisma.salonCustomer.create({
+  return getDb().salonCustomer.create({
     data: {
       tenantId,
       name: input.name,
@@ -43,7 +43,7 @@ export async function createSalonCustomer(
 }
 
 export async function getSalonCustomer(tenantId: string, customerId: string) {
-  const customer = await prisma.salonCustomer.findFirst({
+  const customer = await getDb().salonCustomer.findFirst({
     where: { id: customerId, tenantId },
   });
 
@@ -61,7 +61,7 @@ export async function updateSalonCustomer(
 ) {
   await getSalonCustomer(tenantId, customerId);
 
-  return prisma.salonCustomer.update({
+  return getDb().salonCustomer.update({
     where: { id: customerId },
     data: {
       ...(input.name !== undefined ? { name: input.name } : {}),
@@ -75,7 +75,7 @@ export async function updateSalonCustomer(
 export async function deactivateSalonCustomer(tenantId: string, customerId: string) {
   await getSalonCustomer(tenantId, customerId);
 
-  return prisma.salonCustomer.update({
+  return getDb().salonCustomer.update({
     where: { id: customerId },
     data: { active: false },
   });

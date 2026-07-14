@@ -75,14 +75,17 @@ See [ADR-002](../adr/ADR-002-Identity-Model-and-JWT-Claims.md) — **APPROVED**.
 
 ---
 
-## Environment Configuration (Planned)
+## Environment Configuration
 
 | Variable | Purpose |
 |----------|---------|
-| `SUPABASE_URL` | Project API URL |
-| `SUPABASE_ANON_KEY` | Client-side public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side admin key (never expose to client) |
-| `DATABASE_URL` | Direct PostgreSQL connection for Prisma |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project API URL (local: `http://127.0.0.1:54321`) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon/public key for Auth |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server admin key (never expose to client) |
+| `DATABASE_URL` | PostgreSQL connection for Prisma |
+| `DIRECT_URL` | Direct PostgreSQL URL for migrations |
+
+Local stack: `supabase/config.toml` + `npx supabase start`.
 
 ---
 
@@ -91,22 +94,23 @@ See [ADR-002](../adr/ADR-002-Identity-Model-and-JWT-Claims.md) — **APPROVED**.
 | Context | Supabase Client | Access |
 |---------|----------------|--------|
 | Browser (future) | Anon key client | Auth, RLS-protected queries |
-| Server API (future) | Service role or user-scoped | Full operations, bypass RLS only when necessary |
+| Server API | Anon key for Auth validation; Prisma under `authenticated` for data | Privileged DB only for migrations + tenant bootstrap |
 
 ---
 
-## Auth Flow (Planned)
+## Auth Flow (VS1)
 
 ```
-1. User registers/logs in via Supabase Auth
+1. User registers/logs in via POST /api/v1/auth/signup|login (Supabase Auth)
 2. Supabase returns JWT with sub = identity_id
-3. Application stores session (cookie or header)
+3. Client sends Authorization: Bearer <access_token>
 4. On each request:
    a. Validate JWT via Supabase
    b. Extract identity_id from sub
-   c. Load Membership(s) from application database
-   d. Resolve Tenant context + Role + Permissions
-5. Execute business operation
+   c. withIdentityRls → set JWT claims + SET LOCAL ROLE authenticated
+   d. Load Membership(s) from application database under RLS
+   e. Resolve Tenant context (X-Tenant-Id) + Role + Permissions
+5. Execute business operation (Layer 1 + Layer 2)
 ```
 
 ---

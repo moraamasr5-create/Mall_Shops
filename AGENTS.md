@@ -1,28 +1,31 @@
 # AGENTS.md
 
-## Cursor Cloud specific instructions
+## Cursor Cloud / agent instructions
 
-### Repository state: documentation-only (Phase 0)
+### Repository state: VS1 Runnable (implementation in progress)
 
-This repository currently contains **no application code**. It is a "Phase 0"
-architecture/planning repository consisting entirely of Markdown documents
-(`README.md`, `ARCHITECTURE.md`, and files under `docs/`).
+This repository contains Architecture Lock documentation **and** a runnable
+Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference module).
 
-As a result, there is:
+### Toolchain
 
-- **No dependency manifest** (no `package.json`, `requirements.txt`,
-  `pyproject.toml`, `go.mod`, etc.) and **nothing to install**.
-- **No build, lint, or test tooling** wired up, and no build/lint/test commands
-  to run.
-- **No runnable application or services** — the described platform (a Supabase +
-  Prisma + TypeScript modular "Business Operating Platform") has not been
-  implemented yet. Do not attempt to "start a dev server" or "run the app";
-  there is nothing to run.
+| Concern | Command / location |
+|---------|-------------------|
+| Install | `npm install` |
+| Env | copy `.env.example` → `.env` |
+| Local Supabase | `npx supabase start` (see `supabase/config.toml`) |
+| Migrations + RLS | `npx prisma migrate deploy` (RLS lives inside Prisma migrations) |
+| Dev server | `npm run dev` |
+| Architecture gate | `npm run check:architecture` |
+| Verify | `ARCH_ALLOW_CORE_CHANGES=true npm run verify` only when a reviewed Core Security Improvement is in the working tree; otherwise `npm run verify` |
+| Smoke (Salon path) | `npm run smoke:vs1` (app + Supabase must be running) |
 
-The documents describe the *intended* future stack (Supabase Auth/DB/RLS, Prisma
-ORM, modular TypeScript backend). Those are design intentions, not installed
-dependencies. When code is eventually added, update this section (and add an
-update script via the environment setup) to reflect the real toolchain.
+### Architecture rules for agents
 
-Until then, "development" means editing Markdown docs. The only meaningful
-verification is that Markdown files are well-formed and internal links are valid.
+- Architecture is **LOCKED** — do not redesign.
+- Documentation (Lock → Contracts → Security → Implementation docs) wins over code.
+- Two authorization layers are mandatory: Layer 1 RLS + Layer 2 application RBAC.
+- User-facing Prisma access must go through `withIdentityRls` / `getDb()` — never bypass RLS for normal requests.
+- Tenant bootstrap (`createTenant`) is the only privileged DB path for user onboarding.
+- Salon is the MVP reference module; Restaurant is validation-only — do not expand it.
+- Never create duplicate docs (`v2`, `final`, etc.) — update the canonical file.
