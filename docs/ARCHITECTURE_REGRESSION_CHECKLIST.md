@@ -26,6 +26,7 @@ Adding business functionality is not a valid reason to modify Core.
 - [ ] `git diff -- src/core` is empty unless the slice explicitly targets Core.
 - [ ] If `src/core` changed, work stopped for Architecture Review before merge.
 - [ ] `ARCH_ALLOW_CORE_CHANGES=true` was not used unless Architecture Review approved the Core change.
+- [ ] Architecture gate was run inside a Git repository (fail-closed). `ARCH_SKIP_CORE_FREEZE=true` was not used unless explicitly exempted.
 
 ## Dependency Direction
 

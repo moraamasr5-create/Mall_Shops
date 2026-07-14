@@ -94,7 +94,7 @@ Every authenticated request carries:
 | Context | Source |
 |---------|--------|
 | `identityId` | JWT `sub` claim |
-| `tenantId` | Header `X-Tenant-Id` or session context |
+| `tenantId` | Header `X-Tenant-Id` (required on tenant-scoped routes) |
 | `role` | Loaded from Membership |
 | `permissions` | Resolved from Role |
 
@@ -102,10 +102,11 @@ Every authenticated request carries:
 
 ```
 1. Client sends X-Tenant-Id header (or session stores active Tenant)
-2. Server validates Membership(identityId, tenantId) exists and is active
+2. Server validates Membership(`identityId`, `tenantId`) exists and is active
 3. Server loads Role and Permissions
 4. Server proceeds or returns 403
-```
+
+> VS1: Tenant context is header-only (`X-Tenant-Id`). Session-stored active Tenant is not implemented.```
 
 ---
 

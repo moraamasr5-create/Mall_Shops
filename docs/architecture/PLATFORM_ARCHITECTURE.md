@@ -36,7 +36,7 @@ The platform separates:
 Handles cross-cutting concerns for all modules:
 
 - Authentication and session management
-- User identity
+- Identity (Identity Provider)
 - Tenant lifecycle
 - Membership and role-based access control
 
@@ -98,9 +98,9 @@ Multi-tenancy is a data isolation strategy, not an architectural layer. Tenants 
 
 Every authenticated request resolves:
 
-1. User identity (from auth provider)
+1. Identity (from Identity Provider JWT `sub`)
 2. Active tenant (from membership)
-3. User role in that tenant (from membership)
+3. Role in that Tenant (from Membership)
 4. Enabled modules for that tenant (from TenantModule)
 
 ## Security Architecture
@@ -120,7 +120,7 @@ Supported methods (configurable via provider):
 Role-based access control at the tenant level:
 
 ```
-User → Membership → Tenant → Role → Permissions
+Identity → Membership → Tenant → Role → Permissions
 ```
 
 Roles are stored in membership records, not on the user. Permission evaluation requires an active tenant context.
@@ -171,7 +171,7 @@ External Services
 
 ### Phase 3: Membership
 
-- User invitation
+- Identity invitation (Membership)
 - Role assignment
 - Role-based dashboard views
 

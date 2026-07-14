@@ -12,7 +12,9 @@ prisma/
 └── migrations/         # Migration history
 ```
 
-> **Status:** Schema is planned but not yet committed. The definitions below reflect the target implementation aligned with business contracts.
+> **Status (VS1):** Live schema is in `prisma/schema.prisma` and applied via
+> `prisma/migrations/`. Prefer the live schema over illustrative snippets below
+> when they diverge. Canonical ORM notes: [PRISMA.md](../implementation/PRISMA.md).
 
 ## Enums
 
