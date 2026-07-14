@@ -112,3 +112,11 @@ rg -n "role IN|role = 'OWNER'|role = 'ADMIN'|role = 'MANAGER'" supabase docs/imp
 ```
 
 Expected result for these checks: no matches, except module-owned schema/model names outside Core when explicitly reviewing module files.
+
+---
+
+## Related Documents
+
+- [Architecture Lock v1.0](./ARCHITECTURE_LOCK.md)
+- [Official Architecture Audit](./OFFICIAL_ARCHITECTURE_AUDIT.md)
+- [Contracts Index](./contracts/INDEX.md)

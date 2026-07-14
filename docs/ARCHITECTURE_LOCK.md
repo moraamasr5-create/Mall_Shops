@@ -137,6 +137,8 @@ No further documentation expansion unless a critical implementation flaw is disc
 
 ## Related Documents
 
+- [Official Architecture Audit](./OFFICIAL_ARCHITECTURE_AUDIT.md) — current implementation alignment with this Lock
+- [Architecture Regression Checklist](./ARCHITECTURE_REGRESSION_CHECKLIST.md)
 - [Contracts Index](./contracts/INDEX.md)
 - [Architecture Overview](./architecture/ARCHITECTURE.md)
 - [MVP Decisions](./mvp/MVP_DECISIONS.md)

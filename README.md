@@ -6,11 +6,27 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 ## Status
 
-**Architecture v1.0 FINAL LOCKED / FROZEN**
+**Architecture v1.0 FINAL LOCKED / VALIDATED**
 
-Active work: **Vertical Slice 1**
+Implementation: **Vertical Slices in progress** (Salon reference module + Restaurant validation)
 
-`Identity → Tenant → Membership → TenantModule → Salon (Reference Module)`
+See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for current implementation status.
+
+---
+
+## Architecture Governance
+
+The project architecture is governed by the following documents:
+
+- [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) — fixed architectural decisions
+- [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) — implementation alignment with the Lock
+- [docs/ARCHITECTURE_REGRESSION_CHECKLIST.md](./docs/ARCHITECTURE_REGRESSION_CHECKLIST.md) — merge gate and regression prevention
+
+Any architectural change must remain compatible with the Architecture Lock.
+
+```
+Contracts → Architecture Lock → Official Architecture Audit → Regression Checklist
+```
 
 ---
 
@@ -19,9 +35,11 @@ Active work: **Vertical Slice 1**
 | Layer | Location |
 |-------|----------|
 | Architecture Lock | [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) |
+| Official Architecture Audit | [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) |
+| Regression Checklist | [docs/ARCHITECTURE_REGRESSION_CHECKLIST.md](./docs/ARCHITECTURE_REGRESSION_CHECKLIST.md) |
 | Contracts | [docs/contracts/INDEX.md](./docs/contracts/INDEX.md) |
 | Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
-| Implementation (VS1) | [docs/implementation/VERTICAL_SLICE_1.md](./docs/implementation/VERTICAL_SLICE_1.md) |
+| Implementation | [docs/implementation/](./docs/implementation/) |
 | MVP | [docs/mvp/MVP_DECISIONS.md](./docs/mvp/MVP_DECISIONS.md) |
 
 ---
