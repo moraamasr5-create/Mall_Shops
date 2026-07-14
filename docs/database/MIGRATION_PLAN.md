@@ -108,7 +108,7 @@ npx prisma migrate deploy
 1. Never edit a migration that has been applied to production.
 2. Always create a new migration for schema changes.
 3. Test migrations against a copy of production data before deploying.
-4. RLS policies are applied in the same migration as table creation.
+4. RLS policies are applied in the same Prisma migration as table creation (no parallel standalone `rls.sql`).
 5. Module migrations are independent — adding a module never alters core tables.
 
 ## Rollback Strategy

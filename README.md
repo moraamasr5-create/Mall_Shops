@@ -8,7 +8,7 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 **Architecture v1.0 FINAL LOCKED / VALIDATED**
 
-Implementation: **Vertical Slices in progress** (Salon reference module + Restaurant validation)
+Implementation: **VS1 Runnable** (Salon reference module + Restaurant validation)
 
 See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for current implementation status.
 
@@ -48,11 +48,14 @@ Contracts → Architecture Lock → Official Architecture Audit → Regression C
 
 ```bash
 cp .env.example .env
-# fill Supabase + DATABASE_URL
+
+# Local Identity Provider + Postgres (Docker required)
+npx supabase start
+# copy API URL + anon key from `supabase status` into .env
 
 npm install
-npx prisma migrate dev --name vs1_init
-# apply supabase/rls.sql in Supabase SQL editor
+npx prisma migrate deploy
+# RLS policies are included in Prisma migrations — do not apply a separate rls.sql
 
 npm run dev
 ```
@@ -64,20 +67,34 @@ Authorization: Bearer <supabase-access-token>
 X-Tenant-Id: <tenant-id>
 ```
 
+Obtain a token via:
+
+- `POST /api/v1/auth/signup`
+- `POST /api/v1/auth/login`
+
 ### Minimum path
 
-1. Authenticate via Supabase Auth (Identity)
-2. `POST /api/v1/tenants` → Tenant + OWNER Membership + salon TenantModule
-3. `GET /api/v1/tenants/:id/modules` → activation relationship
+1. `POST /api/v1/auth/signup` → Identity + access token
+2. `POST /api/v1/tenants` → Tenant + OWNER Membership + salon TenantModule (restricted bootstrap DB path)
+3. `GET /api/v1/tenants/:id/modules` → activation relationship (RLS + RBAC)
 4. `POST /api/v1/salon/services` → Salon Reference Module operation
 5. `GET|POST /api/v1/salon/employees` → Salon employee management
 6. `GET|POST /api/v1/salon/customers` → Salon customer management
-7. `GET|POST /api/v1/restaurant/categories` → Restaurant module validation
+
+Optional architectural validation only (not MVP expansion):
+
+7. Enable `restaurant` via `POST /api/v1/tenants/:id/modules` then use restaurant category routes
 
 ### Authorization (mandatory)
 
-- **Layer 1:** RLS tenant isolation (`supabase/rls.sql`)
-- **Layer 2:** Application Role → Permission checks
+- **Layer 1:** RLS tenant isolation (Prisma migrations) — user requests run as `authenticated` with JWT Identity claims
+- **Layer 2:** Application Role → Permission checks (`requirePermission`)
+
+### Smoke test
+
+```bash
+npm run smoke:vs1
+```
 
 ---
 
@@ -87,4 +104,6 @@ X-Tenant-Id: <tenant-id>
 |---------|------------|
 | Module registry | Constants in code |
 | TenantModule persistence | `tenant_module` table |
-| Salon minimum entity | `salon_service` |
+| Salon minimum entity | `salon_service` (+ employees/customers in later slices) |
+| User DB path | `withIdentityRls` → `SET LOCAL ROLE authenticated` + JWT `sub` |
+| Tenant bootstrap | Privileged Prisma path for createTenant only |

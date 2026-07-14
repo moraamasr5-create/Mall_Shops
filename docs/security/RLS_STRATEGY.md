@@ -29,6 +29,8 @@ JWTs must not contain:
 
 RLS uses `auth.uid()` as Identity and checks active Membership rows.
 
+Policies are maintained in **Prisma migrations** (`prisma/migrations/**`), not in a parallel standalone SQL file.
+
 ## Core Policy Pattern
 
 Core tables use tenant isolation predicates. Business permissions such as

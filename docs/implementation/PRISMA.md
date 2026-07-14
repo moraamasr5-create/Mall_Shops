@@ -2,7 +2,7 @@
 
 ## Status
 
-**Draft — implementation layer.** Describes the intended Prisma schema. Not yet implemented in code.
+**Draft — implementation layer.** Describes the Prisma schema and migration rules used by VS1.
 
 ---
 
@@ -19,13 +19,16 @@
 
 ---
 
-## Schema Location (Planned)
+## Schema Location
 
 ```
 prisma/
 ├── schema.prisma       # Core + Module models
-└── migrations/         # Versioned migrations
+└── migrations/         # Versioned migrations (schema + RLS)
 ```
+
+RLS policies must be added/updated in the same Prisma migration history as table changes.
+Do not maintain a parallel standalone `supabase/rls.sql`.
 
 ---
 

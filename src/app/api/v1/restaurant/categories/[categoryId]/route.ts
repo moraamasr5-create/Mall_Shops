@@ -3,6 +3,7 @@ import {
   requireEnabledModule,
   requirePermission,
   requireTenantContext,
+  withAuthenticatedDb,
 } from "@/core/http/request-context";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
@@ -19,22 +20,19 @@ import {
 
 type Params = { params: Promise<{ categoryId: string }> };
 
-async function requireRestaurantModule(req: NextRequest) {
-  const ctx = await requireTenantContext(req);
-  await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
-  return ctx;
-}
-
 export async function GET(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireRestaurantModule(req);
-    requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
-      RESTAURANT_ROLE_PERMISSIONS,
-    ]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
+        RESTAURANT_ROLE_PERMISSIONS,
+      ]);
 
-    const { categoryId } = await params;
-    const category = await getRestaurantCategory(ctx.tenant.tenantId, categoryId);
-    return jsonOk(category);
+      const { categoryId } = await params;
+      const category = await getRestaurantCategory(ctx.tenant.tenantId, categoryId);
+      return jsonOk(category);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -42,19 +40,22 @@ export async function GET(req: NextRequest, { params }: Params) {
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireRestaurantModule(req);
-    requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
-      RESTAURANT_ROLE_PERMISSIONS,
-    ]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
+        RESTAURANT_ROLE_PERMISSIONS,
+      ]);
 
-    const { categoryId } = await params;
-    const body = updateRestaurantCategoryInputSchema.parse(await req.json());
-    const category = await updateRestaurantCategory(
-      ctx.tenant.tenantId,
-      categoryId,
-      body,
-    );
-    return jsonOk(category);
+      const { categoryId } = await params;
+      const body = updateRestaurantCategoryInputSchema.parse(await req.json());
+      const category = await updateRestaurantCategory(
+        ctx.tenant.tenantId,
+        categoryId,
+        body
+      );
+      return jsonOk(category);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -62,17 +63,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(req: NextRequest, { params }: Params) {
   try {
-    const ctx = await requireRestaurantModule(req);
-    requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryDelete, [
-      RESTAURANT_ROLE_PERMISSIONS,
-    ]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryDelete, [
+        RESTAURANT_ROLE_PERMISSIONS,
+      ]);
 
-    const { categoryId } = await params;
-    const category = await deactivateRestaurantCategory(
-      ctx.tenant.tenantId,
-      categoryId,
-    );
-    return jsonOk(category);
+      const { categoryId } = await params;
+      const category = await deactivateRestaurantCategory(
+        ctx.tenant.tenantId,
+        categoryId
+      );
+      return jsonOk(category);
+    });
   } catch (error) {
     return jsonError(error);
   }

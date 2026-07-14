@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { isAppError } from "@/shared/errors";
 
 export function jsonOk<T>(data: T, status = 200) {
@@ -27,6 +28,22 @@ export function jsonError(error: unknown) {
         },
       },
       { status: error.status }
+    );
+  }
+
+  if (error instanceof ZodError) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Request validation failed",
+          details: error.flatten(),
+        },
+        meta: {
+          requestId: crypto.randomUUID(),
+        },
+      },
+      { status: 422 }
     );
   }
 

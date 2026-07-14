@@ -3,6 +3,7 @@ import {
   requireEnabledModule,
   requirePermission,
   requireTenantContext,
+  withAuthenticatedDb,
 } from "@/core/http/request-context";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
@@ -16,21 +17,18 @@ import {
   RESTAURANT_ROLE_PERMISSIONS,
 } from "@/modules/restaurant/permissions";
 
-async function requireRestaurantModule(req: NextRequest) {
-  const ctx = await requireTenantContext(req);
-  await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
-  return ctx;
-}
-
 export async function GET(req: NextRequest) {
   try {
-    const ctx = await requireRestaurantModule(req);
-    requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
-      RESTAURANT_ROLE_PERMISSIONS,
-    ]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
+        RESTAURANT_ROLE_PERMISSIONS,
+      ]);
 
-    const categories = await listRestaurantCategories(ctx.tenant.tenantId);
-    return jsonOk(categories);
+      const categories = await listRestaurantCategories(ctx.tenant.tenantId);
+      return jsonOk(categories);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -38,14 +36,17 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireRestaurantModule(req);
-    requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
-      RESTAURANT_ROLE_PERMISSIONS,
-    ]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
+        RESTAURANT_ROLE_PERMISSIONS,
+      ]);
 
-    const body = createRestaurantCategoryInputSchema.parse(await req.json());
-    const category = await createRestaurantCategory(ctx.tenant.tenantId, body);
-    return jsonOk(category, 201);
+      const body = createRestaurantCategoryInputSchema.parse(await req.json());
+      const category = await createRestaurantCategory(ctx.tenant.tenantId, body);
+      return jsonOk(category, 201);
+    });
   } catch (error) {
     return jsonError(error);
   }

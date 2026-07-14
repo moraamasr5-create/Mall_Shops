@@ -3,6 +3,7 @@ import {
   requireEnabledModule,
   requirePermission,
   requireTenantContext,
+  withAuthenticatedDb,
 } from "@/core/http/request-context";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
@@ -13,19 +14,16 @@ import {
 import { SALON_MODULE } from "@/modules/salon/module";
 import { SALON_PERMISSIONS, SALON_ROLE_PERMISSIONS } from "@/modules/salon/permissions";
 
-async function requireSalonModule(req: NextRequest) {
-  const ctx = await requireTenantContext(req);
-  await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
-  return ctx;
-}
-
 export async function GET(req: NextRequest) {
   try {
-    const ctx = await requireSalonModule(req);
-    requirePermission(ctx, SALON_PERMISSIONS.customerRead, [SALON_ROLE_PERMISSIONS]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+      requirePermission(ctx, SALON_PERMISSIONS.customerRead, [SALON_ROLE_PERMISSIONS]);
 
-    const customers = await listSalonCustomers(ctx.tenant.tenantId);
-    return jsonOk(customers);
+      const customers = await listSalonCustomers(ctx.tenant.tenantId);
+      return jsonOk(customers);
+    });
   } catch (error) {
     return jsonError(error);
   }
@@ -33,12 +31,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSalonModule(req);
-    requirePermission(ctx, SALON_PERMISSIONS.customerWrite, [SALON_ROLE_PERMISSIONS]);
+    return await withAuthenticatedDb(req, async () => {
+      const ctx = await requireTenantContext(req);
+      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+      requirePermission(ctx, SALON_PERMISSIONS.customerWrite, [SALON_ROLE_PERMISSIONS]);
 
-    const body = createSalonCustomerInputSchema.parse(await req.json());
-    const customer = await createSalonCustomer(ctx.tenant.tenantId, body);
-    return jsonOk(customer, 201);
+      const body = createSalonCustomerInputSchema.parse(await req.json());
+      const customer = await createSalonCustomer(ctx.tenant.tenantId, body);
+      return jsonOk(customer, 201);
+    });
   } catch (error) {
     return jsonError(error);
   }
