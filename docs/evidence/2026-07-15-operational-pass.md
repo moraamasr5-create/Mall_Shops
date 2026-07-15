@@ -12,7 +12,7 @@ This is the moment the platform proved: empty Hosted project → migrations → 
 
 | Field | Value |
 |-------|--------|
-| **Commit Hash** | *(see git tag `vs1-operational-pass`; filled after commit)* |
+| **Commit Hash** | `7b89a54f30473313cf6955751228ff388f9d5906` |
 | **Git tag** | `vs1-operational-pass` |
 | **Ran at (evidence)** | `2026-07-15T01:24:42.330Z` |
 | **Overall** | **PASS** (6/6 cases) |
