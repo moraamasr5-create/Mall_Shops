@@ -37,10 +37,10 @@ Release Gates .................. RG-* conditions for VS1 Complete / shipping
 ```
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
-Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS → OP-001 CLOSED
-DB Role Hardening .................... ⏸ Approved, Deferred (OP-002)
+Operational Gate (Cross-Tenant) ...... ✅ OP-001 CLOSED (RG-001 PASSED)
+DB Role Hardening .................... → OP-002 (Production Hardening)
 Production Readiness ................. ⏳ (RG-003)
-VS1 Complete ......................... ⏳ = OP-* CLOSED + Release Gates PASSED
+VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
 Release Candidate (RC1) .............. ⏳ (RG-004)
 Pilot Deployment (trial client) ...... ⏳ (RG-005)
 Tag v1.0.0 ........................... ⏳ (RG-006)
@@ -48,24 +48,26 @@ Reference Module = Salon ............. ✅ Frozen
 First Production Module .............. After RG-006 only
 ```
 
-**Current program phase:** **Operational Qualification** (see [DECISION_LOG.md](./DECISION_LOG.md), [RELEASE_GATES.md](./RELEASE_GATES.md)).  
-Do **not** authorize new Modules, large Features, or architectural redesign until **[OP-001](./DECISION_LOG.md#op-001)** is **CLOSED**.
+**Current program phase:** **Production Hardening** (see [DECISION_LOG.md](./DECISION_LOG.md), [RELEASE_GATES.md](./RELEASE_GATES.md)).  
+Historical freeze: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) · git tag `vs1-operational-pass`.
 
 **Governance foundation:** Platform Principles + Architecture Lock + ADR + Decision Log + Operational Gates + Release Gates = **COMPLETE**.  
-Further architectural evolution is **not authorized** until OP-001 is **VERIFIED** and **CLOSED**.
+**Operational foundation:** Live Cross-Tenant **PASS** on Hosted Staging = **COMPLETE**.
 
 | Dimension | Status |
 |-----------|--------|
 | Architecture Foundation | **COMPLETE** |
 | Governance Foundation | **COMPLETE** |
-| Operational Qualification | **IN PROGRESS** (blocked on OP-001 VERIFIED/CLOSED) |
-| Production Qualification | **NOT STARTED** |
-| Module Expansion | **BLOCKED** until OP-001 **CLOSED** (then Release Gates) |
+| Operational Foundation | **COMPLETE** |
+| Operational Qualification | **COMPLETE** (OP-001 CLOSED) |
+| Production Hardening | **IN PROGRESS** (OP-002) |
+| Production Qualification | **NOT STARTED** (RG-003+) |
+| Module Expansion | **BLOCKED** until RG-006 (Tag v1.0.0) |
 
 **Process rules:**
 
-1. Do not start **DB Hardening** until **OP-001** is on the path to **CLOSED** (live Cross-Tenant **PASS**, then VERIFIED → CLOSED) — see **RG-001**.
-2. Do not start **Production Readiness** until live Cross-Tenant runtime evidence exists (**PASS**).
+1. **OP-001 is CLOSED.** DB Role Hardening (OP-002) may proceed only when **AUTHORIZED** and explicitly assigned.
+2. Do not start **Production Readiness** until OP-002 path and live evidence policy for that phase are met.
 3. Do not claim **VS1 Complete** unless the [formal definition](./RELEASE_GATES.md) is met (mandatory OP-\* **CLOSED** + Release Gates **PASSED**).
 4. Do not introduce a new production Module or expand Restaurant until after **RG-006** (Tag v1.0.0).
 5. Prefer **RC1 → Pilot (RG-004/RG-005)** before Tag so operational learnings land first.

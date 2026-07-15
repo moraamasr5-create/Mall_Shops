@@ -11,8 +11,8 @@ Not Architecture Lock. Not ADRs. Complements [DECISION_LOG.md](./DECISION_LOG.md
 
 | Gate | Condition | Status |
 |------|-----------|--------|
-| **RG-001** | [OP-001](./DECISION_LOG.md#op-001) = **CLOSED** | 🔒 Locked (not passed) |
-| **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | 🔒 Locked (blocked by OP-001) |
+| **RG-001** | [OP-001](./DECISION_LOG.md#op-001) = **CLOSED** | ✅ Passed (2026-07-15) |
+| **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | 🔒 Locked (OP-002 still DEFERRED / not AUTHORIZED) |
 | **RG-003** | Production Readiness Checklist = **PASS** | 🔒 Locked |
 | **RG-004** | Release Candidate **RC1** successful | 🔒 Locked |
 | **RG-005** | Pilot Deployment successful | 🔒 Locked |
@@ -39,9 +39,10 @@ Until then, do **not** claim VS1 Complete, open a new production Module, or trea
 | Dimension | Assessment |
 |-----------|------------|
 | Architecture Foundation | **COMPLETE** |
+| Operational Foundation | **COMPLETE** ([snapshot](./evidence/2026-07-15-operational-pass.md)) |
 | Governance Foundation | **COMPLETE** (Lock + ADR + Decision Log + Operational Gates + Release Gates) |
-| Current Phase | **Operational Qualification** |
-| Architectural evolution | **Not authorized** until OP-001 reaches **VERIFIED** and **CLOSED** |
+| Current Phase | **Production Hardening** |
+| Architectural evolution | Remains Lock-governed; new Modules still gated by RG-006 |
 
 ---
 

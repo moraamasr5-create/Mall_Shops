@@ -67,7 +67,7 @@ Overall **PASS** only if every case passes after a successful runtime (including
 
 Prerequisites (existing VS1 runnable stack — do not change infra for this evidence):
 
-1. Supabase Auth + DB migrated (live local or Hosted)
+1. Supabase Auth + DB migrated (live **Local Docker** or **Hosted** Supabase — see [RUNBOOK_FIRST_DEPLOYMENT.md](../RUNBOOK_FIRST_DEPLOYMENT.md))
 2. `npm run dev`
 3. `.env` configured
 

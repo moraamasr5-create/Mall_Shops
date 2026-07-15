@@ -71,25 +71,18 @@ CREATE POLICY "tenant_isolation_tenant"
 
 ### `membership`
 
+Direct `EXISTS (SELECT … FROM membership)` inside policies on `membership` causes
+Postgres **infinite recursion** (policy re-enters itself). Operational hotfix:
+`SECURITY DEFINER` helpers (`app_identity_is_active_member`, `app_tenant_has_active_member`)
+evaluate the **same** active-member predicates without RLS re-entry. See migration
+`20260715043000_fix_membership_rls_recursion`.
+
 ```sql
-CREATE POLICY "tenant_isolation_membership"
-  ON membership FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM membership AS m
-      WHERE m.tenant_id = membership.tenant_id
-        AND m.identity_id = auth.uid()::text
-        AND m.status = 'active'
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM membership AS m
-      WHERE m.tenant_id = membership.tenant_id
-        AND m.identity_id = auth.uid()::text
-        AND m.status = 'active'
-    )
-  );
+-- Effective check (via helper): active membership for auth.uid() on that tenant_id
+CREATE POLICY membership_select_isolation
+  ON membership FOR SELECT
+  TO authenticated
+  USING (app_identity_is_active_member(tenant_id));
 ```
 
 ### `tenant_module`

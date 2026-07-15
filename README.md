@@ -8,9 +8,15 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 **Architecture v1.0 FINAL LOCKED / VALIDATED**
 
-**Current program phase:** **Operational Qualification** (see [DECISION_LOG.md](./docs/DECISION_LOG.md), [PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md)).
+| Foundation | Status |
+|------------|--------|
+| Architecture Foundation | **COMPLETE** |
+| Operational Foundation | **COMPLETE** (live Cross-Tenant **PASS** on Mall_Full Staging — [snapshot](./docs/evidence/2026-07-15-operational-pass.md)) |
 
-Do not start a new Module, large Feature, or architectural redesign until **OP-001** is **CLOSED**.
+**Current program phase:** **Production Hardening** (starts with [OP-002](./docs/DECISION_LOG.md#op-002) DB Role Hardening).  
+Snapshot / tag: `vs1-operational-pass`.
+
+Do not start a new Module or large Feature until Release Gates for that milestone allow it.
 
 See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for roadmap and gate criteria.
 
@@ -40,8 +46,8 @@ Contracts → Architecture Lock → Official Architecture Audit → Regression C
 ```
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
-Operational Gate (Cross-Tenant) ...... ⏳ → OP-001 CLOSED (RG-001)
-DB Role Hardening .................... ⏸ OP-002 Deferred (RG-002)
+Operational Gate (Cross-Tenant) ...... ✅ OP-001 CLOSED (RG-001)
+DB Role Hardening .................... → OP-002 (Production Hardening)
 Production Readiness ................. ⏳ (RG-003)
 VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
 RC1 → Pilot → Tag v1.0.0 ............. ⏳ (RG-004 … RG-006)
@@ -77,6 +83,7 @@ Details: [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) ·
 | MVP | [docs/mvp/MVP_DECISIONS.md](./docs/mvp/MVP_DECISIONS.md) |
 | Decision Log (ops) | [docs/DECISION_LOG.md](./docs/DECISION_LOG.md) |
 | Release Gates | [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) |
+| First Deployment & First Tenant Runbook | [docs/RUNBOOK_FIRST_DEPLOYMENT.md](./docs/RUNBOOK_FIRST_DEPLOYMENT.md) |
 
 ---
 

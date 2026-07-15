@@ -122,34 +122,86 @@ function setupError(message) {
   return error;
 }
 
+function loadEnvFile() {
+  const envPath = path.join(__dirname, "..", ".env");
+  if (!fs.existsSync(envPath)) return;
+  for (const line of fs.readFileSync(envPath, "utf8").split(/\r?\n/)) {
+    if (!line || line.trim().startsWith("#")) continue;
+    const i = line.indexOf("=");
+    if (i < 1) continue;
+    const key = line.slice(0, i).trim();
+    const value = line.slice(i + 1).trim();
+    if (key && process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+/**
+ * Prefer public signup; on hosted rate-limits / email validation, fall back to
+ * Auth Admin createUser + app login (Identity JWT still from /api/v1/auth/login).
+ */
+async function provisionAccessToken(email, password, label) {
+  const signup = await api("/api/v1/auth/signup", {
+    method: "POST",
+    body: { email, password },
+  });
+  if (signup.status === 201 && signup.json?.data?.accessToken) {
+    return signup.json.data.accessToken;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) {
+    throw setupError(
+      `signup ${label} → ${signup.status} ${JSON.stringify(signup.json)} (no service role fallback)`
+    );
+  }
+
+  const adminRes = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: {
+      apikey: serviceKey,
+      authorization: `Bearer ${serviceKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ email, password, email_confirm: true }),
+  });
+  const adminJson = await adminRes.json().catch(() => ({}));
+  if (!adminRes.ok) {
+    throw setupError(
+      `admin createUser ${label} → ${adminRes.status} ${JSON.stringify(adminJson)} (after signup ${signup.status})`
+    );
+  }
+
+  const login = await api("/api/v1/auth/login", {
+    method: "POST",
+    body: { email, password },
+  });
+  if (login.status !== 200 || !login.json?.data?.accessToken) {
+    throw setupError(
+      `login ${label} → ${login.status} ${JSON.stringify(login.json)}`
+    );
+  }
+  return login.json.data.accessToken;
+}
+
 async function main() {
+  loadEnvFile();
   const stamp = Date.now();
   const password = "EvidenceTest1!";
 
   console.log("Operational Evidence: Cross-Tenant");
   console.log(`Base URL: ${baseUrl}`);
 
-  const signupA = await api("/api/v1/auth/signup", {
-    method: "POST",
-    body: { email: `evidence-a-${stamp}@example.com`, password },
-  });
-  if (signupA.status !== 201 || !signupA.json?.data?.accessToken) {
-    throw setupError(
-      `signup A → ${signupA.status} ${JSON.stringify(signupA.json)}`
-    );
-  }
-  const tokenA = signupA.json.data.accessToken;
-
-  const signupB = await api("/api/v1/auth/signup", {
-    method: "POST",
-    body: { email: `evidence-b-${stamp}@example.com`, password },
-  });
-  if (signupB.status !== 201 || !signupB.json?.data?.accessToken) {
-    throw setupError(
-      `signup B → ${signupB.status} ${JSON.stringify(signupB.json)}`
-    );
-  }
-  const tokenB = signupB.json.data.accessToken;
+  const tokenA = await provisionAccessToken(
+    `evidence.a.${stamp}@gmail.com`,
+    password,
+    "A"
+  );
+  const tokenB = await provisionAccessToken(
+    `evidence.b.${stamp}@gmail.com`,
+    password,
+    "B"
+  );
 
   const tenantARes = await api("/api/v1/tenants", {
     method: "POST",

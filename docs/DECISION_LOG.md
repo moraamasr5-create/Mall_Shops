@@ -5,8 +5,8 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Operational Qualification** — prove the theoretically ready platform works the same way in live runtime.  
-Do **not** start a new Module, large Feature, or architectural redesign until **OP-001** reaches **CLOSED**.
+**Current program phase:** **Production Hardening** — OP-001 **CLOSED**; freeze at [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).  
+**OP-002** is the first authorized work of this phase (see below when AUTHORIZED).
 
 ---
 
@@ -51,8 +51,8 @@ Rules:
 
 | ID | Title | State |
 |----|-------|--------|
-| [OP-001](#op-001) | Cross-Tenant Operational Gate | **APPROVED** + **IMPLEMENTED** → awaiting **VERIFIED** / **CLOSED** |
-| [OP-002](#op-002) | DB Role Hardening | **APPROVED** + **DEFERRED** (not AUTHORIZED) |
+| [OP-001](#op-001) | Cross-Tenant Operational Gate | **CLOSED** (VERIFIED via live PASS) |
+| [OP-002](#op-002) | DB Role Hardening | **APPROVED** + **DEFERRED** (eligible after OP-001 CLOSED — **not AUTHORIZED** until explicit assignment) |
 
 **Release Gates** (claiming Complete / shipping): see [RELEASE_GATES.md](./RELEASE_GATES.md) (RG-001 … RG-006).
 
@@ -68,25 +68,26 @@ VS1 Complete = mandatory OP-* CLOSED + Release Gates PASSED
 |-------|--------|
 | **ID** | OP-001 |
 | **Title** | Cross-Tenant Operational Gate |
-| **State** | **APPROVED** · **IMPLEMENTED** (gate + harness in repo) |
-| **Next state** | **VERIFIED** when live Supabase evidence is **Overall: PASS**, then **CLOSED** |
+| **State** | **CLOSED** (was VERIFIED on live **Overall: PASS**, then closed) |
+| **Next state** | — (history retained) |
 | **Type** | Operational Gate / **Release criterion** |
-| **Blocks until CLOSED** | OP-002 authorization; Production Readiness; VS1 Complete; RC1; Pilot complete; Tag v1.0.0; First Production Module; any new Module / large Feature / architectural redesign |
+| **Blocks until CLOSED** | ~~OP-002 authorization; Production Readiness; …~~ — **unblocked for eligibility**; downstream work still requires Execution Rule / explicit assignment |
 | **Satisfied by (VERIFIED)** | Evidence report **Overall: PASS** on a **live** Supabase environment (Auth JWT + real RLS + cross-tenant read/write denials) |
 | **Not sufficient** | Unit tests alone; **NOT_EXECUTED** |
-| **Evidence** | [`docs/evidence/cross-tenant-latest.md`](./evidence/cross-tenant-latest.md) |
+| **Evidence** | [`docs/evidence/cross-tenant-latest.md`](./evidence/cross-tenant-latest.md) — **Overall: PASS** (2026-07-15T01:24:42.330Z, Mall_Full Staging via app `:3000`) |
 | **Procedure** | [`docs/evidence/CROSS_TENANT.md`](./evidence/CROSS_TENANT.md) |
 | **Canonical definition** | [Official Architecture Audit](./OFFICIAL_ARCHITECTURE_AUDIT.md) |
 | **Why** | Prove runtime isolation matches Architecture Lock Layer 1+2 before hardening DB roles or claiming VS1 complete. |
+| **Operational note** | Membership RLS recursion hotfix: migration `20260715043000_fix_membership_rls_recursion` (SECURITY DEFINER helpers; same active-member predicate). |
 
 ### Lifecycle progress
 
 ```
 PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
-              ✅           ✅*          ✅          ⏳         ⏳
+              ✅           ✅*          ✅          ✅         ✅
 ```
 
-\*Gate policy was authorized as mandatory when adopted; harness **IMPLEMENTED**. Live **VERIFIED** / **CLOSED** still open.
+\*Gate policy was authorized as mandatory when adopted; harness **IMPLEMENTED**; live **VERIFIED** on Mall_Full Staging; **CLOSED** 2026-07-15.
 
 ---
 
@@ -97,13 +98,13 @@ PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
 | **ID** | OP-002 |
 | **Title** | DB Role Hardening |
 | **State** | **APPROVED** + **DEFERRED** |
-| **Next state** | **AUTHORIZED** only after **OP-001 → CLOSED** (or at minimum OP-001 **VERIFIED** with explicit project sign-off — default: wait for OP-001 **CLOSED**) |
+| **Next state** | **AUTHORIZED** only after **explicit project assignment** (OP-001 is now **CLOSED** — eligibility met; Execution Rule still applies) |
 | **Type** | Infrastructure hardening |
-| **Blocked by** | **OP-001** |
+| **Blocked by** | ~~OP-001~~ (satisfied) — waiting on **explicit AUTHORIZED** assignment |
 | **Implementation** | **Not Authorized Yet** |
 | **Proposal** | Non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL for migrations + `createTenant` only |
 | **Pre-answers** | [RLS.md — Decision Record](./implementation/RLS.md) |
-| **Why deferred** | Do not change connection roles before live Cross-Tenant PASS. |
+| **Why deferred** | Do not change connection roles until Cross-Tenant gate closed **and** hardening is explicitly assigned. |
 
 ### Lifecycle progress
 
@@ -119,7 +120,7 @@ PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
 ## How to update this log
 
 1. Advance **State** only when evidence or an explicit project decision warrants it.
-2. When `cross-tenant-latest.md` becomes **PASS**: set OP-001 → **VERIFIED**, then **CLOSED** after formal acknowledgment.
-3. Only then set OP-002 → drop **DEFERRED**, set **AUTHORIZED** (implementation may begin).
+2. When `cross-tenant-latest.md` becomes **PASS**: set OP-001 → **VERIFIED**, then **CLOSED** after formal acknowledgment. *(Done 2026-07-15.)*
+3. Set OP-002 → drop **DEFERRED**, set **AUTHORIZED** only on **explicit assignment** (OP-001 CLOSED is necessary but not sufficient under the Execution Rule).
 4. After OP-002 ships and is proven: **IMPLEMENTED** → **VERIFIED** → **CLOSED**.
 5. Append new entries as `OP-00x` — do not create parallel logs.
