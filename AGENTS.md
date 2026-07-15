@@ -19,6 +19,7 @@ Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference
 | Architecture gate | `npm run check:architecture` |
 | Verify | On branches that include reviewed Core Security Improvements vs `origin/main`, use `ARCH_ALLOW_CORE_CHANGES=true npm run verify`. Otherwise `npm run verify`. Gate **fails closed** if Git/base ref is missing unless `ARCH_SKIP_CORE_FREEZE=true` (explicit exemption only). |
 | Smoke (Salon path) | `npm run smoke:vs1` (app + Supabase must be running) |
+| Cross-tenant evidence | `npm run evidence:cross-tenant` → `docs/evidence/cross-tenant-latest.md` |
 
 ### Architecture rules for agents
 

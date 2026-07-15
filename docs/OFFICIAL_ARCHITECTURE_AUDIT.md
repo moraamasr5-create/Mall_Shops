@@ -166,7 +166,19 @@ Not architectural inconsistencies. Not redesign signals.
 |------|------|
 | Docs | Keep MVP_DECISIONS aligned as Salon remains the only auto-enabled module |
 | Ops | Prefer dedicated non-superuser DB login for app connections |
+| Ops | **DB Role Hardening:** analysis **Approved**; implementation **Deferred** until Cross-Tenant Operational Evidence = **PASS** (see [RLS.md](./implementation/RLS.md) decision record) |
 | Product | Any unimplemented MVP product features |
+| Future review | Last OWNER — suspend/rollback paths must never leave a Tenant with zero active OWNER |
+| Future review | Last OWNER — concurrent revoke/demote race (transaction / row lock / serializable check) |
+| Future review | Ownership transfer — always **Grant OWNER then Remove OWNER** (never reverse); not in MVP |
+
+### Future review notes — Last OWNER (not MVP; do not implement in this slice)
+
+Current Membership invariant (`assertLastOwnerInvariant`) covers the single-request demote/suspend/revoke case when `activeOwnerCount <= 1`. The following remain **open for a later hardening pass** — not Architecture Lock reopeners:
+
+1. **Suspend → rollback:** Ensure reactivation / compensating flows cannot leave the Tenant without an active OWNER at any observable commit boundary.
+2. **Concurrent dual revoke:** Two requests each seeing `activeOwnerCount = 2` and both succeeding could race; revisit with a DB transaction and appropriate lock/serialization when membership mutation APIs are exposed under concurrency.
+3. **Transfer Ownership:** When product needs transfer, order must be Grant OWNER → then Remove/demote source OWNER (Membership Contract already states transfer as grant-then-optionally-revoke).
 
 Incomplete product delivery ≠ architectural failure.
 
@@ -235,8 +247,8 @@ Lock-weighted score: **~96%**.
 
 1. Core freeze gate fail-closed without Git/base ref — **done** (`check-architecture.mjs`)
 2. Lock-contradicting docs aligned (`DOMAIN_MODEL`, `PRISMA_SCHEMA`, `MIGRATION_PLAN`, `PLATFORM_ARCHITECTURE`) — **done**
-3. Cross-tenant penetration evidence on live Supabase
-4. Prefer non-superuser app DB role that can only `SET ROLE authenticated`
+3. Cross-tenant penetration evidence on live stack — **harness ready** (`npm run evidence:cross-tenant`); treat as proven only when `docs/evidence/cross-tenant-latest.md` shows **PASS**
+4. Prefer non-superuser app DB role that can only `SET ROLE authenticated` — **deferred** until Cross-Tenant **PASS**; pre-answers documented in [RLS.md — DB Role Hardening Decision Record](./implementation/RLS.md)
 5. Membership last-OWNER protection when revoke/delete membership is implemented
 
 VS1 Architecture Freeze commits already on history: Lock finalize + VS1 storage choices recorded. Branch `cursor/vs1-runnable-rls-bootstrap` is the runnable Layer-1 enforcement slice (Core Security Improvement), not an architecture redesign.

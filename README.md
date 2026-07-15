@@ -90,11 +90,14 @@ Optional architectural validation only (not MVP expansion):
 - **Layer 1:** RLS tenant isolation (Prisma migrations) — user requests run as `authenticated` with JWT Identity claims
 - **Layer 2:** Application Role → Permission checks (`requirePermission`)
 
-### Smoke test
+### Smoke + Operational Evidence
 
 ```bash
 npm run smoke:vs1
+npm run evidence:cross-tenant
 ```
+
+Cross-tenant PASS/FAIL report: [docs/evidence/CROSS_TENANT.md](./docs/evidence/CROSS_TENANT.md)
 
 ---
 

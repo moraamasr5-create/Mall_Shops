@@ -223,14 +223,106 @@ When using a privileged path, **Layer 2 (Application Permissions / Identity veri
 
 ---
 
+## DB Role Hardening — Decision Record (Analysis Only)
+
+| Field | Value |
+|-------|--------|
+| Analysis | **Approved** |
+| Implementation | **Deferred** |
+| Gate before execute | Live Operational Evidence: Cross-Tenant **PASS** on a running Supabase environment |
+
+### Decision
+
+Approve the minimal DB Role Hardening proposal (non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL only for migrations/`createTenant`).
+
+**Do not implement until** `npm run evidence:cross-tenant` produces overall **PASS** against a live app + Supabase.
+
+Roadmap after that PASS:
+
+```
+Cross-Tenant PASS → DB Hardening → Production Readiness → VS1 Complete → Tag v1.0.0 → next Module
+```
+
+### Pre-implementation questions (must be answered before any future execute)
+
+#### 1) Does Supabase Hosted allow this role model?
+
+**Yes, with SQL in the project database — no Architecture change required.**
+
+- Supabase Hosted is managed Postgres; custom `LOGIN` roles can be created via SQL Editor / migrations (same as local).
+- Official Prisma guide creates a custom DB user for Prisma ([Prisma + Supabase](https://supabase.com/docs/guides/database/prisma)); that example often uses `BYPASSRLS` for migrations convenience — **our hardening goal is the opposite for the app runtime role**: no `BYPASSRLS`, and `GRANT authenticated TO app_runtime` so `SET LOCAL ROLE authenticated` works.
+- Built-in roles `authenticated` / `anon` already exist on Hosted; they must not be replaced. The new role is an additional LOGIN wrapper only.
+- Constraints to verify at execute time (ops checklist, not blockers to the analysis):
+  - Role must be creatable with `LOGIN` + password (or secret via Vault/env).
+  - Membership: `GRANT authenticated TO app_runtime` (and revoke dangerous privileges).
+  - Pooler (Supavisor/PgBouncer): prefer **session** mode or direct connection for transactions that use `SET LOCAL ROLE` (transaction pooling can break session/`SET LOCAL` semantics — validate on Hosted before cutting over).
+
+#### 2) Will Prisma keep working if `DATABASE_URL` becomes `app_runtime`?
+
+**Yes for the VS1 pattern, if grants and pooling are correct.**
+
+Current path already assumes:
+
+```
+PrismaClient(DATABASE_URL)
+  → $transaction
+  → set_config(JWT claims)
+  → SET LOCAL ROLE authenticated
+  → queries under RLS
+```
+
+Changing only the login role in `DATABASE_URL` from `postgres` to `app_runtime` does **not** change that application code path, provided:
+
+| Requirement | Why |
+|-------------|-----|
+| `app_runtime` can `SET ROLE authenticated` | Otherwise `withIdentityRls` fails |
+| `authenticated` retains table DML grants (already in VS1 migration) | Queries after `SET ROLE` still work |
+| Privileged client uses a **separate** URL (`DIRECT_URL` / privileged env) as `postgres` (or migration user) | `createTenant` + `prisma migrate` still need a strong role |
+| Connection pool compatible with `SET LOCAL` | Session mode / direct URL for interactive transactions |
+
+**Side effects to expect (not architecture breaks):** migrate/deploy must keep using the privileged URL; misconfiguring a single URL for both runtime and migrate would either break migrate or reintroduce bypass. Validate with a smoke + cross-tenant evidence re-run after cutover.
+
+### Out of scope until execute is approved
+
+- Creating `app_runtime`
+- Changing `.env` / hosted connection strings
+- New migrations for roles
+- Any Production Readiness checklist items beyond this decision record
+
+---
+
 ## Testing RLS
+
+### Operational Evidence (required before production claims)
+
+Live cross-tenant isolation is proven by:
+
+```bash
+npm run evidence:cross-tenant
+```
+
+See [Operational Evidence — Cross-Tenant](../evidence/CROSS_TENANT.md).
+
+PASS means:
+
+1. The live harness actually executed (not NOT_EXECUTED)
+2. Identity A and Identity B each own a separate Tenant
+3. Identity B cannot read Tenant A salon data (`403` / 0 rows)
+4. Identity A cannot read Tenant B salon data (`403` / 0 rows)
+5. Tenant B’s own list does not expose Tenant A services
+
+Status legend: **PASS** | **FAIL** (isolation broken) | **NOT_EXECUTED** (environment unavailable — no conclusion).
+
+Unit tests cover the evidence matrix and PASS/FAIL/NOT_EXECUTED scoring (`npm test`). They do not replace the live run.
+
+### Manual checklist
 
 Before production:
 
-1. Create test Identities in separate Tenants
-2. Verify Identity A cannot read Tenant B data
-3. Verify Role restrictions at application layer
-4. Verify RLS blocks even when application check is removed (penetration test)
+1. Run `npm run evidence:cross-tenant` → overall **PASS**
+2. Review `docs/evidence/cross-tenant-latest.md`
+3. Verify Role restrictions at application layer (Layer 2)
+4. Optionally re-run after temporarily weakening app filters to confirm Layer 1 still blocks (penetration follow-up)
 
 ---
 
