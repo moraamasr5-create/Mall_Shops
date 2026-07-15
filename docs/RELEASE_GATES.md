@@ -12,7 +12,7 @@ Not Architecture Lock. Not ADRs. Complements [DECISION_LOG.md](./DECISION_LOG.md
 | Gate | Condition | Status |
 |------|-----------|--------|
 | **RG-001** | [OP-001](./DECISION_LOG.md#op-001) = **CLOSED** | ✅ Passed (2026-07-15) |
-| **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | 🔒 Locked (OP-002 still DEFERRED / not AUTHORIZED) |
+| **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | ✅ Passed (2026-07-15; OP-002 CLOSED) |
 | **RG-003** | Production Readiness Checklist = **PASS** | 🔒 Locked |
 | **RG-004** | Release Candidate **RC1** successful | 🔒 Locked |
 | **RG-005** | Pilot Deployment successful | 🔒 Locked |

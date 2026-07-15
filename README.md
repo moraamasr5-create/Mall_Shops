@@ -47,7 +47,7 @@ Contracts → Architecture Lock → Official Architecture Audit → Regression C
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
 Operational Gate (Cross-Tenant) ...... ✅ OP-001 CLOSED (RG-001)
-DB Role Hardening .................... → OP-002 (Production Hardening)
+DB Role Hardening .................... ✅ OP-002 CLOSED (RG-002)
 Production Readiness ................. ⏳ (RG-003)
 VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
 RC1 → Pilot → Tag v1.0.0 ............. ⏳ (RG-004 … RG-006)

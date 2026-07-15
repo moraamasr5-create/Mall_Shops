@@ -38,7 +38,7 @@ Release Gates .................. RG-* conditions for VS1 Complete / shipping
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
 Operational Gate (Cross-Tenant) ...... ✅ OP-001 CLOSED (RG-001 PASSED)
-DB Role Hardening .................... → OP-002 (Production Hardening)
+DB Role Hardening .................... ✅ OP-002 CLOSED (RG-002)
 Production Readiness ................. ⏳ (RG-003)
 VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
 Release Candidate (RC1) .............. ⏳ (RG-004)
@@ -60,7 +60,7 @@ Historical freeze: [2026-07-15 Operational Pass](./evidence/2026-07-15-operation
 | Governance Foundation | **COMPLETE** |
 | Operational Foundation | **COMPLETE** |
 | Operational Qualification | **COMPLETE** (OP-001 CLOSED) |
-| Production Hardening | **IN PROGRESS** (OP-002) |
+| Production Hardening | **OP-002 CLOSED**; next = Production Readiness (RG-003) |
 | Production Qualification | **NOT STARTED** (RG-003+) |
 | Module Expansion | **BLOCKED** until RG-006 (Tag v1.0.0) |
 

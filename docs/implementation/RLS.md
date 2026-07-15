@@ -223,8 +223,8 @@ Executive record: [DECISION_LOG.md — OP-002](../DECISION_LOG.md#op-002).
 | Field | Value |
 |-------|--------|
 | Decision | Approve the minimal DB Role Hardening proposal (non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL only for migrations/`createTenant`). |
-| Implementation | **Deferred** — **not** Ready for Implementation until the Cross-Tenant **release** Operational Gate is **PASSED**. |
-| Gate before execute | **Operational Gate: Cross-Tenant Validation** must be **PASSED** (live Supabase + evidence report). Unit tests alone or **NOT_EXECUTED** do not unlock Hardening. |
+| Implementation | **CLOSED** — `app_runtime` + privileged client split; live Cross-Tenant **PASS** under hardened runtime. |
+| Gate before execute | **Operational Gate: Cross-Tenant Validation** — **PASSED** (OP-001 CLOSED). |
 
 ### Decision
 

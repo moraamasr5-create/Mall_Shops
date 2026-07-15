@@ -52,7 +52,7 @@ Rules:
 | ID | Title | State |
 |----|-------|--------|
 | [OP-001](#op-001) | Cross-Tenant Operational Gate | **CLOSED** (VERIFIED via live PASS) |
-| [OP-002](#op-002) | DB Role Hardening | **APPROVED** + **DEFERRED** (eligible after OP-001 CLOSED — **not AUTHORIZED** until explicit assignment) |
+| [OP-002](#op-002) | DB Role Hardening | **CLOSED** (VERIFIED — live Cross-Tenant PASS under `app_runtime`) |
 
 **Release Gates** (claiming Complete / shipping): see [RELEASE_GATES.md](./RELEASE_GATES.md) (RG-001 … RG-006).
 
@@ -97,23 +97,24 @@ PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
 |-------|--------|
 | **ID** | OP-002 |
 | **Title** | DB Role Hardening |
-| **State** | **APPROVED** + **DEFERRED** |
-| **Next state** | **AUTHORIZED** only after **explicit project assignment** (OP-001 is now **CLOSED** — eligibility met; Execution Rule still applies) |
+| **State** | **CLOSED** |
+| **Next state** | — (history retained) |
 | **Type** | Infrastructure hardening |
-| **Blocked by** | ~~OP-001~~ (satisfied) — waiting on **explicit AUTHORIZED** assignment |
-| **Implementation** | **Not Authorized Yet** |
+| **Blocked by** | ~~OP-001~~ (CLOSED) |
+| **Implementation** | **Done** — `app_runtime` (NOBYPASSRLS) + privileged `DIRECT_URL` client; live evidence re-PASS |
 | **Proposal** | Non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL for migrations + `createTenant` only |
 | **Pre-answers** | [RLS.md — Decision Record](./implementation/RLS.md) |
-| **Why deferred** | Do not change connection roles until Cross-Tenant gate closed **and** hardening is explicitly assigned. |
+| **Evidence** | [`cross-tenant-latest.md`](./evidence/cross-tenant-latest.md) — **Overall: PASS** after cutover (`2026-07-15T01:32:00.414Z`) |
+| **Why now** | Explicit assignment after `vs1-operational-pass` freeze; first work of **Production Hardening**. |
 
 ### Lifecycle progress
 
 ```
 PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
-              ✅
-         (+ DEFERRED)
-                          ⏳           ⏳           ⏳         ⏳
+              ✅           ✅           ✅           ✅         ✅
 ```
+
+(DEFERRED lifted after OP-001 CLOSED + `vs1-operational-pass` + explicit Production Hardening start.)
 
 ---
 

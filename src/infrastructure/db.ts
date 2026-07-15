@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "@/infrastructure/prisma";
+import { privilegedPrisma } from "@/infrastructure/privileged-prisma";
 import { AppError } from "@/shared/errors";
 
 export type DbClient = PrismaClient | Prisma.TransactionClient;
@@ -26,9 +27,10 @@ export function getDb(): DbClient {
 /**
  * Privileged Prisma client — migrations / admin / restricted bootstrap only.
  * Must never be used for normal user-facing API data access.
+ * Uses DIRECT_URL (postgres / migration role), not DATABASE_URL (app_runtime).
  */
 export function getPrivilegedDb(): PrismaClient {
-  return prisma;
+  return privilegedPrisma;
 }
 
 /**
