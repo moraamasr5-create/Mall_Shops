@@ -37,3 +37,17 @@ Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference
 - Respect `docs/DECISION_LOG.md` lifecycle (`PROPOSED → … → CLOSED`). **OP-001** must reach **CLOSED** before new Modules / large Features / architectural redesign. **OP-002** stays **DEFERRED** until then.
 - Respect `docs/RELEASE_GATES.md`: new code should close an existing Gate/OP, not invent scope. **VS1 Complete** is undefined until RGs pass.
 - Prefer closing an existing gate over opening new scope (anti–scope creep).
+
+### Execution Rule
+
+Cursor never advances the roadmap autonomously.
+
+The next implementation task must always originate from one of:
+
+- A Release Gate becoming unblocked.
+- An approved Decision changing state (see `docs/DECISION_LOG.md`).
+- An explicitly assigned implementation task.
+
+Cursor may propose improvements, but may not reorder milestones or begin blocked work.
+
+From this phase forward, act as an **Executor**: implement only what a Gate, Decision Log state change, or explicit assignment authorizes — not what a chat casually suggests.

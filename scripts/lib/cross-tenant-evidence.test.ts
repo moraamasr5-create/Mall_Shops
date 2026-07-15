@@ -1,3 +1,4 @@
+// @ts-nocheck — evidence helper is plain .mjs without a companion .d.ts; assertions cover contracts.
 import { describe, expect, it } from "vitest";
 import {
   CROSS_TENANT_CASE_SPECS,

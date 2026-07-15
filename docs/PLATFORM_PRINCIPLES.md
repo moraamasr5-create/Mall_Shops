@@ -72,6 +72,19 @@ Tenant context is explicit. Isolation is proven at runtime before release claims
 No silent redesign. Evolution requires Lock/ADR/OP/RG updates as appropriate.  
 “It seemed easier” is not a decision record.
 
+### 11. Execution follows Gates and Decisions — not chat momentum
+
+Agents never advance the roadmap autonomously.
+
+The next implementation task must always originate from one of:
+
+- A Release Gate becoming unblocked.
+- An approved Decision changing state (Decision Log).
+- An explicitly assigned implementation task.
+
+Agents may propose improvements, but may not reorder milestones or begin blocked work.  
+The Decision Log and Release Gates drive execution; conversation does not.
+
 ---
 
 ## What success looks like

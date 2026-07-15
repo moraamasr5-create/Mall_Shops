@@ -43,6 +43,7 @@ Rules:
 1. Never jump to **IMPLEMENTED** without **AUTHORIZED** (except documentation-only / harness that defines a gate — record honestly).
 2. **DEFERRED** means “do not ask Cursor/agents to implement.”
 3. **CLOSED** is the only state that permanently unlocks downstream work that this decision was blocking.
+4. **Execution Rule:** agents do not advance the roadmap autonomously. Implementation starts only from an unblocked Release Gate, a Decision state change that authorizes work, or an explicit assignment — see [PLATFORM_PRINCIPLES.md](./PLATFORM_PRINCIPLES.md) §11 and `AGENTS.md`.
 
 ---
 
