@@ -98,8 +98,9 @@ Performed as part of PR-07. **No code modifications.**
 | Decision | Value |
 |----------|--------|
 | **PR-07** | **PASS** |
-| **RG-003** | **PROPOSE = PASSED** (owner confirmation required to flip [RELEASE_GATES.md](../RELEASE_GATES.md)) |
-| **RG-004** | **Not started** — await explicit assignment after clean Final Release Audit |
+| **RG-003** | **PASSED** (Final Release Audit [../evidence/final-release-audit-rg003.md](../evidence/final-release-audit-rg003.md)) |
+| **RG-004** | **Not started** — await explicit assignment |
+| **Current phase** | **Release Candidate (RG-004)** |
 | New Features / Modules | **Blocked** until release train allows |
 | New OP / Architecture change | **Not opened** |
 

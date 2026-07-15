@@ -11,10 +11,11 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 | Foundation | Status |
 |------------|--------|
 | Architecture Foundation | **COMPLETE** |
-| Operational Foundation | **COMPLETE** (live Cross-Tenant **PASS** on Mall_Full Staging — [snapshot](./docs/evidence/2026-07-15-operational-pass.md)) |
+| Operational Foundation | **COMPLETE** ([snapshot](./docs/evidence/2026-07-15-operational-pass.md)) |
+| Production Readiness | **COMPLETE** — **RG-003 PASSED** ([sign-off](./docs/ops/PRODUCTION_SIGNOFF.md)) |
 
-**Current program phase:** **Production Hardening** (starts with [OP-002](./docs/DECISION_LOG.md#op-002) DB Role Hardening).  
-Snapshot / tag: `vs1-operational-pass`.
+**Current program phase:** **Release Candidate (RG-004)** — await explicit assignment for RC1.  
+Tags: `vs1-operational-pass` · `rg-003-passed`
 
 Do not start a new Module or large Feature until Release Gates for that milestone allow it.
 

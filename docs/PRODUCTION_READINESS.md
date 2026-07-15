@@ -4,7 +4,7 @@
 **What this is not:** Architecture Lock, ADR, or authorization to ship `v1.0.0`.
 
 **Plan status:** **APPROVED**  
-**Gate status:** **COMPLETE** — PR-01…PR-07 PASS · **propose RG-003 = PASSED** (await owner flip)
+**Gate status:** **PASSED** — see [Final Release Audit](./evidence/final-release-audit-rg003.md)
 
 **Index:** [RELEASE_GATES.md](./RELEASE_GATES.md) · Prerequisites: [OP-001 CLOSED](./DECISION_LOG.md#op-001), [OP-002 CLOSED](./DECISION_LOG.md#op-002)
 
@@ -85,9 +85,10 @@ PR-04 Application Observability  ✅
 PR-05 Migration Safety / Rollback ✅
 PR-06 Release Verification (CI)  ✅
 PR-07 Production Sign-off        ✅
-→ RG-003 = PASSED (proposed — owner confirm)
-→ Final Release Audit on clean tree (before RG-004)
-→ RG-004 RC1 → RG-005 Pilot (one salon) → RG-006 v1.0.0
+→ RG-003 = PASSED ✅
+→ Final Release Audit (clean) ✅
+→ RG-004 RC1 ← next when assigned
+→ RG-005 Pilot (one salon) → RG-006 v1.0.0
 ```
 
 ---

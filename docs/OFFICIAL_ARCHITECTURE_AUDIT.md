@@ -39,9 +39,9 @@ Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
 Operational Gate (Cross-Tenant) ...... ✅ OP-001 CLOSED (RG-001 PASSED)
 DB Role Hardening .................... ✅ OP-002 CLOSED (RG-002)
-Production Readiness ................. ⏳ (RG-003)
-VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
-Release Candidate (RC1) .............. ⏳ (RG-004)
+Production Readiness ................. ✅ RG-003 PASSED
+VS1 Complete ......................... ⏳ (RG-004…RG-006)
+Release Candidate (RC1) .............. → RG-004 (next when assigned)
 Pilot Deployment (trial client) ...... ⏳ (RG-005)
 Tag v1.0.0 ........................... ⏳ (RG-006)
 Reference Module = Salon ............. ✅ Frozen

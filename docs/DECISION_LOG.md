@@ -5,8 +5,8 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Production Hardening** — OP-001 **CLOSED**; freeze at [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).  
-**OP-002** is the first authorized work of this phase (see below when AUTHORIZED).
+**Current program phase:** **Release Candidate (RG-004)** — RG-003 **PASSED**; start RC1 only when explicitly assigned.  
+Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).
 
 ---
 
