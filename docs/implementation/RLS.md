@@ -225,6 +225,8 @@ When using a privileged path, **Layer 2 (Application Permissions / Identity veri
 
 ## DB Role Hardening — Decision Record (Analysis Only)
 
+Executive record: [DECISION_LOG.md — OP-002](../DECISION_LOG.md#op-002).
+
 | Field | Value |
 |-------|--------|
 | Decision | Approve the minimal DB Role Hardening proposal (non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL only for migrations/`createTenant`). |

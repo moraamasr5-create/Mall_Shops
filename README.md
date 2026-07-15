@@ -8,7 +8,9 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 **Architecture v1.0 FINAL LOCKED / VALIDATED**
 
-Implementation: **VS1 Runnable** completed. Next formal gate: **Operational Gate — Cross-Tenant Validation** (live PASS required before DB Hardening).
+**Current program phase:** **Operational Qualification** (see [DECISION_LOG.md](./docs/DECISION_LOG.md), [PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md)).
+
+Do not start a new Module, large Feature, or architectural redesign until **OP-001** is **CLOSED**.
 
 See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for roadmap and gate criteria.
 
@@ -18,10 +20,13 @@ See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for roa
 
 The project architecture is governed by the following documents:
 
+- [docs/PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md) — Platform constitution (enduring principles)
 - [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) — fixed architectural decisions
 - [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) — implementation alignment with the Lock + **Operational Gate**
 - [docs/ARCHITECTURE_REGRESSION_CHECKLIST.md](./docs/ARCHITECTURE_REGRESSION_CHECKLIST.md) — merge gate and regression prevention
 - [docs/evidence/CROSS_TENANT.md](./docs/evidence/CROSS_TENANT.md) — Cross-Tenant Operational Gate procedure
+- [docs/DECISION_LOG.md](./docs/DECISION_LOG.md) — Operational / executive decision log (OP-001, OP-002, …)
+- [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) — Release Gates (RG-001 … RG-006) + formal **VS1 Complete** definition
 
 Any architectural change must remain compatible with the Architecture Lock.
 
@@ -35,15 +40,13 @@ Contracts → Architecture Lock → Official Architecture Audit → Regression C
 ```
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
-Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS
-DB Role Hardening .................... ⏸ Approved, Deferred
-Production Readiness ................. ⏳
-VS1 Complete ......................... ⏳
-Release Candidate (RC1) .............. ⏳
-Pilot Deployment (trial client) ...... ⏳
-Tag v1.0.0 ........................... ⏳
+Operational Gate (Cross-Tenant) ...... ⏳ → OP-001 CLOSED (RG-001)
+DB Role Hardening .................... ⏸ OP-002 Deferred (RG-002)
+Production Readiness ................. ⏳ (RG-003)
+VS1 Complete ......................... ⏳ OP-* CLOSED + RGs PASSED
+RC1 → Pilot → Tag v1.0.0 ............. ⏳ (RG-004 … RG-006)
 Salon = Reference Module ............. ✅ Frozen
-First Production Module .............. After Tag v1.0.0
+First Production Module .............. After RG-006
 ```
 
 ### Release criteria (mandatory)
@@ -51,9 +54,12 @@ First Production Module .............. After Tag v1.0.0
 | Gate | Blocks |
 |------|--------|
 | Architecture Regression (`npm run verify`) | Merges / slices |
-| **Operational Gate: Cross-Tenant PASS** | DB Hardening, Production Readiness, VS1 Complete, RC1, Tag v1.0.0, new production Modules |
+| **OP-001 / RG-001** Cross-Tenant **CLOSED** | DB Hardening, Production Readiness, VS1 Complete, RC1, Tag, new Modules |
+| **Release Gates RG-002…RG-006** | Shipping train (see [RELEASE_GATES.md](./docs/RELEASE_GATES.md)) |
 
-Details: [Official Architecture Audit — Release Criteria](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) · [Cross-Tenant Gate](./docs/evidence/CROSS_TENANT.md)
+**VS1 Complete** = mandatory Operational Decisions **CLOSED** + Release Gates **PASSED** — [definition](./docs/RELEASE_GATES.md).
+
+Details: [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) · [Decision Log](./docs/DECISION_LOG.md) · [Cross-Tenant Gate](./docs/evidence/CROSS_TENANT.md)
 
 ---
 
@@ -61,6 +67,7 @@ Details: [Official Architecture Audit — Release Criteria](./docs/OFFICIAL_ARCH
 
 | Layer | Location |
 |-------|----------|
+| Platform Principles | [docs/PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md) |
 | Architecture Lock | [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) |
 | Official Architecture Audit | [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) |
 | Regression Checklist | [docs/ARCHITECTURE_REGRESSION_CHECKLIST.md](./docs/ARCHITECTURE_REGRESSION_CHECKLIST.md) |
@@ -68,6 +75,8 @@ Details: [Official Architecture Audit — Release Criteria](./docs/OFFICIAL_ARCH
 | Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
 | Implementation | [docs/implementation/](./docs/implementation/) |
 | MVP | [docs/mvp/MVP_DECISIONS.md](./docs/mvp/MVP_DECISIONS.md) |
+| Decision Log (ops) | [docs/DECISION_LOG.md](./docs/DECISION_LOG.md) |
+| Release Gates | [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) |
 
 ---
 

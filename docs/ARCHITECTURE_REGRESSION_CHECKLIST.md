@@ -64,15 +64,12 @@ Adding business functionality is not a valid reason to modify Core.
 - [ ] Application code enforces Role -> Permission authorization.
 - [ ] Neither RLS nor application authorization is treated as a replacement for the other.
 
-## Operational Gate (Cross-Tenant) — release criterion
+Before claiming **VS1 Complete** (see [RELEASE_GATES.md](./RELEASE_GATES.md)), starting DB Role Hardening, opening RC1 / Pilot, tagging v1.0.0, or opening a new production Module:
 
-Before claiming VS1 Complete, starting DB Role Hardening, opening RC1 / Pilot, tagging v1.0.0, or opening a new production Module:
+- [ ] **RG-001 / OP-001:** Live Cross-Tenant gate **CLOSED** (`docs/evidence/cross-tenant-latest.md` was **PASS**, then Decision Log advanced).
+- [ ] Remaining Release Gates for the intended milestone are tracked in [RELEASE_GATES.md](./RELEASE_GATES.md).
 
-- [ ] Live Cross-Tenant Operational Gate is **PASSED** (not merely unit-test green or NOT_EXECUTED).
-- [ ] `docs/evidence/cross-tenant-latest.md` shows **Overall: PASS**.
-- [ ] Gate criteria in [Official Architecture Audit](./OFFICIAL_ARCHITECTURE_AUDIT.md) and [CROSS_TENANT.md](./evidence/CROSS_TENANT.md) are all satisfied.
-
-DB Role Hardening must not begin until this gate is PASSED. Production Readiness must not begin until live Cross-Tenant runtime evidence exists.
+DB Role Hardening must not begin until OP-001 is on the **CLOSED** path. Prefer closing existing gates over new Features/Modules.
 
 ## Module Addition Workflow
 

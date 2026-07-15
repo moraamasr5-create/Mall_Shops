@@ -8,7 +8,7 @@ This is the project’s **Operational Gate: Cross-Tenant Validation** — a form
 
 ## Formal gate (release criterion)
 
-Canonical definition also lives in [Official Architecture Audit](../OFFICIAL_ARCHITECTURE_AUDIT.md) (§ Operational Gate + **Release Criteria**).
+Formal release record: [Decision Log — OP-001](../DECISION_LOG.md#op-001). DB Hardening: [OP-002](../DECISION_LOG.md#op-002).
 
 This gate is part of **project release criteria**, not a local developer convenience.
 

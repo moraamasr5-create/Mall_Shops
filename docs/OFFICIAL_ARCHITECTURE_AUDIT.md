@@ -18,12 +18,17 @@
 This document sits in the project governance chain:
 
 ```
+Platform Principles ............ Enduring constitution (why the platform exists)
 Contracts ...................... Business Truth (what must be)
 Architecture Lock .............. Fixed architectural decisions
 Official Architecture Audit .... Does current implementation match those decisions?
 Regression Checklist ........... How we prevent breaking them during development
 Operational Gate ............... Live Cross-Tenant evidence before DB Hardening
+Decision Log ................... Executive OP-* records (why work is blocked/deferred)
+Release Gates .................. RG-* conditions for VS1 Complete / shipping
 ```
+
+**Documentation rule:** New docs only for **Decision**, **Evidence**, or **Policy** — see [PLATFORM_PRINCIPLES.md](./PLATFORM_PRINCIPLES.md).
 
 ---
 
@@ -32,24 +37,39 @@ Operational Gate ............... Live Cross-Tenant evidence before DB Hardening
 ```
 Architecture Lock v1.0 ............... ✅ Locked
 VS1 Runnable ......................... ✅ Completed
-Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS
-DB Role Hardening .................... ⏸ Approved, Deferred (blocked on Gate)
-Production Readiness ................. ⏳ (blocked until runtime evidence exists)
-VS1 Complete ......................... ⏳
-Release Candidate (RC1) .............. ⏳ After VS1 Complete
-Pilot Deployment ..................... ⏳ One trial salon/restaurant client
-Tag v1.0.0 ........................... ⏳ After successful pilot learnings absorbed
-Reference Module = Salon ............. ✅ Frozen (do not expand as product surface)
-First Production Module .............. After Tag v1.0.0 only
+Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS → OP-001 CLOSED
+DB Role Hardening .................... ⏸ Approved, Deferred (OP-002)
+Production Readiness ................. ⏳ (RG-003)
+VS1 Complete ......................... ⏳ = OP-* CLOSED + Release Gates PASSED
+Release Candidate (RC1) .............. ⏳ (RG-004)
+Pilot Deployment (trial client) ...... ⏳ (RG-005)
+Tag v1.0.0 ........................... ⏳ (RG-006)
+Reference Module = Salon ............. ✅ Frozen
+First Production Module .............. After RG-006 only
 ```
+
+**Current program phase:** **Operational Qualification** (see [DECISION_LOG.md](./DECISION_LOG.md), [RELEASE_GATES.md](./RELEASE_GATES.md)).  
+Do **not** authorize new Modules, large Features, or architectural redesign until **[OP-001](./DECISION_LOG.md#op-001)** is **CLOSED**.
+
+**Governance foundation:** Platform Principles + Architecture Lock + ADR + Decision Log + Operational Gates + Release Gates = **COMPLETE**.  
+Further architectural evolution is **not authorized** until OP-001 is **VERIFIED** and **CLOSED**.
+
+| Dimension | Status |
+|-----------|--------|
+| Architecture Foundation | **COMPLETE** |
+| Governance Foundation | **COMPLETE** |
+| Operational Qualification | **IN PROGRESS** (blocked on OP-001 VERIFIED/CLOSED) |
+| Production Qualification | **NOT STARTED** |
+| Module Expansion | **BLOCKED** until OP-001 **CLOSED** (then Release Gates) |
 
 **Process rules:**
 
-1. Do not start **DB Hardening** until the **Operational Gate: Cross-Tenant Validation** is **PASSED**.
-2. Do not start **Production Readiness** cutover work until live Cross-Tenant runtime evidence exists (**PASS**).
-3. Do not claim **VS1 Complete**, open **RC1**, or **Tag v1.0.0** without the Cross-Tenant gate **PASSED**.
-4. Do not introduce a new production Module or expand Restaurant until after **Tag v1.0.0**.
-5. Prefer a short **Pilot Deployment** between RC1 and v1.0.0 so operational learnings (logs, monitoring, permissions, usability) land before building the next Module.
+1. Do not start **DB Hardening** until **OP-001** is on the path to **CLOSED** (live Cross-Tenant **PASS**, then VERIFIED → CLOSED) — see **RG-001**.
+2. Do not start **Production Readiness** until live Cross-Tenant runtime evidence exists (**PASS**).
+3. Do not claim **VS1 Complete** unless the [formal definition](./RELEASE_GATES.md) is met (mandatory OP-\* **CLOSED** + Release Gates **PASSED**).
+4. Do not introduce a new production Module or expand Restaurant until after **RG-006** (Tag v1.0.0).
+5. Prefer **RC1 → Pilot (RG-004/RG-005)** before Tag so operational learnings land first.
+6. Prefer closing an existing Gate/OP over opening new scope.
 
 ---
 
@@ -93,7 +113,8 @@ npm run evidence:cross-tenant
 | **FAIL** | Gate FAILED — tenant isolation broken; stop and fix |
 | **NOT_EXECUTED** | Gate not evaluated — environment unavailable; no conclusion |
 
-Canonical procedure: [docs/evidence/CROSS_TENANT.md](./evidence/CROSS_TENANT.md).
+Canonical procedure: [docs/evidence/CROSS_TENANT.md](./evidence/CROSS_TENANT.md).  
+Executive record: [Decision Log — OP-001](./DECISION_LOG.md#op-001).
 
 **Only after this gate is PASSED may DB Role Hardening begin.**
 
@@ -251,7 +272,7 @@ Not architectural inconsistencies. Not redesign signals.
 |------|------|
 | Docs | Keep MVP_DECISIONS aligned as Salon remains the only auto-enabled module |
 | Ops | Prefer dedicated non-superuser DB login for app connections |
-| Ops | **DB Role Hardening:** analysis **Approved**; implementation **Deferred** until Cross-Tenant Operational Evidence = **PASS** (see [RLS.md](./implementation/RLS.md) decision record) |
+| Ops | **DB Role Hardening (OP-002):** analysis **Approved**; implementation **Deferred** / **Not Authorized Yet** until OP-001 PASS — see [DECISION_LOG.md](./DECISION_LOG.md) |
 | Product | Any unimplemented MVP product features |
 | Future review | Last OWNER — suspend/rollback paths must never leave a Tenant with zero active OWNER |
 | Future review | Last OWNER — concurrent revoke/demote race (transaction / row lock / serializable check) |
