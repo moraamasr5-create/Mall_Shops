@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { handleApi } from "@/core/http/api";
 import {
   requireEnabledModule,
   requirePermission,
@@ -21,63 +22,69 @@ import {
 type Params = { params: Promise<{ categoryId: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
-      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
-        RESTAURANT_ROLE_PERMISSIONS,
-      ]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+        requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryRead, [
+          RESTAURANT_ROLE_PERMISSIONS,
+        ]);
 
-      const { categoryId } = await params;
-      const category = await getRestaurantCategory(ctx.tenant.tenantId, categoryId);
-      return jsonOk(category);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { categoryId } = await params;
+        const category = await getRestaurantCategory(ctx.tenant.tenantId, categoryId);
+        return jsonOk(category);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
-      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
-        RESTAURANT_ROLE_PERMISSIONS,
-      ]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+        requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryWrite, [
+          RESTAURANT_ROLE_PERMISSIONS,
+        ]);
 
-      const { categoryId } = await params;
-      const body = updateRestaurantCategoryInputSchema.parse(await req.json());
-      const category = await updateRestaurantCategory(
-        ctx.tenant.tenantId,
-        categoryId,
-        body
-      );
-      return jsonOk(category);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { categoryId } = await params;
+        const body = updateRestaurantCategoryInputSchema.parse(await req.json());
+        const category = await updateRestaurantCategory(
+          ctx.tenant.tenantId,
+          categoryId,
+          body
+        );
+        return jsonOk(category);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }
 
 export async function DELETE(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
-      requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryDelete, [
-        RESTAURANT_ROLE_PERMISSIONS,
-      ]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, RESTAURANT_MODULE.moduleKey);
+        requirePermission(ctx, RESTAURANT_PERMISSIONS.categoryDelete, [
+          RESTAURANT_ROLE_PERMISSIONS,
+        ]);
 
-      const { categoryId } = await params;
-      const category = await deactivateRestaurantCategory(
-        ctx.tenant.tenantId,
-        categoryId
-      );
-      return jsonOk(category);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { categoryId } = await params;
+        const category = await deactivateRestaurantCategory(
+          ctx.tenant.tenantId,
+          categoryId
+        );
+        return jsonOk(category);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }

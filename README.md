@@ -83,6 +83,13 @@ Details: [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) ·
 | MVP | [docs/mvp/MVP_DECISIONS.md](./docs/mvp/MVP_DECISIONS.md) |
 | Decision Log (ops) | [docs/DECISION_LOG.md](./docs/DECISION_LOG.md) |
 | Release Gates | [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) |
+| Production Readiness (RG-003 plan) | [docs/PRODUCTION_READINESS.md](./docs/PRODUCTION_READINESS.md) |
+| Backup Strategy (PR-02) | [docs/ops/BACKUP_STRATEGY.md](./docs/ops/BACKUP_STRATEGY.md) |
+| Restore Verification (PR-03) | [docs/ops/RESTORE_VERIFICATION.md](./docs/ops/RESTORE_VERIFICATION.md) |
+| Observability MVP (PR-04) | [docs/ops/OBSERVABILITY.md](./docs/ops/OBSERVABILITY.md) |
+| Migration Safety (PR-05) | [docs/ops/MIGRATION_SAFETY.md](./docs/ops/MIGRATION_SAFETY.md) |
+| Release Verification (PR-06) | [docs/ops/RELEASE_VERIFICATION.md](./docs/ops/RELEASE_VERIFICATION.md) |
+| Production Sign-off (PR-07) | [docs/ops/PRODUCTION_SIGNOFF.md](./docs/ops/PRODUCTION_SIGNOFF.md) |
 | First Deployment & First Tenant Runbook | [docs/RUNBOOK_FIRST_DEPLOYMENT.md](./docs/RUNBOOK_FIRST_DEPLOYMENT.md) |
 
 ---

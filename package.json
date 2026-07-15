@@ -16,6 +16,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "smoke:vs1": "node scripts/smoke-vs1.mjs",
     "evidence:cross-tenant": "node scripts/evidence-cross-tenant.mjs",
+    "check:env": "node scripts/check-environment.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

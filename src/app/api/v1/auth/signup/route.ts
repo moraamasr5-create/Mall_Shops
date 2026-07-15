@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import { handleApi } from "@/core/http/api";
 import { jsonError, jsonOk } from "@/core/http/response";
 import {
   signInWithPassword,
@@ -16,23 +17,25 @@ const credentialsSchema = z.object({
  * JWT remains Identity-only (Architecture Lock / ADR-002).
  */
 export async function POST(req: NextRequest) {
-  try {
-    const body = credentialsSchema.parse(await req.json());
-    const result = await signUpWithPassword(body.email, body.password);
+  return handleApi(req, async () => {
+    try {
+      const body = credentialsSchema.parse(await req.json());
+      const result = await signUpWithPassword(body.email, body.password);
 
-    return jsonOk(
-      {
-        identity: {
-          id: result.user.id,
-          email: result.user.email,
+      return jsonOk(
+        {
+          identity: {
+            id: result.user.id,
+            email: result.user.email,
+          },
+          accessToken: result.session.access_token,
+          refreshToken: result.session.refresh_token,
+          expiresAt: result.session.expires_at,
         },
-        accessToken: result.session.access_token,
-        refreshToken: result.session.refresh_token,
-        expiresAt: result.session.expires_at,
-      },
-      201
-    );
-  } catch (error) {
-    return jsonError(error);
-  }
+        201
+      );
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }

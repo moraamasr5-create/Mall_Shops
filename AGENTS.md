@@ -19,7 +19,8 @@ Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference
 | Architecture gate | `npm run check:architecture` |
 | Verify | On branches that include reviewed Core Security Improvements vs `origin/main`, use `ARCH_ALLOW_CORE_CHANGES=true npm run verify`. Otherwise `npm run verify`. Gate **fails closed** if Git/base ref is missing unless `ARCH_SKIP_CORE_FREEZE=true` (explicit exemption only). |
 | Smoke (Salon path) | `npm run smoke:vs1` (app + Supabase must be running) |
-| Cross-tenant evidence | Formal **release Operational Gate** (`npm run evidence:cross-tenant`). Blocks DB Hardening / Production Readiness / VS1 Complete / RC1 / Tag / new Modules until **PASS**. |
+| Cross-tenant evidence | Formal **release Operational Gate** (`npm run evidence:cross-tenant`). |
+| Environment validation | `npm run check:env` — RG-003 **PR-01** |
 | First deployment | `docs/RUNBOOK_FIRST_DEPLOYMENT.md` — empty Supabase → migrations → first Tenant → evidence (Local Docker **or** Hosted) |
 | Operational pass snapshot | `docs/evidence/2026-07-15-operational-pass.md` · git tag `vs1-operational-pass` |
 | Decision Log | `docs/DECISION_LOG.md` (OP-001, OP-002, …) — lifecycle + why work is deferred |

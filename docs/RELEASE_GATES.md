@@ -13,7 +13,7 @@ Not Architecture Lock. Not ADRs. Complements [DECISION_LOG.md](./DECISION_LOG.md
 |------|-----------|--------|
 | **RG-001** | [OP-001](./DECISION_LOG.md#op-001) = **CLOSED** | ✅ Passed (2026-07-15) |
 | **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | ✅ Passed (2026-07-15; OP-002 CLOSED) |
-| **RG-003** | Production Readiness Checklist = **PASS** | 🔒 Locked |
+| **RG-003** | Production Readiness Checklist = **PASS** | ✅ **Proposed PASSED** (2026-07-15) — confirm via [PRODUCTION_SIGNOFF.md](./ops/PRODUCTION_SIGNOFF.md) |
 | **RG-004** | Release Candidate **RC1** successful | 🔒 Locked |
 | **RG-005** | Pilot Deployment successful | 🔒 Locked |
 | **RG-006** | Tag / release **v1.0.0** | 🔒 Locked |
@@ -74,7 +74,12 @@ May be marked N/A for an interim internal milestone **only** with an explicit wr
 
 ### RG-003 — Production Readiness Checklist
 
-Checklist to be maintained under implementation/ops docs when that phase opens. Not started until live Cross-Tenant evidence exists (OP-001 path).
+Canonical plan: **[PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)** — **APPROVED**.  
+**In progress.** Execute **one PR-xx at a time** (Execution Rule).  
+**Done:** PR-01 … PR-07 (Production Sign-off).  
+**RG-003:** proposed **PASSED** — owner confirmation.  
+**Next:** do **not** start RG-004 until assigned; prefer commit/push + clean Final Release Audit first.  
+**Doc debt:** `PLATFORM.md` vs `PLATFORM_ARCHITECTURE.md`.
 
 ### RG-004 — RC1
 

@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { handleApi } from "@/core/http/api";
 import {
   requireEnabledModule,
   requirePermission,
@@ -18,50 +19,56 @@ import {
 type Params = { params: Promise<{ serviceId: string }> };
 
 export async function GET(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
-      requirePermission(ctx, SALON_PERMISSIONS.serviceRead, [SALON_ROLE_PERMISSIONS]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+        requirePermission(ctx, SALON_PERMISSIONS.serviceRead, [SALON_ROLE_PERMISSIONS]);
 
-      const { serviceId } = await params;
-      const service = await getSalonService(ctx.tenant.tenantId, serviceId);
-      return jsonOk(service);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { serviceId } = await params;
+        const service = await getSalonService(ctx.tenant.tenantId, serviceId);
+        return jsonOk(service);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
-      requirePermission(ctx, SALON_PERMISSIONS.serviceWrite, [SALON_ROLE_PERMISSIONS]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+        requirePermission(ctx, SALON_PERMISSIONS.serviceWrite, [SALON_ROLE_PERMISSIONS]);
 
-      const { serviceId } = await params;
-      const body = updateSalonServiceInputSchema.parse(await req.json());
-      const service = await updateSalonService(ctx.tenant.tenantId, serviceId, body);
-      return jsonOk(service);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { serviceId } = await params;
+        const body = updateSalonServiceInputSchema.parse(await req.json());
+        const service = await updateSalonService(ctx.tenant.tenantId, serviceId, body);
+        return jsonOk(service);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }
 
 export async function DELETE(req: NextRequest, { params }: Params) {
-  try {
-    return await withAuthenticatedDb(req, async () => {
-      const ctx = await requireTenantContext(req);
-      await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
-      requirePermission(ctx, SALON_PERMISSIONS.serviceDelete, [SALON_ROLE_PERMISSIONS]);
+  return handleApi(req, async () => {
+    try {
+      return await withAuthenticatedDb(req, async () => {
+        const ctx = await requireTenantContext(req);
+        await requireEnabledModule(ctx.tenant.tenantId, SALON_MODULE.moduleKey);
+        requirePermission(ctx, SALON_PERMISSIONS.serviceDelete, [SALON_ROLE_PERMISSIONS]);
 
-      const { serviceId } = await params;
-      const service = await deactivateSalonService(ctx.tenant.tenantId, serviceId);
-      return jsonOk(service);
-    });
-  } catch (error) {
-    return jsonError(error);
-  }
+        const { serviceId } = await params;
+        const service = await deactivateSalonService(ctx.tenant.tenantId, serviceId);
+        return jsonOk(service);
+      });
+    } catch (error) {
+      return jsonError(error);
+    }
+  });
 }

@@ -1,0 +1,48 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Release verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Core freeze compares against origin/main
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Architecture regression
+        run: npm run check:architecture
+        env:
+          ARCH_CHECK_BASE_REF: origin/${{ github.base_ref || 'main' }}
+
+      - name: Full verify
+        run: npm run verify
+        env:
+          ARCH_CHECK_BASE_REF: origin/${{ github.base_ref || 'main' }}
