@@ -227,9 +227,9 @@ When using a privileged path, **Layer 2 (Application Permissions / Identity veri
 
 | Field | Value |
 |-------|--------|
-| Analysis | **Approved** |
-| Implementation | **Deferred** |
-| Gate before execute | Live Operational Evidence: Cross-Tenant **PASS** on a running Supabase environment |
+| Decision | Approve the minimal DB Role Hardening proposal (non-`BYPASSRLS` app login + `SET ROLE authenticated`; privileged URL only for migrations/`createTenant`). |
+| Implementation | **Deferred** — **not** Ready for Implementation until the Cross-Tenant **release** Operational Gate is **PASSED**. |
+| Gate before execute | **Operational Gate: Cross-Tenant Validation** must be **PASSED** (live Supabase + evidence report). Unit tests alone or **NOT_EXECUTED** do not unlock Hardening. |
 
 ### Decision
 
@@ -240,7 +240,14 @@ Approve the minimal DB Role Hardening proposal (non-`BYPASSRLS` app login + `SET
 Roadmap after that PASS:
 
 ```
-Cross-Tenant PASS → DB Hardening → Production Readiness → VS1 Complete → Tag v1.0.0 → next Module
+Cross-Tenant PASS (release Operational Gate)
+  → DB Hardening (Approved → Ready for Implementation)
+  → Production Readiness
+  → VS1 Complete
+  → Release Candidate (RC1)
+  → Pilot Deployment (one trial client)
+  → Tag v1.0.0
+  → First Production Module
 ```
 
 ### Pre-implementation questions (must be answered before any future execute)

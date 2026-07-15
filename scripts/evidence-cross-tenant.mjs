@@ -213,6 +213,17 @@ async function main() {
     token: tokenB,
     tenantId: tenantA,
   });
+  const denyBWriteA = await api("/api/v1/salon/services", {
+    method: "POST",
+    token: tokenB,
+    tenantId: tenantA,
+    body: {
+      name: `Hostile Write ${stamp}`,
+      durationMin: 15,
+      priceCents: 1,
+      currency: "SAR",
+    },
+  });
 
   const actualById = {
     A_lists_own_services: {
@@ -234,6 +245,10 @@ async function main() {
     B_get_A_service_by_id_denied: {
       actualStatus: denyBGetA.status,
       dataRows: dataRows(denyBGetA),
+    },
+    B_write_A_tenant_denied: {
+      actualStatus: denyBWriteA.status,
+      dataRows: dataRows(denyBWriteA),
     },
   };
 

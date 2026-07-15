@@ -14,6 +14,7 @@ describe("cross-tenant operational evidence matrix", () => {
     expect(ids).toContain("A_with_B_tenant_header");
     expect(ids).toContain("B_lists_own_services_empty_of_A");
     expect(ids).toContain("B_get_A_service_by_id_denied");
+    expect(ids).toContain("B_write_A_tenant_denied");
   });
 
   it("marks cross-tenant header misuse as PASS only on 403", () => {

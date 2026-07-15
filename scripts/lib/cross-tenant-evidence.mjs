@@ -182,4 +182,10 @@ export const CROSS_TENANT_CASE_SPECS = [
     expectedStatuses: [403],
     maxDataRows: 0,
   },
+  {
+    id: "B_write_A_tenant_denied",
+    title: "Identity B cannot POST salon service into Tenant A (cross-tenant write denied)",
+    expectedStatuses: [403],
+    maxDataRows: 0,
+  },
 ];

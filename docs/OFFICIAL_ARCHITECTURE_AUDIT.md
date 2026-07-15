@@ -22,7 +22,90 @@ Contracts ...................... Business Truth (what must be)
 Architecture Lock .............. Fixed architectural decisions
 Official Architecture Audit .... Does current implementation match those decisions?
 Regression Checklist ........... How we prevent breaking them during development
+Operational Gate ............... Live Cross-Tenant evidence before DB Hardening
 ```
+
+---
+
+## 0. Delivery Roadmap (current)
+
+```
+Architecture Lock v1.0 ............... ✅ Locked
+VS1 Runnable ......................... ✅ Completed
+Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS
+DB Role Hardening .................... ⏸ Approved, Deferred (blocked on Gate)
+Production Readiness ................. ⏳ (blocked until runtime evidence exists)
+VS1 Complete ......................... ⏳
+Release Candidate (RC1) .............. ⏳ After VS1 Complete
+Pilot Deployment ..................... ⏳ One trial salon/restaurant client
+Tag v1.0.0 ........................... ⏳ After successful pilot learnings absorbed
+Reference Module = Salon ............. ✅ Frozen (do not expand as product surface)
+First Production Module .............. After Tag v1.0.0 only
+```
+
+**Process rules:**
+
+1. Do not start **DB Hardening** until the **Operational Gate: Cross-Tenant Validation** is **PASSED**.
+2. Do not start **Production Readiness** cutover work until live Cross-Tenant runtime evidence exists (**PASS**).
+3. Do not claim **VS1 Complete**, open **RC1**, or **Tag v1.0.0** without the Cross-Tenant gate **PASSED**.
+4. Do not introduce a new production Module or expand Restaurant until after **Tag v1.0.0**.
+5. Prefer a short **Pilot Deployment** between RC1 and v1.0.0 so operational learnings (logs, monitoring, permissions, usability) land before building the next Module.
+
+---
+
+## Release Criteria — Operational Gates
+
+Operational Gates are **release criteria**, not developer utilities.
+
+| Gate | Required for | Status source |
+|------|--------------|---------------|
+| Architecture Regression (`npm run verify` / checklist) | Every merge / Vertical Slice | [ARCHITECTURE_REGRESSION_CHECKLIST.md](./ARCHITECTURE_REGRESSION_CHECKLIST.md) |
+| **Operational Gate: Cross-Tenant Validation** | DB Hardening start; Production Readiness; VS1 Complete; RC1; Tag v1.0.0; any new production Module | [evidence/CROSS_TENANT.md](./evidence/CROSS_TENANT.md) + `docs/evidence/cross-tenant-latest.md` |
+
+A unit-test-green matrix alone does **not** satisfy the Cross-Tenant release gate. Only a stored live report with **Overall: PASS** does.
+
+---
+
+## Operational Gate: Cross-Tenant Validation
+
+This is a **formal project gate**, not an informal script success.
+
+The gate is **PASSED** only when **all** of the following are true:
+
+| # | Requirement |
+|---|-------------|
+| 1 | Live Supabase environment (local CLI stack or Hosted — real Auth + Postgres + applied migrations/RLS) |
+| 2 | Authenticated JWT (Identity-only access token from Supabase Auth) |
+| 3 | Real RLS policies active (`FORCE ROW LEVEL SECURITY` from Prisma migrations) |
+| 4 | Cross-tenant **read** attempts return **403** or **0** business rows |
+| 5 | Cross-tenant **write** attempts **fail** (denied; no foreign-tenant mutation) |
+| 6 | Evidence report generated and stored at `docs/evidence/cross-tenant-latest.md` with **Overall: PASS** |
+
+Command:
+
+```bash
+npm run evidence:cross-tenant
+```
+
+| Report overall | Gate meaning |
+|----------------|--------------|
+| **PASS** | Gate PASSED — DB Hardening may begin |
+| **FAIL** | Gate FAILED — tenant isolation broken; stop and fix |
+| **NOT_EXECUTED** | Gate not evaluated — environment unavailable; no conclusion |
+
+Canonical procedure: [docs/evidence/CROSS_TENANT.md](./evidence/CROSS_TENANT.md).
+
+**Only after this gate is PASSED may DB Role Hardening begin.**
+
+### Current runtime evidence (living)
+
+| Field | Value |
+|-------|--------|
+| Last overall | See [`docs/evidence/cross-tenant-latest.md`](./evidence/cross-tenant-latest.md) |
+| DB Hardening proposal | **Approved / Deferred** until this gate shows **PASS** |
+| Ready for Implementation? | **No** until live **PASS** is recorded |
+
+When a live run succeeds, update the evidence file and change DB Hardening to **Approved / Ready for Implementation** only after confirming no discrepancy between unit-test matrix and live behavior.
 
 ---
 
@@ -54,8 +137,10 @@ Dependency Direction .......... ENFORCED
 Core Independence ............. PROVEN
 Second Module Validation ...... PASSED
 Regression Gate ............... AUTOMATED
+Operational Gate (Cross-Tenant) WAITING LIVE PASS
 
 Implementation Maturity ....... IN PROGRESS
+DB Role Hardening ............. APPROVED / DEFERRED (blocked on Operational Gate)
 Production Hardening .......... REQUIRED
 Production Ready .............. NOT YET
 ```

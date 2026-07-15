@@ -8,9 +8,9 @@ Multi-tenant, multi-module Business Operating Platform (BOP).
 
 **Architecture v1.0 FINAL LOCKED / VALIDATED**
 
-Implementation: **VS1 Runnable** (Salon reference module + Restaurant validation)
+Implementation: **VS1 Runnable** completed. Next formal gate: **Operational Gate — Cross-Tenant Validation** (live PASS required before DB Hardening).
 
-See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for current implementation status.
+See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for roadmap and gate criteria.
 
 ---
 
@@ -19,14 +19,41 @@ See [Official Architecture Audit](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) for cur
 The project architecture is governed by the following documents:
 
 - [docs/ARCHITECTURE_LOCK.md](./docs/ARCHITECTURE_LOCK.md) — fixed architectural decisions
-- [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) — implementation alignment with the Lock
+- [docs/OFFICIAL_ARCHITECTURE_AUDIT.md](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) — implementation alignment with the Lock + **Operational Gate**
 - [docs/ARCHITECTURE_REGRESSION_CHECKLIST.md](./docs/ARCHITECTURE_REGRESSION_CHECKLIST.md) — merge gate and regression prevention
+- [docs/evidence/CROSS_TENANT.md](./docs/evidence/CROSS_TENANT.md) — Cross-Tenant Operational Gate procedure
 
 Any architectural change must remain compatible with the Architecture Lock.
 
 ```
 Contracts → Architecture Lock → Official Architecture Audit → Regression Checklist
+                              → Operational Gate (Cross-Tenant PASS)
 ```
+
+### Delivery roadmap
+
+```
+Architecture Lock v1.0 ............... ✅ Locked
+VS1 Runnable ......................... ✅ Completed
+Operational Gate (Cross-Tenant) ...... ⏳ Waiting for live PASS
+DB Role Hardening .................... ⏸ Approved, Deferred
+Production Readiness ................. ⏳
+VS1 Complete ......................... ⏳
+Release Candidate (RC1) .............. ⏳
+Pilot Deployment (trial client) ...... ⏳
+Tag v1.0.0 ........................... ⏳
+Salon = Reference Module ............. ✅ Frozen
+First Production Module .............. After Tag v1.0.0
+```
+
+### Release criteria (mandatory)
+
+| Gate | Blocks |
+|------|--------|
+| Architecture Regression (`npm run verify`) | Merges / slices |
+| **Operational Gate: Cross-Tenant PASS** | DB Hardening, Production Readiness, VS1 Complete, RC1, Tag v1.0.0, new production Modules |
+
+Details: [Official Architecture Audit — Release Criteria](./docs/OFFICIAL_ARCHITECTURE_AUDIT.md) · [Cross-Tenant Gate](./docs/evidence/CROSS_TENANT.md)
 
 ---
 
