@@ -41,7 +41,7 @@ Until then, do **not** claim VS1 Complete, open a new production Module, or trea
 | Architecture Foundation | **COMPLETE** |
 | Operational Foundation | **COMPLETE** ([snapshot](./evidence/2026-07-15-operational-pass.md)) |
 | Governance Foundation | **COMPLETE** (Lock + ADR + Decision Log + Operational Gates + Release Gates) |
-| Current Phase | **Production Hardening** |
+| Current Phase | **Release Candidate (RG-004)** — await explicit assignment |
 | Architectural evolution | Remains Lock-governed; new Modules still gated by RG-006 |
 
 ---
@@ -83,7 +83,34 @@ Canonical plan: **[PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)** — **A
 
 ### RG-004 — RC1
 
-Release Candidate build + smoke + Operational Gate still PASS.
+**Goal:** Prove a **first salon owner** can start using the platform and **fully manage their salon** via APIs only — no manual DB or developer intervention.
+
+**Business Acceptance Scenario (not a new Gate):** **[BAS-001 — Salon Owner Happy Path](./evidence/BAS-001.md)**  
+Latest run record: [`bas-001-latest.md`](./evidence/bas-001-latest.md)
+
+BAS-001 is a **data lifecycle** scenario (create → edit → delete → list → persist → isolate), not isolated CRUD checks.
+
+```
+Signup → Create Tenant → Salon Enabled
+  → Create 3 Services → Edit → Delete → verify list/side-effects
+  → Create + Edit Employee → Create Customer
+  → Login Again → Verify Persistence
+  → Cross-Tenant → PASS
+```
+
+**RG-004 = PASSED** when **all** are true:
+
+| # | Criterion |
+|---|-----------|
+| 1 | BAS-001 **Overall: PASS** (see `bas-001-latest.md`) |
+| 2 | `npm run smoke:vs1` → PASS |
+| 3 | `npm run evidence:cross-tenant` → **Overall: PASS** |
+| 4 | `npm run verify` + CI green on RC1 commit |
+| 5 | Zero open **Release Blockers** from BAS-001 |
+
+**Release Blocker rule:** any defect that blocks the BAS-001 happy path must be fixed before RG-005 / v1.0.0 — not deferred as a Feature Request.
+
+**Explicitly not required for RG-004:** appointments API, UI, Restaurant product surface, new Modules.
 
 ### RG-005 — Pilot
 
