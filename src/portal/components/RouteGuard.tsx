@@ -8,9 +8,7 @@ export type GuardMode = "public" | "auth" | "tenant";
 
 /**
  * Central route protection for Owner Portal pages.
- * - public: signup/login (redirect away if already has tenant)
- * - auth: requires accessToken
- * - tenant: requires accessToken + tenantId
+ * Waits for sessionReady so Refresh never flashes /onboarding before membership sync.
  */
 export function RouteGuard({
   mode,
@@ -19,12 +17,12 @@ export function RouteGuard({
   mode: GuardMode;
   children: ReactNode;
 }) {
-  const { ready, isAuthenticated, tenantId } = usePortal();
+  const { ready, sessionReady, isAuthenticated, tenantId } = usePortal();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !sessionReady) return;
 
     if (mode === "public") {
       if (isAuthenticated && tenantId) {
@@ -43,9 +41,9 @@ export function RouteGuard({
     if (mode === "tenant" && !tenantId) {
       router.replace("/onboarding/salon");
     }
-  }, [ready, mode, isAuthenticated, tenantId, router, pathname]);
+  }, [ready, sessionReady, mode, isAuthenticated, tenantId, router, pathname]);
 
-  if (!ready) {
+  if (!ready || !sessionReady) {
     return (
       <div className="portal-main">
         <p className="lead">جاري التحميل…</p>

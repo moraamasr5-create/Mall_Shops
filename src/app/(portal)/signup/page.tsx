@@ -9,7 +9,7 @@ import { RouteGuard } from "@/portal/components/RouteGuard";
 import { usePortal } from "@/portal/session/PortalProvider";
 
 function SignupForm() {
-  const { signup, listTenants, setTenantId } = usePortal();
+  const { signup } = usePortal();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,14 +26,11 @@ function SignupForm() {
     }
     setSubmitting(true);
     try {
-      const session = await signup(email.trim(), password);
-      const tenants = await listTenants(session.accessToken);
+      const { tenants } = await signup(email.trim(), password);
       if (tenants.length === 0) {
-        setTenantId(null);
         router.replace("/onboarding/salon");
         return;
       }
-      setTenantId(tenants[0].tenant.id);
       router.replace("/salon/services");
     } catch (err) {
       setError(err);

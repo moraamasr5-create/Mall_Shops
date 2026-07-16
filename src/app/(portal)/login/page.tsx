@@ -9,7 +9,7 @@ import { RouteGuard } from "@/portal/components/RouteGuard";
 import { usePortal } from "@/portal/session/PortalProvider";
 
 function LoginForm() {
-  const { login, listTenants, setTenantId } = usePortal();
+  const { login } = usePortal();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -22,18 +22,13 @@ function LoginForm() {
     setError(null);
     setSubmitting(true);
     try {
-      const session = await login(email.trim(), password);
-      // Must use new token immediately — React state api is still stale this tick.
-      const tenants = await listTenants(session.accessToken);
+      const { tenants } = await login(email.trim(), password);
       if (tenants.length === 0) {
-        setTenantId(null);
         router.replace("/onboarding/salon");
         return;
       }
-      setTenantId(tenants[0].tenant.id);
       const next = searchParams.get("next");
-      const fallback = "/salon/services";
-      router.replace(next && next.startsWith("/") ? next : fallback);
+      router.replace(next && next.startsWith("/") ? next : "/salon/services");
     } catch (err) {
       setError(err);
     } finally {
