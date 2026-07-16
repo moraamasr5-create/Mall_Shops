@@ -9,12 +9,14 @@ export type EntityColumn<T> = {
   render: (row: T) => ReactNode;
 };
 
+// قائمة كيانات الصالون (Services / Employees / Customers) — بيانات من API الصالون.
 export function EntityList<T extends { id: string }>({
   title,
   description,
   rows,
   columns,
   emptyMessage,
+  loading = false,
   onAdd,
   addLabel = "إضافة",
   onEdit,
@@ -24,6 +26,8 @@ export function EntityList<T extends { id: string }>({
   rows: T[];
   columns: EntityColumn<T>[];
   emptyMessage: string;
+  /** أثناء الجلب من الـ API — لا نعرض emptyMessage حتى لا يظن المستخدم أن القائمة فارغة */
+  loading?: boolean;
   onAdd?: () => void;
   addLabel?: string;
   onEdit?: (row: T) => void;
@@ -36,13 +40,15 @@ export function EntityList<T extends { id: string }>({
           {description ? <p className="lead">{description}</p> : null}
         </div>
         {onAdd ? (
-          <Button type="button" onClick={onAdd}>
+          <Button type="button" onClick={onAdd} disabled={loading}>
             {addLabel}
           </Button>
         ) : null}
       </div>
 
-      {rows.length === 0 ? (
+      {loading ? (
+        <p className="lead">جاري التحميل…</p>
+      ) : rows.length === 0 ? (
         <p className="portal-empty">{emptyMessage}</p>
       ) : (
         <div className="portal-table-wrap">

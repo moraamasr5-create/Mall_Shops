@@ -6,10 +6,7 @@ import { usePortal } from "@/portal/session/PortalProvider";
 
 export type GuardMode = "public" | "auth" | "tenant";
 
-/**
- * Central route protection for Owner Portal pages.
- * Waits for sessionReady so Refresh never flashes /onboarding before membership sync.
- */
+// RouteGuard يمنع دخول صفحات الصالون قبل اكتمال الجلسة (PortalProvider.sessionReady).
 export function RouteGuard({
   mode,
   children,
@@ -43,16 +40,34 @@ export function RouteGuard({
     }
   }, [ready, sessionReady, mode, isAuthenticated, tenantId, router, pathname]);
 
-  if (!ready || !sessionReady) {
+  // انتظار قراءة Session من التخزين فقط
+  if (!ready) {
     return (
       <div className="portal-main">
-        <p className="lead">جاري التحميل…</p>
+        <p className="lead">جاري تجهيز الصفحة…</p>
       </div>
     );
   }
 
+  // صفحات عامة (Login/Signup): أبقِ النموذج ظاهرًا حتى لو كانت الجلسة تُزامَن،
+  // حتى لا يظن المستخدم أن النظام علّق عند فشل الإرسال.
   if (mode === "public") {
+    if (isAuthenticated && !sessionReady) {
+      return (
+        <div className="portal-main">
+          <p className="lead">جاري التحقق من حسابك…</p>
+        </div>
+      );
+    }
     return <>{children}</>;
+  }
+
+  if (!sessionReady) {
+    return (
+      <div className="portal-main">
+        <p className="lead">جاري التحقق من الجلسة…</p>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { EntityForm } from "@/portal/components/EntityForm";
 import { EntityList } from "@/portal/components/EntityList";
-import { FormField, TextInput } from "@/portal/components/FormField";
+import { ErrorBanner } from "@/portal/components/ErrorBanner";
+import { Button, FormField, TextInput } from "@/portal/components/FormField";
 import { RouteGuard } from "@/portal/components/RouteGuard";
 import type { SalonEmployee } from "@/portal/api/types";
 import { usePortal } from "@/portal/session/PortalProvider";
 
+// إدارة الموظفين — GET/POST/PATCH /api/v1/salon/employees (Tenant Context عبر PortalProvider)
 function EmployeesPage() {
   const { api } = usePortal();
   const [rows, setRows] = useState<SalonEmployee[]>([]);
   const [error, setError] = useState<unknown>(null);
+  const [listLoading, setListLoading] = useState(true);
   const [mode, setMode] = useState<"list" | "create" | "edit">("list");
   const [editing, setEditing] = useState<SalonEmployee | null>(null);
   const [name, setName] = useState("");
@@ -21,12 +24,20 @@ function EmployeesPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
+    setListLoading(true);
     setError(null);
-    setRows(await api.get<SalonEmployee[]>("/api/v1/salon/employees"));
+    try {
+      setRows(await api.get<SalonEmployee[]>("/api/v1/salon/employees"));
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setListLoading(false);
+    }
   }, [api]);
 
   useEffect(() => {
-    load().catch(setError);
+    void load().catch(() => {});
   }, [load]);
 
   function openCreate() {
@@ -81,7 +92,10 @@ function EmployeesPage() {
         submitting={submitting}
         submitLabel={mode === "create" ? "إنشاء الموظف" : "حفظ التغييرات"}
         onSubmit={save}
-        onCancel={() => setMode("list")}
+        onCancel={() => {
+          setMode("list");
+          setError(null);
+        }}
       >
         <FormField label="الاسم">
           <TextInput required minLength={2} value={name} onChange={(e) => setName(e.target.value)} />
@@ -101,10 +115,19 @@ function EmployeesPage() {
 
   return (
     <>
+      <ErrorBanner error={error} />
+      {error ? (
+        <div className="portal-actions" style={{ marginBottom: "1rem" }}>
+          <Button type="button" onClick={() => void load().catch(() => {})}>
+            إعادة تحميل الموظفين
+          </Button>
+        </div>
+      ) : null}
       <EntityList
         title="الموظفون"
         description="الأشخاص الذين يعملون في صالونك."
         rows={rows}
+        loading={listLoading}
         emptyMessage="لا يوجد موظفون بعد. أضف أول موظف."
         addLabel="إضافة موظف"
         onAdd={openCreate}
@@ -115,11 +138,6 @@ function EmployeesPage() {
           { key: "phone", header: "الهاتف", render: (r) => r.phone ?? "—" },
         ]}
       />
-      {error ? (
-        <p className="portal-error" role="alert">
-          {error instanceof Error ? error.message : "فشل تحميل الموظفين"}
-        </p>
-      ) : null}
     </>
   );
 }

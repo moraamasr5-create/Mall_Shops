@@ -8,12 +8,14 @@ import { Button, FormActions, FormField, TextInput } from "@/portal/components/F
 import { RouteGuard } from "@/portal/components/RouteGuard";
 import { usePortal } from "@/portal/session/PortalProvider";
 
+// يستدعي Login عبر PortalProvider (POST /api/v1/auth/login) ثم يوجّه حسب وجود Tenant.
 function LoginForm() {
   const { login } = usePortal();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // رسالة الخطأ القادمة من الـ API (مع requestId عبر ErrorBanner)
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,6 +49,7 @@ function LoginForm() {
             type="email"
             autoComplete="email"
             required
+            disabled={submitting}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -57,6 +60,7 @@ function LoginForm() {
             autoComplete="current-password"
             required
             minLength={8}
+            disabled={submitting}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -77,7 +81,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <RouteGuard mode="public">
-      <Suspense fallback={<p className="lead">جاري التحميل…</p>}>
+      <Suspense fallback={<p className="lead">جاري تجهيز الصفحة…</p>}>
         <LoginForm />
       </Suspense>
     </RouteGuard>

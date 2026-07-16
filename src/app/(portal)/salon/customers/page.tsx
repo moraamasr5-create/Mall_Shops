@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { EntityForm } from "@/portal/components/EntityForm";
 import { EntityList } from "@/portal/components/EntityList";
-import { FormField, TextInput, TextTextarea } from "@/portal/components/FormField";
+import { ErrorBanner } from "@/portal/components/ErrorBanner";
+import { Button, FormField, TextInput, TextTextarea } from "@/portal/components/FormField";
 import { RouteGuard } from "@/portal/components/RouteGuard";
 import type { SalonCustomer } from "@/portal/api/types";
 import { usePortal } from "@/portal/session/PortalProvider";
 
+// إدارة العملاء — GET/POST/PATCH /api/v1/salon/customers (Tenant Context عبر PortalProvider)
 function CustomersPage() {
   const { api } = usePortal();
   const [rows, setRows] = useState<SalonCustomer[]>([]);
   const [error, setError] = useState<unknown>(null);
+  const [listLoading, setListLoading] = useState(true);
   const [mode, setMode] = useState<"list" | "create" | "edit">("list");
   const [editing, setEditing] = useState<SalonCustomer | null>(null);
   const [name, setName] = useState("");
@@ -21,12 +24,20 @@ function CustomersPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
+    setListLoading(true);
     setError(null);
-    setRows(await api.get<SalonCustomer[]>("/api/v1/salon/customers"));
+    try {
+      setRows(await api.get<SalonCustomer[]>("/api/v1/salon/customers"));
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setListLoading(false);
+    }
   }, [api]);
 
   useEffect(() => {
-    load().catch(setError);
+    void load().catch(() => {});
   }, [load]);
 
   function openCreate() {
@@ -81,7 +92,10 @@ function CustomersPage() {
         submitting={submitting}
         submitLabel={mode === "create" ? "إنشاء العميل" : "حفظ التغييرات"}
         onSubmit={save}
-        onCancel={() => setMode("list")}
+        onCancel={() => {
+          setMode("list");
+          setError(null);
+        }}
       >
         <FormField label="الاسم">
           <TextInput required minLength={2} value={name} onChange={(e) => setName(e.target.value)} />
@@ -101,10 +115,19 @@ function CustomersPage() {
 
   return (
     <>
+      <ErrorBanner error={error} />
+      {error ? (
+        <div className="portal-actions" style={{ marginBottom: "1rem" }}>
+          <Button type="button" onClick={() => void load().catch(() => {})}>
+            إعادة تحميل العملاء
+          </Button>
+        </div>
+      ) : null}
       <EntityList
         title="العملاء"
         description="الأشخاص الذين يزورون صالونك."
         rows={rows}
+        loading={listLoading}
         emptyMessage="لا يوجد عملاء بعد. أضف أول عميل."
         addLabel="إضافة عميل"
         onAdd={openCreate}
@@ -115,11 +138,6 @@ function CustomersPage() {
           { key: "notes", header: "ملاحظات", render: (r) => r.notes ?? "—" },
         ]}
       />
-      {error ? (
-        <p className="portal-error" role="alert">
-          {error instanceof Error ? error.message : "فشل تحميل العملاء"}
-        </p>
-      ) : null}
     </>
   );
 }

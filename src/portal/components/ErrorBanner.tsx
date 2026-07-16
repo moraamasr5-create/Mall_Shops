@@ -2,6 +2,7 @@
 
 import { PortalApiError } from "@/portal/api/types";
 
+// يعرض رسالة الخطأ من الـ API مع requestId إن وُجد — مصدرها PortalApiError من api/client.
 export function ErrorBanner({ error }: { error: unknown }) {
   if (!error) return null;
 

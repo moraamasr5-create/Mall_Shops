@@ -4,9 +4,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Button, FormActions } from "@/portal/components/FormField";
 import { ErrorBanner } from "@/portal/components/ErrorBanner";
 
-/**
- * Shared create/edit form shell for Services / Employees / Customers.
- */
+// غلاف نماذج الإنشاء/التعديل لشاشات الصالون — الأخطاء من API عبر ErrorBanner.
 export function EntityForm({
   title,
   description,
@@ -37,7 +35,9 @@ export function EntityForm({
       {description ? <p className="lead">{description}</p> : null}
       <form className="portal-stack" onSubmit={handleSubmit}>
         <ErrorBanner error={error} />
-        {children}
+        <fieldset disabled={submitting} style={{ border: 0, margin: 0, padding: 0 }}>
+          {children}
+        </fieldset>
         <FormActions>
           <Button type="submit" disabled={submitting}>
             {submitting ? "جاري الحفظ…" : submitLabel}

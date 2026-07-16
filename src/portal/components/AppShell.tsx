@@ -11,11 +11,13 @@ const TENANT_LINKS = [
   { href: "/salon/customers", label: "العملاء" },
 ];
 
+// هيكل بوابة المالك: تنقل حسب الجلسة (PortalProvider) بعد جاهزية Session.
 export function AppShell({ children }: { children: ReactNode }) {
-  const { isAuthenticated, tenantId, logout } = usePortal();
+  const { ready, isAuthenticated, tenantId, logout } = usePortal();
   const pathname = usePathname();
   const router = useRouter();
 
+  // يخرج من الجلسة (Session) ويعيد توجيهًا إلى /login.
   function onLogout() {
     logout();
     router.replace("/login");
@@ -28,7 +30,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           مول شوبس — المالك
         </Link>
         <nav className="portal-nav" aria-label="بوابة المالك">
-          {!isAuthenticated && (
+          {/* ننتظر Session hydrate حتى لا يختلف HTML بين الخادم والمتصفح */}
+          {!ready ? null : !isAuthenticated ? (
             <>
               <Link href="/signup" data-active={pathname === "/signup"}>
                 إنشاء حساب
@@ -37,26 +40,30 @@ export function AppShell({ children }: { children: ReactNode }) {
                 تسجيل الدخول
               </Link>
             </>
-          )}
-          {isAuthenticated && !tenantId && (
-            <Link href="/onboarding/salon" data-active={pathname?.startsWith("/onboarding")}>
-              إنشاء صالون
-            </Link>
-          )}
-          {isAuthenticated && tenantId &&
-            TENANT_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                data-active={pathname === link.href || pathname?.startsWith(link.href + "/")}
-              >
-                {link.label}
+          ) : !tenantId ? (
+            <>
+              <Link href="/onboarding/salon" data-active={pathname?.startsWith("/onboarding")}>
+                إنشاء صالون
               </Link>
-            ))}
-          {isAuthenticated && (
-            <button type="button" className="portal-btn secondary" onClick={onLogout}>
-              تسجيل الخروج
-            </button>
+              <button type="button" className="portal-btn secondary" onClick={onLogout}>
+                تسجيل الخروج
+              </button>
+            </>
+          ) : (
+            <>
+              {TENANT_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  data-active={pathname === link.href || pathname?.startsWith(link.href + "/")}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <button type="button" className="portal-btn secondary" onClick={onLogout}>
+                تسجيل الخروج
+              </button>
+            </>
           )}
         </nav>
       </header>

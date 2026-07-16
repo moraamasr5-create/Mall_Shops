@@ -134,30 +134,35 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     writeTenantId(id);
   }, []);
 
+  // Signup/Login: POST /api/v1/auth/* ثم جلب الـ Tenants بالتوكن الجديد (Business Flow).
+  // لا نخفّض sessionReady أثناء الطلب — وإلا RouteGuard يخفي النموذج ويبدو النظام معلّقًا عند الفشل.
   const establishWithPassword = useCallback(
     async (path: "/api/v1/auth/signup" | "/api/v1/auth/login", email: string, password: string) => {
-      setSessionReady(false);
-      // Public auth — no Authorization header (correct)
-      const session = await createApiClient().post<AuthSessionPayload>(path, {
-        email,
-        password,
-      });
+      try {
+        // Public auth — بدون Authorization (صحيح قبل الجلسة)
+        const session = await createApiClient().post<AuthSessionPayload>(path, {
+          email,
+          password,
+        });
 
-      // Immediately use the NEW token for membership lookup (not React state yet)
-      const tenants = await fetchTenantsWithToken(session.accessToken);
-      const tid = tenants[0]?.tenant.id ?? null;
+        // جلب العضوية فورًا بالتوكن الجديد قبل الاعتماد على React State
+        const tenants = await fetchTenantsWithToken(session.accessToken);
+        const tid = tenants[0]?.tenant.id ?? null;
 
-      setAccessToken(session.accessToken);
-      setTenantIdState(tid);
-      writeSession({
-        accessToken: session.accessToken,
-        refreshToken: session.refreshToken,
-        expiresAt: session.expiresAt,
-        tenantId: tid,
-      });
-      setSessionReady(true);
+        setAccessToken(session.accessToken);
+        setTenantIdState(tid);
+        writeSession({
+          accessToken: session.accessToken,
+          refreshToken: session.refreshToken,
+          expiresAt: session.expiresAt,
+          tenantId: tid,
+        });
 
-      return { session, tenants };
+        return { session, tenants };
+      } finally {
+        // نجاحًا أو فشلًا: أعد جاهزية الجلسة حتى يستطيع المستخدم إعادة المحاولة
+        setSessionReady(true);
+      }
     },
     []
   );

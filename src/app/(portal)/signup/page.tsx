@@ -8,6 +8,8 @@ import { Button, FormActions, FormField, TextInput } from "@/portal/components/F
 import { RouteGuard } from "@/portal/components/RouteGuard";
 import { usePortal } from "@/portal/session/PortalProvider";
 
+// يبدأ Business Flow: Signup → Create Tenant → Salon Ready → Management
+// المصدر: POST /api/v1/auth/signup عبر PortalProvider
 function SignupForm() {
   const { signup } = usePortal();
   const router = useRouter();
@@ -50,6 +52,7 @@ function SignupForm() {
             type="email"
             autoComplete="email"
             required
+            disabled={submitting}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -60,6 +63,7 @@ function SignupForm() {
             autoComplete="new-password"
             required
             minLength={8}
+            disabled={submitting}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -70,13 +74,14 @@ function SignupForm() {
             autoComplete="new-password"
             required
             minLength={8}
+            disabled={submitting}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
         </FormField>
         <FormActions>
           <Button type="submit" disabled={submitting}>
-            {submitting ? "جاري الإنشاء…" : "إنشاء حساب"}
+            {submitting ? "جاري إنشاء الحساب…" : "إنشاء حساب"}
           </Button>
         </FormActions>
       </form>

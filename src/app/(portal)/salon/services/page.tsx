@@ -3,15 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { EntityForm } from "@/portal/components/EntityForm";
 import { EntityList } from "@/portal/components/EntityList";
-import { FormField, TextInput, TextTextarea } from "@/portal/components/FormField";
+import { ErrorBanner } from "@/portal/components/ErrorBanner";
+import { Button, FormField, TextInput, TextTextarea } from "@/portal/components/FormField";
 import { RouteGuard } from "@/portal/components/RouteGuard";
 import type { SalonService } from "@/portal/api/types";
 import { usePortal } from "@/portal/session/PortalProvider";
 
+// إدارة الخدمات — GET/POST/PATCH /api/v1/salon/services (Tenant Context عبر PortalProvider)
 function ServicesPage() {
   const { api } = usePortal();
   const [rows, setRows] = useState<SalonService[]>([]);
   const [error, setError] = useState<unknown>(null);
+  const [listLoading, setListLoading] = useState(true);
   const [mode, setMode] = useState<"list" | "create" | "edit">("list");
   const [editing, setEditing] = useState<SalonService | null>(null);
   const [name, setName] = useState("");
@@ -21,13 +24,22 @@ function ServicesPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
+    setListLoading(true);
     setError(null);
-    const data = await api.get<SalonService[]>("/api/v1/salon/services");
-    setRows(data);
+    try {
+      setRows(await api.get<SalonService[]>("/api/v1/salon/services"));
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setListLoading(false);
+    }
   }, [api]);
 
   useEffect(() => {
-    load().catch(setError);
+    void load().catch(() => {
+      /* الخطأ معروض عبر ErrorBanner */
+    });
   }, [load]);
 
   function openCreate() {
@@ -86,7 +98,10 @@ function ServicesPage() {
         submitting={submitting}
         submitLabel={mode === "create" ? "إنشاء الخدمة" : "حفظ التغييرات"}
         onSubmit={save}
-        onCancel={() => setMode("list")}
+        onCancel={() => {
+          setMode("list");
+          setError(null);
+        }}
       >
         <FormField label="الاسم">
           <TextInput required minLength={2} value={name} onChange={(e) => setName(e.target.value)} />
@@ -122,15 +137,19 @@ function ServicesPage() {
 
   return (
     <>
+      <ErrorBanner error={error} />
       {error ? (
-        <div style={{ marginBottom: "1rem" }}>
-          {/* list-level load errors */}
+        <div className="portal-actions" style={{ marginBottom: "1rem" }}>
+          <Button type="button" onClick={() => void load().catch(() => {})}>
+            إعادة تحميل الخدمات
+          </Button>
         </div>
       ) : null}
       <EntityList
         title="الخدمات"
         description="الخدمات التي يقدمها صالونك."
         rows={rows}
+        loading={listLoading}
         emptyMessage="لا توجد خدمات بعد. أضف أول خدمة."
         addLabel="إضافة خدمة"
         onAdd={openCreate}
@@ -145,11 +164,6 @@ function ServicesPage() {
           },
         ]}
       />
-      {error ? (
-        <p className="portal-error" role="alert">
-          {error instanceof Error ? error.message : "فشل تحميل الخدمات"}
-        </p>
-      ) : null}
     </>
   );
 }
