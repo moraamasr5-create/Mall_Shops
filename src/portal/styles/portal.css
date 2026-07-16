@@ -1,0 +1,240 @@
+/* Owner Portal — functional, minimal (no UI framework) */
+:root {
+  --portal-bg: #f6f7f9;
+  --portal-surface: #ffffff;
+  --portal-text: #1a1d21;
+  --portal-muted: #5c6570;
+  --portal-border: #d8dee6;
+  --portal-accent: #0f6e56;
+  --portal-accent-hover: #0b5844;
+  --portal-danger: #b42318;
+  --portal-danger-bg: #fef3f2;
+  --portal-radius: 8px;
+  --portal-font: "Segoe UI", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--portal-font);
+  color: var(--portal-text);
+  background: var(--portal-bg);
+  line-height: 1.45;
+}
+
+a {
+  color: var(--portal-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.portal-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--portal-surface);
+  border-bottom: 1px solid var(--portal-border);
+}
+
+.portal-brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--portal-text);
+  text-decoration: none;
+}
+
+.portal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+}
+
+.portal-nav a {
+  color: var(--portal-muted);
+  font-size: 0.95rem;
+}
+
+.portal-nav a[data-active="true"] {
+  color: var(--portal-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.portal-main {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  flex: 1;
+}
+
+.portal-card {
+  background: var(--portal-surface);
+  border: 1px solid var(--portal-border);
+  border-radius: var(--portal-radius);
+  padding: 1.25rem 1.35rem;
+}
+
+.portal-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.portal-card .lead {
+  margin: 0 0 1.25rem;
+  color: var(--portal-muted);
+  font-size: 0.95rem;
+}
+
+.portal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.portal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.portal-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.portal-field input,
+.portal-field textarea,
+.portal-field select {
+  border: 1px solid var(--portal-border);
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  background: #fff;
+}
+
+.portal-field input:focus,
+.portal-field textarea:focus,
+.portal-field select:focus {
+  outline: 2px solid color-mix(in srgb, var(--portal-accent) 35%, white);
+  border-color: var(--portal-accent);
+}
+
+.portal-field .hint {
+  font-size: 0.8rem;
+  color: var(--portal-muted);
+}
+
+.portal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+
+.portal-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--portal-accent);
+  color: #fff;
+}
+
+.portal-btn:hover:not(:disabled) {
+  background: var(--portal-accent-hover);
+}
+
+.portal-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.portal-btn.secondary {
+  background: #fff;
+  color: var(--portal-text);
+  border-color: var(--portal-border);
+}
+
+.portal-btn.danger {
+  background: var(--portal-danger);
+}
+
+.portal-error {
+  background: var(--portal-danger-bg);
+  color: var(--portal-danger);
+  border: 1px solid color-mix(in srgb, var(--portal-danger) 25%, white);
+  border-radius: 6px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+.portal-error code {
+  font-size: 0.8rem;
+}
+
+.portal-table-wrap {
+  overflow-x: auto;
+}
+
+.portal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.portal-table th,
+.portal-table td {
+  text-align: left;
+  padding: 0.55rem 0.45rem;
+  border-bottom: 1px solid var(--portal-border);
+  vertical-align: top;
+}
+
+.portal-table th {
+  color: var(--portal-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.portal-empty {
+  color: var(--portal-muted);
+  padding: 1rem 0;
+}
+
+.portal-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.portal-home {
+  max-width: 560px;
+  margin: 3rem auto;
+  padding: 0 1.25rem;
+}
+
+.portal-home ul {
+  padding-left: 1.2rem;
+}
