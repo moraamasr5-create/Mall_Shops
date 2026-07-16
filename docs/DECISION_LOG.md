@@ -5,7 +5,8 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Pilot eligible (RG-005)** — RG-004 **PASSED**; start Pilot only on explicit assignment.  
+**Current program phase:** **Pilot Learning (RG-005 eligible)** — RG-004 **PASSED**; start Pilot only on explicit assignment.  
+**Feature Freeze** during RG-005: see [RELEASE_GATES.md — RG-005](./RELEASE_GATES.md#rg-005--pilot-pilot-learning-phase).  
 Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).
 
 ---

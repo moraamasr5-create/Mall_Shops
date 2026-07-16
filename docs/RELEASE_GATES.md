@@ -41,7 +41,7 @@ Until then, do **not** claim VS1 Complete, open a new production Module, or trea
 | Architecture Foundation | **COMPLETE** |
 | Operational Foundation | **COMPLETE** ([snapshot](./evidence/2026-07-15-operational-pass.md)) |
 | Governance Foundation | **COMPLETE** (Lock + ADR + Decision Log + Operational Gates + Release Gates) |
-| Current Phase | **Production Hardening** |
+| Current Phase | **Pilot Learning (RG-005 eligible)** — Feature Freeze until Exit Criteria below |
 | Architectural evolution | Remains Lock-governed; new Modules still gated by RG-006 |
 
 ---
@@ -78,7 +78,7 @@ Canonical plan: **[PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)** — **A
 **In progress.** Execute **one PR-xx at a time** (Execution Rule).  
 **Done:** PR-01 … PR-07.  
 **RG-003:** ✅ **PASSED** (Final Release Audit on clean `main`).  
-**Current phase:** **Pilot eligible (RG-005)** — RG-004 PASSED; await explicit assignment for Pilot.  
+**Current phase:** **Pilot Learning (RG-005 eligible)** — Feature Freeze rules under § RG-005; await explicit assignment.  
 **Doc debt (before v1.0.0):** `PLATFORM.md` vs `PLATFORM_ARCHITECTURE.md`.
 
 ### RG-004 — RC1
@@ -87,9 +87,58 @@ Release Candidate = **BAS-001** Business Acceptance (Public APIs only) + smoke +
 
 **2026-07-16:** ✅ **PASSED** — BAS-001 runId `1784223356496-122787b4` PASS; smoke PASS; cross-tenant PASS; READY FOR PILOT. See [business-acceptance-summary-bas-001.md](./evidence/business-acceptance-summary-bas-001.md). **STOP** — do not open RG-005 until explicit assignment.
 
-### RG-005 — Pilot
+### RG-005 — Pilot (Pilot Learning Phase)
 
-One trial client (salon/restaurant trial). Operational learnings (logs, monitoring, permissions, usability) absorbed before Tag.
+One trial client (first salon owner). Goal: **learn from real use**, not ship Features.  
+Start only on **explicit assignment**. Until then: 🔒 Locked.
+
+#### Feature Freeze (executive rule during RG-005)
+
+While RG-005 is active (Pilot in progress), work is **frozen** except as allowed below.
+
+**Allowed**
+
+| Kind | Meaning |
+|------|---------|
+| 🔴 Bug / Pilot Blocker | Fix that prevents the client from completing their work |
+| 🟡 UX | Only if it blocks or clearly confuses normal use |
+| ⚙️ Operational | Environment / Deployment / Monitoring fixes |
+
+**Forbidden**
+
+- 🔵 Any new Business Feature
+- Domain Model changes
+- Database Schema changes except to fix a proven Bug
+- Architecture changes
+- New Module or Platform Shared Service (including Printing)
+
+#### Pilot note decision rule
+
+| Note type | Decision |
+|-----------|----------|
+| 🔴 Blocker | Fix immediately |
+| 🟡 UX | Implement only if it clearly improves real use |
+| 🔵 Feature Request | **Do not** implement during Pilot — record in Backlog; prioritize later by frequency × value |
+
+Do **not** treat “first client asked for X” as authorization to build X during the Freeze.
+
+#### Pilot note template (four fields only)
+
+1. What was the client trying to do?
+2. Where did they stop?
+3. How did they complete (or not)?
+4. Classification: 🔴 Blocker / 🟡 UX / 🔵 Feature Request
+
+#### Exit Criteria — when Feature Freeze ends
+
+Feature Freeze ends **only when all** of the following are true:
+
+1. RG-005 (Pilot) completed
+2. Pilot Review issued
+3. Backlog prioritized from real client notes
+4. VS1.1 plan approved
+
+Only then may the first new Feature start. Until then: Product Validation, not Feature delivery.
 
 ### RG-006 — v1.0.0
 

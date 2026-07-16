@@ -2,10 +2,15 @@
 
 ## Cursor Cloud / agent instructions
 
-### Repository state: VS1 Runnable (implementation in progress)
+### Repository state: VS1 Pilot-eligible (Feature Freeze pending / during RG-005)
 
 This repository contains Architecture Lock documentation **and** a runnable
 Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference module).
+
+**Feature Freeze (RG-005):** While Pilot is assigned or in progress, implement **only**
+🔴 Pilot Blocker fixes, 🟡 UX that blocks/confuses real use, or ⚙️ operational fixes.
+**Do not** add Business Features, Domain/Schema/Architecture changes, new Modules, or
+Platform Shared Services. Full rule: [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) § RG-005.
 
 ### Toolchain
 
@@ -54,3 +59,6 @@ The next implementation task must always originate from one of:
 Cursor may propose improvements, but may not reorder milestones or begin blocked work.
 
 From this phase forward, act as an **Executor**: implement only what a Gate, Decision Log state change, or explicit assignment authorizes — not what a chat casually suggests.
+
+**During RG-005:** a Feature Request from the first client is **not** authorization to build it —
+record it for Pilot Review / Backlog after Freeze Exit Criteria.
