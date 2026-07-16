@@ -22,8 +22,9 @@ function LoginForm() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(email.trim(), password);
-      const tenants = await listTenants();
+      const session = await login(email.trim(), password);
+      // Must use new token immediately — React state api is still stale this tick.
+      const tenants = await listTenants(session.accessToken);
       if (tenants.length === 0) {
         setTenantId(null);
         router.replace("/onboarding/salon");
@@ -31,7 +32,8 @@ function LoginForm() {
       }
       setTenantId(tenants[0].tenant.id);
       const next = searchParams.get("next");
-      router.replace(next && next.startsWith("/") ? next : "/salon/services");
+      const fallback = "/salon/services";
+      router.replace(next && next.startsWith("/") ? next : fallback);
     } catch (err) {
       setError(err);
     } finally {

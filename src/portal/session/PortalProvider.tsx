@@ -34,7 +34,8 @@ type PortalContextValue = {
   login: (email: string, password: string) => Promise<AuthSessionPayload>;
   logout: () => void;
   createTenant: (name: string, slug?: string) => Promise<CreateTenantResult>;
-  listTenants: () => Promise<TenantListItem[]>;
+  /** Pass accessToken right after login/signup to avoid stale client (pre-re-render). */
+  listTenants: (accessTokenOverride?: string) => Promise<TenantListItem[]>;
 };
 
 const PortalContext = createContext<PortalContextValue | null>(null);
@@ -126,9 +127,16 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     [api, setTenantId]
   );
 
-  const listTenants = useCallback(async () => {
-    return api.get<TenantListItem[]>("/api/v1/tenants");
-  }, [api]);
+  const listTenants = useCallback(
+    async (accessTokenOverride?: string) => {
+      const client = createApiClient({
+        accessToken: accessTokenOverride ?? accessToken,
+        tenantId: accessTokenOverride ? null : tenantId,
+      });
+      return client.get<TenantListItem[]>("/api/v1/tenants");
+    },
+    [accessToken, tenantId]
+  );
 
   const value: PortalContextValue = {
     ready,

@@ -26,8 +26,8 @@ function SignupForm() {
     }
     setSubmitting(true);
     try {
-      await signup(email.trim(), password);
-      const tenants = await listTenants();
+      const session = await signup(email.trim(), password);
+      const tenants = await listTenants(session.accessToken);
       if (tenants.length === 0) {
         setTenantId(null);
         router.replace("/onboarding/salon");
