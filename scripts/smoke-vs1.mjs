@@ -35,9 +35,11 @@ async function api(path, { method = "GET", token, tenantId, body } = {}) {
 }
 
 async function main() {
-  const stamp = Date.now();
-  const email = `vs1-smoke-${stamp}@example.com`;
-  const password = "SmokeTest1!";
+  // Unique per run — do not reuse prior smoke identities.
+  const stamp = `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+  // Hosted Auth rejects disposable domains like @example.com.
+  const email = `vs1-smoke-${stamp}@gmail.com`;
+  const password = `SmokeTest-${stamp.slice(-8)}!`;
 
   console.log("1) signup");
   const signup = await api("/api/v1/auth/signup", {

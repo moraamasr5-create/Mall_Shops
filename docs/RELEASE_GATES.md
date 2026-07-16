@@ -14,7 +14,7 @@ Not Architecture Lock. Not ADRs. Complements [DECISION_LOG.md](./DECISION_LOG.md
 | **RG-001** | [OP-001](./DECISION_LOG.md#op-001) = **CLOSED** | ✅ Passed (2026-07-15) |
 | **RG-002** | [OP-002](./DECISION_LOG.md#op-002) = **VERIFIED** | ✅ Passed (2026-07-15; OP-002 CLOSED) |
 | **RG-003** | Production Readiness Checklist = **PASS** | ✅ **PASSED** (2026-07-15) — [sign-off](./ops/PRODUCTION_SIGNOFF.md) · [Final Release Audit](./evidence/final-release-audit-rg003.md) |
-| **RG-004** | Release Candidate **RC1** successful | 🔒 Locked |
+| **RG-004** | Release Candidate **RC1** successful | ✅ **PASSED** (2026-07-16) — BAS-001 PASS · READY FOR PILOT · [business-acceptance-summary-bas-001.md](./evidence/business-acceptance-summary-bas-001.md) |
 | **RG-005** | Pilot Deployment successful | 🔒 Locked |
 | **RG-006** | Tag / release **v1.0.0** | 🔒 Locked |
 
@@ -78,12 +78,14 @@ Canonical plan: **[PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)** — **A
 **In progress.** Execute **one PR-xx at a time** (Execution Rule).  
 **Done:** PR-01 … PR-07.  
 **RG-003:** ✅ **PASSED** (Final Release Audit on clean `main`).  
-**Current phase:** **Release Candidate (RG-004)** — await explicit assignment.  
+**Current phase:** **Pilot eligible (RG-005)** — RG-004 PASSED; await explicit assignment for Pilot.  
 **Doc debt (before v1.0.0):** `PLATFORM.md` vs `PLATFORM_ARCHITECTURE.md`.
 
 ### RG-004 — RC1
 
-Release Candidate build + smoke + Operational Gate still PASS.
+Release Candidate = **BAS-001** Business Acceptance (Public APIs only) + smoke + cross-tenant + verify + CI green.
+
+**2026-07-16:** ✅ **PASSED** — BAS-001 runId `1784223356496-122787b4` PASS; smoke PASS; cross-tenant PASS; READY FOR PILOT. See [business-acceptance-summary-bas-001.md](./evidence/business-acceptance-summary-bas-001.md). **STOP** — do not open RG-005 until explicit assignment.
 
 ### RG-005 — Pilot
 

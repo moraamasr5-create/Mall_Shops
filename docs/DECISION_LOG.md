@@ -5,7 +5,7 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Release Candidate (RG-004)** — RG-003 **PASSED**; start RC1 only when explicitly assigned.  
+**Current program phase:** **Pilot eligible (RG-005)** — RG-004 **PASSED**; start Pilot only on explicit assignment.  
 Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).
 
 ---
@@ -53,6 +53,7 @@ Rules:
 |----|-------|--------|
 | [OP-001](#op-001) | Cross-Tenant Operational Gate | **CLOSED** (VERIFIED via live PASS) |
 | [OP-002](#op-002) | DB Role Hardening | **CLOSED** (VERIFIED — live Cross-Tenant PASS under `app_runtime`) |
+| [OP-003](#op-003) | MVP Authentication Policy (Staging Only) | **CLOSED** (Staging Auth enabled BAS-001 PASS) |
 
 **Release Gates** (claiming Complete / shipping): see [RELEASE_GATES.md](./RELEASE_GATES.md) (RG-001 … RG-006).
 
@@ -118,6 +119,38 @@ PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
 
 ---
 
+## OP-003
+
+| Field | Value |
+|-------|--------|
+| **ID** | OP-003 |
+| **Title** | MVP Authentication Policy (**Staging Only**) |
+| **State** | **CLOSED** |
+| **Next state** | — (Exit Condition still applies before Production Auth policy) |
+| **Type** | **Operational decision for Staging / RC1** — not Architecture Lock, not a permanent platform Auth policy |
+| **Scope** | Hosted Staging project Mall_Full (`ovjbgxhhfjmgatdwqagb`) only |
+| **Triggered by** | RG-004 / BAS-001 Run 1 — **RB-004-01** (Environment) |
+| **Evidence of root cause** | [BAS-001 § Root cause proof](./acceptance/BAS-001.md#root-cause-proof-before-staging-auth-change) — signup `400` (no session) + login `401 Email not confirmed` = GoTrue Confirm email, not app/RLS |
+| **Decision (Staging / BAS-001 / RC1)** | For the purpose of **BAS-001 and RC1**, disable **Email Confirmation** on Staging so the first salon owner can complete the full journey via **Public APIs only**. |
+| **Explicit non-goals** | Does **not** change Architecture. Does **not** prescribe Production Auth policy. Does **not** mean “the platform forever skips email confirmation.” |
+| **Production** | Confirm email **may be re-enabled**. If so, update BAS-001 to: **Signup → Confirm Email → Login → Continue** — do not keep Confirm email OFF solely to preserve an old test. |
+| **Implementation (ops only)** | Mall_Full Dashboard: Confirm email **OFF** (or `mailer_autoconfirm: true` via Management API). **No application code change.** |
+| **Why document** | So readers a year later know this was a **Staging RC1 operational choice** after an Environment blocker — not a permanent product/architecture rule. |
+| **Exit Condition** | OP-003 **ends** at the earlier of: **first Production Deployment**, or **RG-006 (v1.0.0)**. Before Production, a **separate Product decision** on Email Verification policy is required; update BAS-001 accordingly (e.g. Signup → Confirm Email → Login → Continue if confirmation is mandatory). Closing via Exit Condition does not by itself change Staging Auth settings. |
+
+### Lifecycle progress
+
+```
+PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
+              ✅           ✅           ✅           ✅         ✅
+```
+
+Staging Auth enabled RC1; BAS-001 PASS 2026-07-16 (runId `1784223356496-122787b4`).
+
+**Exit:** first Production Deployment **or** RG-006 (v1.0.0), whichever comes first — then replace with an independent Product Email Verification decision + BAS-001 update.
+
+---
+
 ## How to update this log
 
 1. Advance **State** only when evidence or an explicit project decision warrants it.
@@ -125,3 +158,4 @@ PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
 3. Set OP-002 → drop **DEFERRED**, set **AUTHORIZED** only on **explicit assignment** (OP-001 CLOSED is necessary but not sufficient under the Execution Rule).
 4. After OP-002 ships and is proven: **IMPLEMENTED** → **VERIFIED** → **CLOSED**.
 5. Append new entries as `OP-00x` — do not create parallel logs.
+6. OP-003 (Staging only): **IMPLEMENTED** when Staging Confirm email is OFF; **VERIFIED**/**CLOSED** when BAS-001 Run 2 PASSes. Closing OP-003 does **not** freeze Production Auth policy.
