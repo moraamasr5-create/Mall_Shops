@@ -63,11 +63,23 @@ function ServicesPage() {
   }
 
   async function save() {
-    setSubmitting(true);
     setError(null);
+    const priceCents = Math.round(Number(priceMajor) * 100);
+    const duration = Number(durationMin);
+    if (!name.trim() || name.trim().length < 2) {
+      setError(new Error("أدخل اسم خدمة واضحًا (حرفان على الأقل)."));
+      return;
+    }
+    if (!Number.isFinite(duration) || duration < 1) {
+      setError(new Error("أدخل مدة صالحة بالدقائق (رقم أكبر من صفر)."));
+      return;
+    }
+    if (!Number.isFinite(priceCents) || priceCents < 0) {
+      setError(new Error("أدخل سعرًا صالحًا بالريال (مثال: 50)."));
+      return;
+    }
+    setSubmitting(true);
     try {
-      const priceCents = Math.round(Number(priceMajor) * 100);
-      const duration = Number(durationMin);
       const body = {
         name: name.trim(),
         description: description.trim() || undefined,
@@ -93,7 +105,7 @@ function ServicesPage() {
     return (
       <EntityForm
         title={mode === "create" ? "إضافة خدمة" : "تعديل خدمة"}
-        description="الأسعار تُخزَّن بالهللة؛ أدخل المبلغ الذي يدفعه العملاء."
+        description="أدخل السعر بالريال كما يدفعه العميل (مثال: 50)."
         error={error}
         submitting={submitting}
         submitLabel={mode === "create" ? "إنشاء الخدمة" : "حفظ التغييرات"}

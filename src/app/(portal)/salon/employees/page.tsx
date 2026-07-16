@@ -61,8 +61,12 @@ function EmployeesPage() {
   }
 
   async function save() {
-    setSubmitting(true);
     setError(null);
+    if (!name.trim() || name.trim().length < 2) {
+      setError(new Error("أدخل اسم موظف واضحًا (حرفان على الأقل)."));
+      return;
+    }
+    setSubmitting(true);
     try {
       const body = {
         name: name.trim(),

@@ -37,7 +37,21 @@ export async function apiRequest<T>(
     headers.set("x-tenant-id", tenantId);
   }
 
-  const res = await fetch(path, { ...rest, headers });
+  let res: Response;
+  try {
+    res = await fetch(path, { ...rest, headers });
+  } catch {
+    // انقطاع شبكة / سيرفر متوقف — بلا requestId من الخادم
+    throw new PortalApiError(
+      "تعذّر الاتصال بالخادم. تحقق من الإنترنت أو أن التطبيق يعمل، ثم أعد المحاولة.",
+      {
+        code: "NETWORK_ERROR",
+        status: 0,
+        requestId: null,
+      }
+    );
+  }
+
   const json = (await parseJson(res)) as ApiSuccess<T> | ApiFailure;
   const requestId =
     (json as ApiSuccess<T>)?.meta?.requestId ??
@@ -55,7 +69,7 @@ export async function apiRequest<T>(
   }
 
   if (!("data" in json)) {
-    throw new PortalApiError("استجابة واجهة البرمجة غير صالحة", {
+    throw new PortalApiError("استجابة غير صالحة من الخادم. أعد المحاولة.", {
       code: "CLIENT_ERROR",
       status: res.status,
       requestId,

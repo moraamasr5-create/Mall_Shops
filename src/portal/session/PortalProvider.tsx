@@ -15,6 +15,7 @@ import type {
   CreateTenantResult,
   TenantListItem,
 } from "@/portal/api/types";
+import { PortalApiError } from "@/portal/api/types";
 import {
   clearSession,
   readSession,
@@ -191,7 +192,11 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       const body = slug ? { name, slug } : { name };
       const token = accessToken;
       if (!token) {
-        throw new Error("Not authenticated");
+        throw new PortalApiError("انتهت الجلسة. سجّل الدخول من جديد ثم أنشئ الصالون.", {
+          code: "UNAUTHENTICATED",
+          status: 401,
+          requestId: null,
+        });
       }
       // Use explicit token — avoid stale memoized api right after auth
       const result = await createApiClient({ accessToken: token }).post<CreateTenantResult>(
@@ -208,7 +213,11 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     async (accessTokenOverride?: string) => {
       const token = accessTokenOverride ?? accessToken;
       if (!token) {
-        throw new Error("Not authenticated");
+        throw new PortalApiError("انتهت الجلسة. سجّل الدخول من جديد.", {
+          code: "UNAUTHENTICATED",
+          status: 401,
+          requestId: null,
+        });
       }
       return fetchTenantsWithToken(token);
     },
