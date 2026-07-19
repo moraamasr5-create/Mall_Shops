@@ -6,14 +6,15 @@
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
 **Current program phase:** **Internal Pilot (Learning)** — OP-005 **CLOSED**; OP-006 **AUTHORIZED**.  
+**Single question:** هل الـ Salon MVP قابل للاستخدام الطبيعي؟  
 RG-005 remains 🔒 Locked until a real first client is named and officially authorized.  
-**Internal Pilot Freeze:** only 🔴 blockers that prevent completing the Visit loop, plus ⚙️ operational fixes — **no Features**.  
+**Internal Pilot Freeze:** only 🔴 blockers that prevent completing the Visit loop, plus ⚙️ operational fixes — **no Features, no Domain change, no Capability Extraction.**  
 **Operating mind (ADOPTED / normative):** [ENGINEERING_OPERATING_CONSTITUTION.md](./ENGINEERING_OPERATING_CONSTITUTION.md).  
 Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).  
 **Pilot Readiness Evidence:** [pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) (**ADOPTED**).  
-**Internal Pilot focus questions:** [PILOT_READINESS.md](./PILOT_READINESS.md) § Internal Pilot observation (VS1.1 inputs).
+**Internal Pilot focus:** [PILOT_READINESS.md](./PILOT_READINESS.md) § B.
 
-**Post-foundation execution rule:** During Internal Pilot, implement **only** fixes from real usage that are 🔴 (block the Visit loop) or ⚙️ operational. No Features, Architecture, or proactive work.
+**Post-foundation execution rule:** During Internal Pilot, implement **only** 🔴 (Visit loop blockers, with root cause) or ⚙️ operational. No Features, Shared Capabilities design, or proactive Architecture.
 
 ---
 
@@ -230,12 +231,25 @@ Founder approved refined domain + Boundary Verification + anti-bloat rule; order
 | **Type** | Product Validation / learning — **not** Feature delivery, **not** RG-005 |
 | **Triggered by** | Founder after OP-005 CLOSED — explicit start of Internal Pilot |
 | **Decision** | Run Internal Pilot on Salon MVP Operational Loop (Setup + Visit). Observer records Owner Experience only. |
+| **Single question (this phase only)** | **هل الـ Salon MVP قابل للاستخدام الطبيعي؟** — nothing else. |
 | **Allowed work during Internal Pilot** | 🔴 Bugs that prevent completing the Visit loop (with **root-cause** notes); ⚙️ operational/environment fixes. |
-| **Forbidden** | Any Domain/schema/Visit Aggregate change; any new Feature; Appointments / Queue / Billing / Notifications / Printing; opening RG-005. |
+| **Forbidden** | Any Domain/schema/Visit Aggregate change; any new Feature; Appointments / Queue / Billing / Notifications / Printing; **Capability Extraction / Platform Shared Services design**; opening RG-005. |
 | **🔵 Feature requests** | Record only. Same ask from ~3 independent owners → VS1.1 **candidate** (still not auto-build). One ask ≠ product need. |
+| **Do not discuss until OP-006 CLOSED** | Printing, Notifications, Activity Log, Timeline, Active Workload, Reports, Restaurant expansion, Platform Shared Capabilities — even as “deferred architecture.” Those belong to later phase questions (below). |
 | **Does not open** | RG-005 (real first client still requires separate authorization). |
 | **VS1.1 inputs** | Observation questions + frequency of 🔵 + root-cause 🔴 notes in [PILOT_READINESS.md](./PILOT_READINESS.md) § B — not engineer preference. |
 | **Related** | [OP-005](#op-005) · [PILOT_READINESS.md](./PILOT_READINESS.md) § B · [RELEASE_GATES.md](./RELEASE_GATES.md) § RG-005 (still Locked) |
+
+### Phase questions (one per stage — Architect discipline)
+
+| When | Single question |
+|------|-----------------|
+| **Now (OP-006)** | هل الـ Salon MVP قابل للاستخدام الطبيعي؟ |
+| After Pilot closed | ما الذي تعلمناه من الاستخدام الحقيقي؟ |
+| After VS1.1 plan | ما الذي يتكرر بين Modules ويستحق أن يصبح Platform Capability؟ |
+| Later | هل Restaurant يستطيع استخدام نفس النمط؟ |
+
+Do **not** jump ahead. Evidence first → then Capability Extraction → then second Module.
 
 ### Lifecycle progress
 

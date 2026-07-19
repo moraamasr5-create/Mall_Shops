@@ -4,14 +4,21 @@
 
 ### Repository state: **Internal Pilot (Learning)** — OP-006
 
+**Mode:** Architect discipline under a **single question** — not Feature brainstorming.
+
+**OP-006 question only:** هل الـ Salon MVP قابل للاستخدام الطبيعي؟
+
 OP-005 (Salon MVP Operational Loop) is **CLOSED**.  
-Do **not** add Features, Architecture, or proactive polish.
+Do **not** add Features, change Domain, or design Platform Shared Capabilities in this phase.
 
 **Allowed now:** 🔴 bugs that block completing the Visit loop (**write root cause, not only the symptom**); ⚙️ operational/environment fixes.  
-**Forbidden:** Domain/Visit Aggregate changes; Business Features; Appointments / Queue / Billing / Notifications / Printing; opening RG-005.  
-**🔵 asks:** record only; ~3 independent similar asks → VS1.1 candidate — never build from a single request.
+**Forbidden:** Domain/Visit Aggregate changes; Business Features; Appointments / Queue / Billing / Notifications / Printing; Capability Extraction; opening RG-005.  
+**🔵 asks:** record only; ~3 independent similar asks → VS1.1 candidate — never build from a single request.  
+**Do not discuss until OP-006 CLOSED:** Printing, Notifications, Activity Log, Timeline, Workload, Reports, Restaurant — even as deferred architecture.
 
 **RG-005:** remains Locked until a real first client is named and officially authorized.
+
+**Later sequence (not now):** Pilot Review → VS1.1 Planning → Capability Extraction → Shared Capabilities → Restaurant Module.
 
 **VS1.1** will be shaped by Internal Pilot observation questions + request frequency in [docs/PILOT_READINESS.md](./docs/PILOT_READINESS.md) § B — not by engineer preference.
 

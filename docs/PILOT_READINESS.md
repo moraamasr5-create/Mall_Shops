@@ -8,7 +8,10 @@
 **Official Evidence (pre-Pilot):** [evidence/pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) — **ADOPTED** · verdict **⚠️ Ready with Minor Conditions**.  
 **Meaning:** Operational Readiness enabled learning — **not** commercial success (Constitution §8).
 
-**During Internal Pilot:** implement **only** 🔴 bugs that block the Visit loop, or ⚙️ operational fixes. **No Features.**
+**During Internal Pilot:** implement **only** 🔴 bugs that block the Visit loop, or ⚙️ operational fixes. **No Features.** **No Domain changes.**
+
+**Single question (OP-006):** هل الـ Salon MVP قابل للاستخدام الطبيعي؟  
+Do not open Platform Shared Capabilities / Printing / Notifications / Timeline / Activity Log / Workload / Reports / Restaurant until **OP-006 is CLOSED** and a separate Founder session authorizes Capability Extraction.
 
 ---
 
