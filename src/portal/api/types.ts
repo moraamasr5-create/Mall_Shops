@@ -104,3 +104,27 @@ export type SalonCustomer = {
   notes: string | null;
   active: boolean;
 };
+
+export type SalonVisitServiceLine = {
+  id: string;
+  tenantId: string;
+  visitId: string;
+  serviceId: string;
+  name: string;
+  priceCents: number;
+  currency: string;
+  durationMin: number;
+  sortOrder: number;
+};
+
+export type SalonVisit = {
+  id: string;
+  tenantId: string;
+  status: "open" | "closed" | "cancelled";
+  customerId: string;
+  employeeId: string | null;
+  notes: string | null;
+  openedAt: string;
+  closedAt: string | null;
+  services: SalonVisitServiceLine[];
+};

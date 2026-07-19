@@ -52,6 +52,20 @@ describe("Salon module permissions", () => {
       ])
     ).toBe(false);
   });
+
+  it("grants visit write for STAFF through module-owned mapping", () => {
+    expect(
+      roleHasPermission("STAFF", SALON_PERMISSIONS.visitWrite, [SALON_ROLE_PERMISSIONS])
+    ).toBe(true);
+  });
+
+  it("denies visit write for CUSTOMER", () => {
+    expect(
+      roleHasPermission("CUSTOMER", SALON_PERMISSIONS.visitWrite, [
+        SALON_ROLE_PERMISSIONS,
+      ])
+    ).toBe(false);
+  });
 });
 
 describe("Module registry (VS1 constants outside Core)", () => {

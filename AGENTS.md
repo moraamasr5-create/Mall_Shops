@@ -2,16 +2,20 @@
 
 ## Cursor Cloud / agent instructions
 
-### Repository state: **Operationally Ready – Awaiting Learning**
+### Repository state: **Internal Pilot (Learning)** — OP-006
 
-Foundation phase is **complete**. Canonical docs are the official project state.  
-Do **not** run proactive analysis, Architecture reviews, or Features.  
-New work only from: (1) new Operational Evidence, or (2) real Pilot usage notes — after Founder assignment.
+OP-005 (Salon MVP Operational Loop) is **CLOSED**.  
+Do **not** add Features, Architecture, or proactive polish.
 
-**Next authorized step:** await explicit Founder assignment **«ابدأ Internal Pilot»**.  
+**Allowed now:** 🔴 bugs that block completing the Visit loop (**write root cause, not only the symptom**); ⚙️ operational/environment fixes.  
+**Forbidden:** Domain/Visit Aggregate changes; Business Features; Appointments / Queue / Billing / Notifications / Printing; opening RG-005.  
+**🔵 asks:** record only; ~3 independent similar asks → VS1.1 candidate — never build from a single request.
+
 **RG-005:** remains Locked until a real first client is named and officially authorized.
 
-**Feature Freeze (RG-005):** While Pilot is assigned or in progress, implement **only**
+**VS1.1** will be shaped by Internal Pilot observation questions + request frequency in [docs/PILOT_READINESS.md](./docs/PILOT_READINESS.md) § B — not by engineer preference.
+
+**Feature Freeze (also when RG-005 later opens):** implement **only**
 🔴 Pilot Blocker fixes, 🟡 UX that blocks/confuses real use, or ⚙️ operational fixes.
 **Do not** add Business Features, Domain/Schema/Architecture changes, new Modules, or
 Platform Shared Services. Full rule: [docs/RELEASE_GATES.md](./docs/RELEASE_GATES.md) § RG-005.

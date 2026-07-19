@@ -133,6 +133,12 @@ Any change that makes Core understand Salon, Restaurant, Clinic, or any single v
 
 Shared Services are introduced when discovery proves need — designed as platform capabilities, never as a single Module’s private forever-solution that must be rewritten for the next vertical.
 
+**Salon operational unit (Reference Module — OP-005):**
+
+> A Visit represents work performed, not a reservation, invoice, payment, or queue.
+>
+> SalonVisit is the operational unit of work for the Salon Module. It must remain focused on completing a single business workflow. Any capability that can exist independently (Appointments, Queue Management, Billing, Notifications, Printing, Loyalty, etc.) must evolve as separate Aggregates or Platform Services rather than expanding SalonVisit.
+
 How Modules are registered or stored is an Architecture / Implementation concern (may be unlocked); the **sellable isolation** rule is constitutional.
 
 ---

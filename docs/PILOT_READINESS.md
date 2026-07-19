@@ -3,12 +3,12 @@
 **Purpose:** Operational checklist and Pilot Learning rules before / during RG-005.  
 **Not** Architecture. **Not** a new Gate. Complements [RELEASE_GATES.md](./RELEASE_GATES.md) § RG-005.
 
-**Phase:** **Operationally Ready – Awaiting Learning.** Foundation complete. Pilot Readiness Audit **CLOSED** (2026-07-19). Await Founder assignment «ابدأ Internal Pilot». RG-005 remains Locked until a real first client is authorized.
+**Phase:** **Internal Pilot (Learning)** — OP-005 **CLOSED**; OP-006 **AUTHORIZED**. RG-005 remains Locked until a real first client is authorized.
 
-**Official Evidence:** [evidence/pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) — **ADOPTED** · verdict **⚠️ Ready with Minor Conditions**.  
-**Meaning:** Operational Readiness to **start learning** — **not** commercial success or MVP completion (see Constitution §8).
+**Official Evidence (pre-Pilot):** [evidence/pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) — **ADOPTED** · verdict **⚠️ Ready with Minor Conditions**.  
+**Meaning:** Operational Readiness enabled learning — **not** commercial success (Constitution §8).
 
-**Post-foundation:** No proactive analysis, Architecture reviews, or Features. New work only from new Operational Evidence or real Pilot usage notes.
+**During Internal Pilot:** implement **only** 🔴 bugs that block the Visit loop, or ⚙️ operational fixes. **No Features.**
 
 ---
 
@@ -57,25 +57,62 @@ Use a **fresh identity** every run. Do not rely leftover session or prior Pilot 
 
 ---
 
-## B. Internal Pilot (optional before real client)
+## B. Internal Pilot (OP-006 — in progress)
 
-Same rules as external Pilot. Observer does **not** drive the mouse for the owner.
+Same discipline as external Pilot. Observer does **not** drive the mouse for the owner.
 
 | Role | Who |
 |------|-----|
-| Actor | Non-developer (or you acting as salon owner only) |
+| Actor | Non-developer (or Founder acting as salon owner / receptionist only) |
 | Observer | Records notes only — does not fix mid-session unless 🔴 |
 
-**Journey to observe**
+**Status:** **AUTHORIZED** ([OP-006](./DECISION_LOG.md#op-006)). Not RG-005.
+
+**Journey to observe (Operational Loop)**
 
 ```
-Signup → Login → Create Salon → Ready
-  → Services → Employees → Customers
-  → Logout → Login → data still present
+Setup (Services → Employees → Customers as needed)
+  → Open Visit → choose services → Close Visit
+  → (optional) Logout → Login → open visits still visible
 ```
 
-**Allowed mid-session:** 🔴 Blocker fix only if journey cannot continue.  
-**Forbidden mid-session:** Features, “quick improvements”, Architecture.
+**Allowed mid-session:** 🔴 Bug / loop blocker only if the Visit journey cannot continue; ⚙️ operational if environment breaks.  
+**Forbidden mid-session:** Features, “quick improvements”, Architecture, Appointments / Queue / Billing.  
+**Domain freeze:** Do **not** change Salon Domain / Visit Aggregate / schema during Internal Pilot — even if an owner asks for Printing, Appointments, etc.
+
+### Feature requests → frequency before VS1.1
+
+Individual asks are **not** authorization to build.
+
+| Signal | Action |
+|--------|--------|
+| First owner asks (e.g. Printing) | Record 🔵 only |
+| Second similar ask | Record again (frequency++) |
+| Third similar ask | Eligible candidate for **VS1.1** prioritization — still not auto-build |
+
+Difference: **individual request** vs **product need**.
+
+### Internal Pilot observation questions (VS1.1 inputs)
+
+These — not code taste — determine VS1.1 priorities:
+
+1. هل موظف الاستقبال فهم فكرة «فتح زيارة» مباشرة؟
+2. هل أنهى زيارة دون مساعدة؟
+3. هل اختار الخدمات بسهولة؟
+4. هل شعر أن النظام يسرّع عمله أم يضيف خطوات؟
+5. هل قال تلقائيًا: «أين أرى الزيارات المفتوحة؟»
+
+Record answers with the four-field template in §C. Classify 🔴 / 🟡 / 🔵. Features (🔵) wait for Pilot Review → VS1.1 (and frequency rule above).
+
+### Root-cause notes for 🔴 (mandatory)
+
+Do **not** stop at the surface symptom. Write the **root cause** that drove the stop.
+
+| Weak | Better |
+|------|--------|
+| المستخدم لم يجد زر الإغلاق | المستخدم لم يدرك أن الزيارة ما زالت مفتوحة، لأن حالة الزيارة لم تكن واضحة بصريًا |
+
+The second leads to a better fix (and better VS1.1 judgment). Still: fix during Pilot **only** if it is a 🔴 loop blocker or ⚙️ ops — otherwise record for Review.
 
 ---
 

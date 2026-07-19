@@ -10,6 +10,8 @@ export const SALON_PERMISSIONS = {
   serviceRead: "salon:service:read",
   serviceWrite: "salon:service:write",
   serviceDelete: "salon:service:delete",
+  visitRead: "salon:visit:read",
+  visitWrite: "salon:visit:write",
 } as const satisfies Record<string, Permission>;
 
 export const SALON_ROLE_PERMISSIONS: PermissionGrantMap = {
@@ -23,6 +25,8 @@ export const SALON_ROLE_PERMISSIONS: PermissionGrantMap = {
     SALON_PERMISSIONS.serviceRead,
     SALON_PERMISSIONS.serviceWrite,
     SALON_PERMISSIONS.serviceDelete,
+    SALON_PERMISSIONS.visitRead,
+    SALON_PERMISSIONS.visitWrite,
   ],
   ADMIN: [
     SALON_PERMISSIONS.customerRead,
@@ -34,6 +38,8 @@ export const SALON_ROLE_PERMISSIONS: PermissionGrantMap = {
     SALON_PERMISSIONS.serviceRead,
     SALON_PERMISSIONS.serviceWrite,
     SALON_PERMISSIONS.serviceDelete,
+    SALON_PERMISSIONS.visitRead,
+    SALON_PERMISSIONS.visitWrite,
   ],
   MANAGER: [
     SALON_PERMISSIONS.customerRead,
@@ -42,11 +48,15 @@ export const SALON_ROLE_PERMISSIONS: PermissionGrantMap = {
     SALON_PERMISSIONS.employeeWrite,
     SALON_PERMISSIONS.serviceRead,
     SALON_PERMISSIONS.serviceWrite,
+    SALON_PERMISSIONS.visitRead,
+    SALON_PERMISSIONS.visitWrite,
   ],
   STAFF: [
     SALON_PERMISSIONS.customerRead,
     SALON_PERMISSIONS.employeeRead,
     SALON_PERMISSIONS.serviceRead,
+    SALON_PERMISSIONS.visitRead,
+    SALON_PERMISSIONS.visitWrite,
   ],
   CUSTOMER: [SALON_PERMISSIONS.serviceRead],
 };

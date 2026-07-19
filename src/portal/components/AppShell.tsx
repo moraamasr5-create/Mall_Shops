@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { usePortal } from "@/portal/session/PortalProvider";
 
 const TENANT_LINKS = [
+  { href: "/salon/visits", label: "الزيارات" },
   { href: "/salon/services", label: "الخدمات" },
   { href: "/salon/employees", label: "الموظفون" },
   { href: "/salon/customers", label: "العملاء" },

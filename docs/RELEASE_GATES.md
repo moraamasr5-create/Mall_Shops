@@ -41,7 +41,7 @@ Until then, do **not** claim VS1 Complete, open a new production Module, or trea
 | Architecture Foundation | **COMPLETE** |
 | Operational Foundation | **COMPLETE** ([snapshot](./evidence/2026-07-15-operational-pass.md)) |
 | Governance Foundation | **COMPLETE** (Lock + ADR + Decision Log + Operational Gates + Release Gates) |
-| Current Phase | **Operationally Ready – Awaiting Learning.** Await «ابدأ Internal Pilot». RG-005 🔒 until real first client authorized |
+| Current Phase | **Internal Pilot (Learning)** — OP-006 AUTHORIZED. RG-005 🔒 until real first client authorized |
 | Architectural evolution | Remains Lock-governed; new Modules still gated by RG-006 |
 
 ---
@@ -78,7 +78,7 @@ Canonical plan: **[PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)** — **A
 **In progress.** Execute **one PR-xx at a time** (Execution Rule).  
 **Done:** PR-01 … PR-07.  
 **RG-003:** ✅ **PASSED** (Final Release Audit on clean `main`).  
-**Current phase:** **Operationally Ready – Awaiting Learning.** Foundation complete; Pilot Readiness **CLOSED** ([OP-004](./DECISION_LOG.md#op-004)). Await Founder assignment «ابدأ Internal Pilot». RG-005 remains Locked.  
+**Current phase:** **Internal Pilot (Learning)** — [OP-006](./DECISION_LOG.md#op-006) AUTHORIZED; [OP-005](./DECISION_LOG.md#op-005) CLOSED. RG-005 remains Locked.  
 **Doc debt (before v1.0.0):** `PLATFORM.md` vs `PLATFORM_ARCHITECTURE.md`.
 
 ### RG-004 — RC1

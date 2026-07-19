@@ -110,6 +110,47 @@ model SalonCustomer {
   @@map("salon_customer")
 }
 
+/// Salon operational unit of work (OP-005). Not reservation, invoice, payment, or queue.
+model SalonVisit {
+  id         String    @id @default(cuid())
+  tenantId   String    @map("tenant_id")
+  status     String    @default("open")
+  customerId String    @map("customer_id")
+  employeeId String?   @map("employee_id")
+  notes      String?
+  openedAt   DateTime  @default(now()) @map("opened_at")
+  closedAt   DateTime? @map("closed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  services SalonVisitService[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, openedAt])
+  @@map("salon_visit")
+}
+
+/// Line under SalonVisit — snapshot of catalog service at add time (no JSON).
+model SalonVisitService {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  visitId     String   @map("visit_id")
+  serviceId   String   @map("service_id")
+  name        String
+  priceCents  Int      @map("price_cents")
+  currency    String
+  durationMin Int      @map("duration_min")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  visit SalonVisit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([visitId])
+  @@map("salon_visit_service")
+}
+
 /// Restaurant Reference Module — category entity owned by the Restaurant module.
 model RestaurantCategory {
   id          String   @id @default(cuid())

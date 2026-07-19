@@ -5,13 +5,15 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Operationally Ready – Awaiting Learning.** Foundation complete. Pilot Readiness Audit **CLOSED** (OP-004). Await Founder assignment **«ابدأ Internal Pilot»**. RG-005 remains 🔒 Locked until a real first client is authorized.  
-**Feature Freeze** during RG-005: see [RELEASE_GATES.md — RG-005](./RELEASE_GATES.md#rg-005--pilot-pilot-learning-phase).  
+**Current program phase:** **Internal Pilot (Learning)** — OP-005 **CLOSED**; OP-006 **AUTHORIZED**.  
+RG-005 remains 🔒 Locked until a real first client is named and officially authorized.  
+**Internal Pilot Freeze:** only 🔴 blockers that prevent completing the Visit loop, plus ⚙️ operational fixes — **no Features**.  
 **Operating mind (ADOPTED / normative):** [ENGINEERING_OPERATING_CONSTITUTION.md](./ENGINEERING_OPERATING_CONSTITUTION.md).  
 Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).  
-**Pilot Readiness Evidence:** [pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) (**ADOPTED**).
+**Pilot Readiness Evidence:** [pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) (**ADOPTED**).  
+**Internal Pilot focus questions:** [PILOT_READINESS.md](./PILOT_READINESS.md) § Internal Pilot observation (VS1.1 inputs).
 
-**Post-foundation execution rule:** New work only from (1) new Operational Evidence, or (2) real Pilot usage notes. No proactive analysis, Architecture reviews, or Features outside the Decision Hierarchy.
+**Post-foundation execution rule:** During Internal Pilot, implement **only** fixes from real usage that are 🔴 (block the Visit loop) or ⚙️ operational. No Features, Architecture, or proactive work.
 
 ---
 
@@ -60,6 +62,8 @@ Rules:
 | [OP-002](#op-002) | DB Role Hardening | **CLOSED** (VERIFIED — live Cross-Tenant PASS under `app_runtime`) |
 | [OP-003](#op-003) | MVP Authentication Policy (Staging Only) | **CLOSED** (Staging Auth enabled BAS-001 PASS) |
 | [OP-004](#op-004) | Pilot Readiness Audit (Mall_Full Staging) | **CLOSED** (Founder-adopted Evidence) |
+| [OP-005](#op-005) | Salon MVP Operational Loop | **CLOSED** |
+| [OP-006](#op-006) | Internal Pilot (Learning) | **AUTHORIZED** (in progress) |
 
 **Release Gates** (claiming Complete / shipping): see [RELEASE_GATES.md](./RELEASE_GATES.md) (RG-001 … RG-006).
 
@@ -184,6 +188,66 @@ Audit executed 2026-07-19; Founder adopted verdict and philosophy clarification 
 
 ---
 
+## OP-005
+
+| Field | Value |
+|-------|--------|
+| **ID** | OP-005 |
+| **Title** | Salon MVP Operational Loop |
+| **State** | **CLOSED** |
+| **Next state** | — (history retained) |
+| **Type** | Product / Module scope decision — **not** Architecture redesign, **not** Core change |
+| **Triggered by** | Founder redefinition of Salon MVP from Business Setup-only to Setup + daily operating loop; Domain Boundary Verification PASS (4/4) |
+| **Decision** | Salon MVP operational loop = existing Setup (`SalonService` / `SalonEmployee` / `SalonCustomer`) + **`SalonVisit`** (root) + **`SalonVisitService`** (child lines with price/name/currency/duration snapshots). Statuses: `open` \| `closed` \| `cancelled`. This **completes the first sellable operating loop**; it is **not** a grab-bag Feature. |
+| **Anti-bloat rule (normative for this decision)** | SalonVisit is the operational unit of work for the Salon Module. It must remain focused on completing a single business workflow. Any capability that can exist independently (Appointments, Queue Management, Billing, Notifications, Printing, Loyalty, etc.) must evolve as separate Aggregates or Platform Services rather than expanding SalonVisit. |
+| **Module boundary** | Entirely inside Salon Module. No new Core concepts. Restaurant later mirrors the pattern as `Order` + `OrderLine` without sharing Visit tables. |
+| **Explicit non-goals** | Appointment, Queue, Invoice, Payment, Printing, Notifications, Loyalty, Shared Services, Core schema/meaning changes. |
+| **Does not open** | RG-005 (still Locked until real first client authorized). |
+| **Evidence / design** | Founder-approved Domain Review + Domain Boundary Verification (plan `Salon Visit Domain`) |
+| **Related** | Constitution § Modules / Visit protection · [PILOT_READINESS.md](./PILOT_READINESS.md) |
+
+### Lifecycle progress
+
+```
+PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
+              ✅           ✅           ✅            ✅         ✅         ✅
+```
+
+Founder approved refined domain + Boundary Verification + anti-bloat rule; ordered implementation 2026-07-19.  
+**Evidence:** `npm run smoke:vs1` PASS — step 6 open/close Visit (Mall_Full Staging).  
+**CLOSED** 2026-07-19 by Founder decision after VERIFIED.
+
+---
+
+## OP-006
+
+| Field | Value |
+|-------|--------|
+| **ID** | OP-006 |
+| **Title** | Internal Pilot (Learning) |
+| **State** | **AUTHORIZED** (in progress) |
+| **Next state** | VERIFIED (notes + short Internal Pilot summary) → CLOSED → then optionally RG-005 with real client |
+| **Type** | Product Validation / learning — **not** Feature delivery, **not** RG-005 |
+| **Triggered by** | Founder after OP-005 CLOSED — explicit start of Internal Pilot |
+| **Decision** | Run Internal Pilot on Salon MVP Operational Loop (Setup + Visit). Observer records Owner Experience only. |
+| **Allowed work during Internal Pilot** | 🔴 Bugs that prevent completing the Visit loop (with **root-cause** notes); ⚙️ operational/environment fixes. |
+| **Forbidden** | Any Domain/schema/Visit Aggregate change; any new Feature; Appointments / Queue / Billing / Notifications / Printing; opening RG-005. |
+| **🔵 Feature requests** | Record only. Same ask from ~3 independent owners → VS1.1 **candidate** (still not auto-build). One ask ≠ product need. |
+| **Does not open** | RG-005 (real first client still requires separate authorization). |
+| **VS1.1 inputs** | Observation questions + frequency of 🔵 + root-cause 🔴 notes in [PILOT_READINESS.md](./PILOT_READINESS.md) § B — not engineer preference. |
+| **Related** | [OP-005](#op-005) · [PILOT_READINESS.md](./PILOT_READINESS.md) § B · [RELEASE_GATES.md](./RELEASE_GATES.md) § RG-005 (still Locked) |
+
+### Lifecycle progress
+
+```
+PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
+              ✅           ✅           ✅            —          —          —
+```
+
+AUTHORIZED 2026-07-19. Learning in progress — no Feature work.
+
+---
+
 ## How to update this log
 
 1. Advance **State** only when evidence or an explicit project decision warrants it.
@@ -193,3 +257,5 @@ Audit executed 2026-07-19; Founder adopted verdict and philosophy clarification 
 5. Append new entries as `OP-00x` — do not create parallel logs.
 6. OP-003 (Staging only): **IMPLEMENTED** when Staging Confirm email is OFF; **VERIFIED**/**CLOSED** when BAS-001 Run 2 PASSes. Closing OP-003 does **not** freeze Production Auth policy.
 7. OP-004 closes Pilot Readiness only. Internal Pilot and RG-005 each require a **separate** explicit Founder assignment.
+8. OP-005 authorizes SalonVisit operational loop inside Salon Module only; do not expand Visit with Appointments/Billing/Queue/etc. (anti-bloat rule on the OP). **CLOSED** 2026-07-19.
+9. OP-006 authorizes Internal Pilot learning only. Features wait for Pilot notes → VS1.1. RG-005 still requires a real first client + explicit open.

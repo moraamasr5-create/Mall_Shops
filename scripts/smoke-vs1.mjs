@@ -95,6 +95,46 @@ async function main() {
   const listRes = await api("/api/v1/salon/services", { token, tenantId });
   assertOk(listRes.status === 200, `list services failed: ${listRes.status}`);
   assertOk((listRes.json.data ?? []).length >= 1, "expected at least one service");
+  const serviceId = listRes.json.data[0].id;
+
+  console.log("6) create employee + open/close visit (OP-005 loop)");
+  const empRes = await api("/api/v1/salon/employees", {
+    method: "POST",
+    token,
+    tenantId,
+    body: { name: "Smoke Stylist" },
+  });
+  assertOk(empRes.status === 201, `create employee failed: ${empRes.status}`);
+  const employeeId = empRes.json.data.id;
+
+  const visitRes = await api("/api/v1/salon/visits", {
+    method: "POST",
+    token,
+    tenantId,
+    body: {
+      walkInCustomer: { name: "Smoke Guest" },
+      employeeId,
+      serviceIds: [serviceId],
+    },
+  });
+  assertOk(
+    visitRes.status === 201,
+    `open visit failed: ${visitRes.status} ${JSON.stringify(visitRes.json)}`
+  );
+  const visitId = visitRes.json.data.id;
+  assertOk(visitRes.json.data.status === "open", "visit should be open");
+  assertOk((visitRes.json.data.services ?? []).length >= 1, "visit needs service line");
+
+  const closeRes = await api(`/api/v1/salon/visits/${visitId}/close`, {
+    method: "POST",
+    token,
+    tenantId,
+  });
+  assertOk(
+    closeRes.status === 200,
+    `close visit failed: ${closeRes.status} ${JSON.stringify(closeRes.json)}`
+  );
+  assertOk(closeRes.json.data.status === "closed", "visit should be closed");
 
   console.log("VS1 smoke passed.");
 }
