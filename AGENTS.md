@@ -14,7 +14,7 @@ Do **not** add Features, change Domain, or design Platform Shared Capabilities i
 **Allowed now:** 🔴 bugs that block completing the Visit loop (**write root cause, not only the symptom**); ⚙️ operational/environment fixes.  
 **Forbidden:** Domain/Visit Aggregate changes; Business Features; Appointments / Queue / Billing / Notifications / Printing; Capability Extraction; opening RG-005.  
 **🔵 asks:** record only; ~3 independent similar asks → VS1.1 candidate — never build from a single request.  
-**Do not discuss until OP-006 CLOSED:** Printing, Notifications, Activity Log, Timeline, Workload, Reports, Restaurant — even as deferred architecture.
+**Do not discuss until OP-006 CLOSED:** Printing, Notifications, Activity Log, Timeline, Workload, Reports, Restaurant, **Tenant Business Settings (shared)** — even as deferred architecture. Those belong to Capability Extraction / later phase questions only.
 
 **RG-005:** remains Locked until a real first client is named and officially authorized.
 

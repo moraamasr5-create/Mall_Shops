@@ -71,6 +71,10 @@ Same discipline as external Pilot. Observer does **not** drive the mouse for the
 
 **Status:** **AUTHORIZED** ([OP-006](./DECISION_LOG.md#op-006)). Not RG-005.
 
+**How the Actor tests (Founder method):**  
+Run a **full workday scenario**, not a feature checklist. Goal is not “does Visit work?” but: **do I feel I am running a normal salon day?**  
+Note any moment that feels like **CRUD instead of Workflow**. During the session: **record only** — no solution proposals, no future-improvement brainstorming.
+
 **Journey to observe (Operational Loop)**
 
 ```
@@ -79,6 +83,7 @@ Setup (Services → Employees → Customers as needed)
   → (optional) Logout → Login → open visits still visible
 ```
 
+Repeat as a natural day (several visits), not as isolated API checks.
 **Allowed mid-session:** 🔴 Bug / loop blocker only if the Visit journey cannot continue; ⚙️ operational if environment breaks.  
 **Forbidden mid-session:** Features, “quick improvements”, Architecture, Appointments / Queue / Billing.  
 **Domain freeze:** Do **not** change Salon Domain / Visit Aggregate / schema during Internal Pilot — even if an owner asks for Printing, Appointments, etc.

@@ -232,6 +232,7 @@ Founder approved refined domain + Boundary Verification + anti-bloat rule; order
 | **Triggered by** | Founder after OP-005 CLOSED — explicit start of Internal Pilot |
 | **Decision** | Run Internal Pilot on Salon MVP Operational Loop (Setup + Visit). Observer records Owner Experience only. |
 | **Single question (this phase only)** | **هل الـ Salon MVP قابل للاستخدام الطبيعي؟** — nothing else. |
+| **Actor method** | Full **workday scenario**, not a feature checklist. Success feel = “I am managing a normal salon day,” not “Visit endpoint works.” Note CRUD-vs-Workflow friction; **record only** mid-session (no solutions, no future roadmap). |
 | **Allowed work during Internal Pilot** | 🔴 Bugs that prevent completing the Visit loop (with **root-cause** notes); ⚙️ operational/environment fixes. |
 | **Forbidden** | Any Domain/schema/Visit Aggregate change; any new Feature; Appointments / Queue / Billing / Notifications / Printing; **Capability Extraction / Platform Shared Services design**; opening RG-005. |
 | **🔵 Feature requests** | Record only. Same ask from ~3 independent owners → VS1.1 **candidate** (still not auto-build). One ask ≠ product need. |
@@ -250,6 +251,14 @@ Founder approved refined domain + Boundary Verification + anti-bloat rule; order
 | Later | هل Restaurant يستطيع استخدام نفس النمط؟ |
 
 Do **not** jump ahead. Evidence first → then Capability Extraction → then second Module.
+
+### Deferred agenda (record only — NOT authorized now)
+
+After **OP-006 CLOSED** and within a Founder-authorized **Capability Extraction** session (not during Internal Pilot), classify architecturally whether the platform needs **Tenant-level Business Settings** shared across Modules — e.g. business identity, location, currency, timezone, theme, general operating policies — with a **clear boundary** vs Module-owned operational data (Salon Visit, future Restaurant Order, etc.).
+
+- **Now:** do not design, schema, or implement.  
+- **Then:** classification only (Core vs Tenant settings vs Module) unless a later OP authorizes build.  
+- **Not** a Feature request from Pilot alone; treat as platform-shape question with Evidence from real use when available.
 
 ### Lifecycle progress
 
