@@ -1,7 +1,7 @@
 # Environment Validation — Latest Run (PR-01)
 
 **Overall:** PASS
-**Ran at:** 2026-07-15T01:38:21.558Z
+**Ran at:** 2026-07-19T15:11:57.653Z
 **Base URL (health):** http://127.0.0.1:3000
 
 | Check | Result | Detail |

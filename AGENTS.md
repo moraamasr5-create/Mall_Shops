@@ -2,10 +2,14 @@
 
 ## Cursor Cloud / agent instructions
 
-### Repository state: VS1 Pilot-eligible (Feature Freeze pending / during RG-005)
+### Repository state: **Operationally Ready – Awaiting Learning**
 
-This repository contains Architecture Lock documentation **and** a runnable
-Next.js + Prisma + Supabase implementation for Vertical Slice 1 (Salon reference module).
+Foundation phase is **complete**. Canonical docs are the official project state.  
+Do **not** run proactive analysis, Architecture reviews, or Features.  
+New work only from: (1) new Operational Evidence, or (2) real Pilot usage notes — after Founder assignment.
+
+**Next authorized step:** await explicit Founder assignment **«ابدأ Internal Pilot»**.  
+**RG-005:** remains Locked until a real first client is named and officially authorized.
 
 **Feature Freeze (RG-005):** While Pilot is assigned or in progress, implement **only**
 🔴 Pilot Blocker fixes, 🟡 UX that blocks/confuses real use, or ⚙️ operational fixes.
@@ -30,20 +34,31 @@ Platform Shared Services. Full rule: [docs/RELEASE_GATES.md](./docs/RELEASE_GATE
 | Operational pass snapshot | `docs/evidence/2026-07-15-operational-pass.md` · git tag `vs1-operational-pass` |
 | Decision Log | `docs/DECISION_LOG.md` (OP-001, OP-002, …) — lifecycle + why work is deferred |
 | Release Gates | `docs/RELEASE_GATES.md` (RG-001 … RG-006) — objective VS1 Complete / ship criteria |
+| Pilot readiness | `docs/PILOT_READINESS.md` — Audit **CLOSED** (OP-004); Evidence `docs/evidence/pilot-readiness-audit-2026-07-19.md` |
+| Operating Constitution | `docs/ENGINEERING_OPERATING_CONSTITUTION.md` — **ADOPTED / normative** (Decision Hierarchy, Owner Experience, Core Mission, amendment process) |
+
+### Standard operating pattern (after Constitution adoption)
+
+Do **not** rely on re-explaining project philosophy in every chat. On each task:
+
+1. **Read** [ENGINEERING_OPERATING_CONSTITUTION.md](./docs/ENGINEERING_OPERATING_CONSTITUTION.md) (normative mind).
+2. **Determine current phase** from [RELEASE_GATES.md](./docs/RELEASE_GATES.md) + [DECISION_LOG.md](./docs/DECISION_LOG.md) (temporary allow/deny).
+3. **Execute only** the assigned task (Gate / Decision / explicit assignment).
+4. **Brief governance report before implementing** if the task may affect governance, Architecture, Core Mission, Contracts, or Freeze rules — then wait for confirmation when required.
 
 ### Architecture rules for agents
 
-- Start from [docs/PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md) — platform constitution.
-- Architecture is **LOCKED** — do not redesign.
-- Documentation wins over code when they conflict (Lock → Contracts → Security → Implementation).
+- Start from [docs/ENGINEERING_OPERATING_CONSTITUTION.md](./docs/ENGINEERING_OPERATING_CONSTITUTION.md) — **normative**. Temporary bans/phases live in Release Gates / Decision Log / Pilot Readiness, not in the Constitution.
+- Then [docs/PLATFORM_PRINCIPLES.md](./docs/PLATFORM_PRINCIPLES.md) — platform axioms.
+- Architecture is **LOCKED** — do not redesign without the Decision Hierarchy path.
+- Documentation wins over code when they conflict (Hierarchy → Lock → Contracts → Implementation).
 - New Markdown only for **Decision**, **Evidence**, or **Policy** — do not grow docs for their own sake.
 - Two authorization layers are mandatory: Layer 1 RLS + Layer 2 application RBAC.
 - User-facing Prisma access must go through `withIdentityRls` / `getDb()` — never bypass RLS for normal requests.
 - Tenant bootstrap (`createTenant`) is the only privileged DB path for user onboarding.
-- Salon is the **Reference Implementation**, not a redefinition of the platform as a salon-only product; Restaurant is validation-only — do not expand it.
+- Salon is the **Reference Implementation**, not a redefinition of the platform as a salon-only product; Restaurant is validation-only — do not expand it until authorized by Gates/Decisions.
 - Never create duplicate docs (`v2`, `final`, etc.) — update the canonical file.
-- Respect `docs/DECISION_LOG.md` lifecycle (`PROPOSED → … → CLOSED`). **OP-001** must reach **CLOSED** before new Modules / large Features / architectural redesign. **OP-002** stays **DEFERRED** until then.
-- Respect `docs/RELEASE_GATES.md`: new code should close an existing Gate/OP, not invent scope. **VS1 Complete** is undefined until RGs pass.
+- Respect `docs/DECISION_LOG.md` lifecycle and `docs/RELEASE_GATES.md` for current execution rights.
 - Prefer closing an existing gate over opening new scope (anti–scope creep).
 
 ### Execution Rule
@@ -58,7 +73,7 @@ The next implementation task must always originate from one of:
 
 Cursor may propose improvements, but may not reorder milestones or begin blocked work.
 
-From this phase forward, act as an **Executor**: implement only what a Gate, Decision Log state change, or explicit assignment authorizes — not what a chat casually suggests.
+Act as an **Executor**: implement only what a Gate, Decision Log state change, or explicit assignment authorizes — not what a chat casually suggests.
 
-**During RG-005:** a Feature Request from the first client is **not** authorization to build it —
+**During an active Pilot freeze (see Release Gates):** a Feature Request from a client is **not** authorization to build it —
 record it for Pilot Review / Backlog after Freeze Exit Criteria.

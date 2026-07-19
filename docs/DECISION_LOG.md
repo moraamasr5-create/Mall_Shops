@@ -5,9 +5,13 @@
 **Not** Architecture Lock. **Not** ADRs.  
 Architecture decisions stay in [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) and [docs/adr/](./adr/).
 
-**Current program phase:** **Pilot Learning (RG-005 eligible)** — RG-004 **PASSED**; start Pilot only on explicit assignment.  
+**Current program phase:** **Operationally Ready – Awaiting Learning.** Foundation complete. Pilot Readiness Audit **CLOSED** (OP-004). Await Founder assignment **«ابدأ Internal Pilot»**. RG-005 remains 🔒 Locked until a real first client is authorized.  
 **Feature Freeze** during RG-005: see [RELEASE_GATES.md — RG-005](./RELEASE_GATES.md#rg-005--pilot-pilot-learning-phase).  
-Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).
+**Operating mind (ADOPTED / normative):** [ENGINEERING_OPERATING_CONSTITUTION.md](./ENGINEERING_OPERATING_CONSTITUTION.md).  
+Operational freeze retained: [2026-07-15 Operational Pass](./evidence/2026-07-15-operational-pass.md) (`vs1-operational-pass`).  
+**Pilot Readiness Evidence:** [pilot-readiness-audit-2026-07-19.md](./evidence/pilot-readiness-audit-2026-07-19.md) (**ADOPTED**).
+
+**Post-foundation execution rule:** New work only from (1) new Operational Evidence, or (2) real Pilot usage notes. No proactive analysis, Architecture reviews, or Features outside the Decision Hierarchy.
 
 ---
 
@@ -55,6 +59,7 @@ Rules:
 | [OP-001](#op-001) | Cross-Tenant Operational Gate | **CLOSED** (VERIFIED via live PASS) |
 | [OP-002](#op-002) | DB Role Hardening | **CLOSED** (VERIFIED — live Cross-Tenant PASS under `app_runtime`) |
 | [OP-003](#op-003) | MVP Authentication Policy (Staging Only) | **CLOSED** (Staging Auth enabled BAS-001 PASS) |
+| [OP-004](#op-004) | Pilot Readiness Audit (Mall_Full Staging) | **CLOSED** (Founder-adopted Evidence) |
 
 **Release Gates** (claiming Complete / shipping): see [RELEASE_GATES.md](./RELEASE_GATES.md) (RG-001 … RG-006).
 
@@ -152,6 +157,33 @@ Staging Auth enabled RC1; BAS-001 PASS 2026-07-16 (runId `1784223356496-122787b4
 
 ---
 
+## OP-004
+
+| Field | Value |
+|-------|--------|
+| **ID** | OP-004 |
+| **Title** | Pilot Readiness Audit (Mall_Full Staging) |
+| **State** | **CLOSED** |
+| **Next state** | — (history retained) |
+| **Type** | Operational Evidence / phase closure — **not** Architecture, **not** Product Validation |
+| **Triggered by** | Founder assignment to run Pilot Readiness Audit on Mall_Full Staging |
+| **Decision** | Adopt [`docs/evidence/pilot-readiness-audit-2026-07-19.md`](./evidence/pilot-readiness-audit-2026-07-19.md) as **official Evidence**. Verdict **⚠️ Ready with Minor Conditions**. Pilot Readiness phase **CLOSED**. |
+| **Meaning (normative)** | Proves **Operational Readiness to begin learning** (Internal Pilot eligible once assigned). Does **not** prove commercial success, subscription retention, or MVP completeness. Product Validation requires Internal Pilot → (later) real-client Pilot → Pilot Review. See Constitution §8. |
+| **Explicit non-goals** | Does **not** open RG-005. Does **not** authorize Features, Refactoring, Architecture changes, or Internal Pilot until Founder says «ابدأ Internal Pilot». Does **not** authorize a real-client Pilot until a first client is named and RG-005 is explicitly opened. |
+| **Evidence** | [`docs/evidence/pilot-readiness-audit-2026-07-19.md`](./evidence/pilot-readiness-audit-2026-07-19.md) |
+| **Related** | [PILOT_READINESS.md](./PILOT_READINESS.md) · [RELEASE_GATES.md](./RELEASE_GATES.md) § RG-005 · Constitution §8 |
+
+### Lifecycle progress
+
+```
+PROPOSED → APPROVED → AUTHORIZED → IMPLEMENTED → VERIFIED → CLOSED
+              ✅           ✅           ✅           ✅         ✅
+```
+
+Audit executed 2026-07-19; Founder adopted verdict and philosophy clarification same day → **CLOSED**.
+
+---
+
 ## How to update this log
 
 1. Advance **State** only when evidence or an explicit project decision warrants it.
@@ -160,3 +192,4 @@ Staging Auth enabled RC1; BAS-001 PASS 2026-07-16 (runId `1784223356496-122787b4
 4. After OP-002 ships and is proven: **IMPLEMENTED** → **VERIFIED** → **CLOSED**.
 5. Append new entries as `OP-00x` — do not create parallel logs.
 6. OP-003 (Staging only): **IMPLEMENTED** when Staging Confirm email is OFF; **VERIFIED**/**CLOSED** when BAS-001 Run 2 PASSes. Closing OP-003 does **not** freeze Production Auth policy.
+7. OP-004 closes Pilot Readiness only. Internal Pilot and RG-005 each require a **separate** explicit Founder assignment.

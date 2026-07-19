@@ -99,6 +99,8 @@ That is the measure of a durable multi-module platform.
 
 | Concern | Canonical location |
 |---------|-------------------|
+| Normative operating mind (Decision Hierarchy, Owner Experience, Core Mission, Amendment Process) | [ENGINEERING_OPERATING_CONSTITUTION.md](./ENGINEERING_OPERATING_CONSTITUTION.md) — **ADOPTED / normative**; other docs derive state/details from it |
+| Current phase / Feature Freeze allow-lists | [RELEASE_GATES.md](./RELEASE_GATES.md) · [DECISION_LOG.md](./DECISION_LOG.md) · [PILOT_READINESS.md](./PILOT_READINESS.md) |
 | Locked architecture decisions | [ARCHITECTURE_LOCK.md](./ARCHITECTURE_LOCK.md) |
 | Why a technical choice was made | [docs/adr/](./adr/) |
 | Executive OP lifecycle | [DECISION_LOG.md](./DECISION_LOG.md) |
