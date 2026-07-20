@@ -1,23 +1,155 @@
 # Shift Contract
 
-## Definition
+**Module:** `restaurant`  
+**Concept:** Shift  
+**Status:** Accepted (Phase 3) — behavior Contract  
+**Parents:** [DOMAIN_LANGUAGE](../../../modules/restaurant/DOMAIN_LANGUAGE.md) · [LIFECYCLE_MAP](../../../modules/restaurant/LIFECYCLE_MAP.md)  
+**Template:** [CONTRACT.template.md](../../../templates/module-contract/CONTRACT.template.md)
 
-The **Shift** domain handles time, attendance, and scheduling for Employees. It tracks *when* staff are expected to work and when they *actually* worked.
+> Period container behavior — not a timesheet product. Module-local for MVP limits, **not** because Shift is restaurant-only.
 
-## Entities
+---
 
-### Shift
-A planned block of time during which an Employee is scheduled to work. Includes start time, end time, and assigned role for that specific shift.
+## 1. Purpose
 
-### TimeEntry
-A factual record of attendance (Clock-in / Clock-out).
+Shift opens and closes the operating period so the restaurant knows when work may be accepted and when the day is accountable to close.
 
-## Invariants
+---
 
-1. **Decoupled from Employee Core**: This domain depends on `EMPLOYEE.md` for identity, but holds all logic related to time tracking and schedules (Rotating Schedules, Fixed Schedules).
-2. **Strict Time Boundaries**: A TimeEntry must belong to a specific operational day or Shift to ensure accurate payroll calculations.
-3. **Auditability**: Alterations to TimeEntries (e.g., a manager fixing a missed clock-out) must be tracked.
+## 2. Domain Language
 
-## Relationships
-- **Employee**: Every Shift and TimeEntry references an Employee.
-- **Future Expansion**: This domain serves as the foundation for future Payroll modules.
+| Term | Meaning |
+|------|---------|
+| **Shift** | Bounded operating period |
+| **Logical business date** | The period’s business day (may overnight) |
+
+**Forbidden:** Shift as Core · “Shift is Restaurant-only forever”
+
+---
+
+## 3. Responsibilities
+
+**Responsible for:**
+
+- Opening the period when the business may operate  
+- Refusing close while active Orders remain  
+- Closing the period when the day is clear  
+- Exception force-close when governance allows  
+
+**Not responsible for:**
+
+- Order line contents  
+- Fiscal accounting / Z-reports as a product  
+- Shared Shift platform implementation (until migration)  
+
+---
+
+## 4. Aggregate Boundary
+
+| Kind | Role |
+|------|------|
+| **Shift** (Root) | Period consistency |
+| May reference | Who opened/closed (Membership) |
+| Does not contain | Orders as owned children (Orders reference the period) |
+
+**Consistency rule:** Open and Close are period decisions; Close must see whether any Order still blocks the day.
+
+---
+
+## 5. State Machine
+
+```
+Closed → Open → Closing → Closed
+```
+
+| From | To | Business guard |
+|------|----|----------------|
+| Closed | Open | Within configured hours (or force) |
+| Open | Closing | Close intended |
+| Closing | Closed | No blocking non-terminal Orders |
+| Closing | Open | Close aborted — work still active |
+
+---
+
+## 6. Invariants
+
+1. At most one Open Shift for the place’s logical date (v1).  
+2. New Orders require Open Shift when Shift is in use.  
+3. A Shift cannot reach Closed while blocking Orders remain.  
+4. Shift does not own Order Aggregates.  
+5. Module-local placement is an MVP limit — the Pattern is cross-Module.
+
+---
+
+## 7. Commands
+
+| Command | Who may intend it | Preconditions | Business result |
+|---------|-------------------|---------------|-----------------|
+| **OpenShift** | cashier, manager, owner | Hours allow (or authorized force) | Period open; Orders may be created |
+| **CloseShift** | cashier, manager, owner | No blocking Orders | Period closed; day accountable |
+| **ForceCloseShift** | manager, owner | Governance allows | Period closed despite normal hour rules |
+
+---
+
+## 8. Domain Events
+
+| Domain Event | After | Business meaning |
+|--------------|-------|------------------|
+| **ShiftOpened** | OpenShift | Day/period started |
+| **ShiftCloseAttempted** | Close intended | Entering Closing |
+| **ShiftClosed** | CloseShift / ForceCloseShift | Period ended |
+| **ShiftCloseRejected** | Close aborted | Work still blocks close |
+
+---
+
+## 9. Relationships
+
+| Other | Business rule |
+|-------|---------------|
+| Order | Orders associate to Open Shift; block Close |
+| Settings | Hours window |
+| Platform Timezone Policy | Interprets “now” / overnight day |
+
+---
+
+## 10. Permissions
+
+| Permission | Authorizes |
+|------------|------------|
+| `restaurant.shift.open` | OpenShift |
+| `restaurant.shift.close` | CloseShift |
+| `restaurant.shift.force_close` | ForceCloseShift |
+
+---
+
+## 11. Out of Scope
+
+- Shared Shift product build  
+- Cash drawer Settlement suite  
+- Pilot payroll  
+
+---
+
+## 12. Future Evolution
+
+| Change | Trigger |
+|--------|---------|
+| Migrate to Shared Shift | Shared Capability + OP |
+| Multi-place periods | Tenant model expansion |
+
+---
+
+## 13. References
+
+| | Concepts |
+|--|----------|
+| **Depends On** | SETTINGS · RESTAURANT_EMPLOYEE |
+| **Uses** | ORDER (read for close validation) |
+| **Referenced By** | ORDER · REPORTING |
+
+---
+
+## Acceptance
+
+- [x] Behavior-first · MVP-local ≠ restaurant-only  
+- [x] §13 filled  

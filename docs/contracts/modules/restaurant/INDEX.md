@@ -1,48 +1,60 @@
 # Restaurant Module Contracts — Index
 
-> ## LEGACY (Read-only) — DO NOT USE AS PRODUCT SOURCE OF TRUTH
->
-> **Canonical Rule:** [GOVERNANCE_FRAMEWORK.md](../../platform/GOVERNANCE_FRAMEWORK.md) — hierarchy beats banners; conflict with Thesis / Index / Canonical Contracts / Discovery ⇒ auto-Legacy.  
-> **Canonicalization Audit:** [restaurant-canonicalization-audit.md](../../evidence/restaurant-canonicalization-audit.md) (2026-07-20)  
-> **Product Constitution:** [MVP_THESIS.md](../../modules/restaurant/MVP_THESIS.md) (**ADOPTED**)  
->
-> This entire folder is a **pre–Reference-Design stub pack**. It describes peer Aggregates (Payment, Fulfillment, KitchenTicket, Driver, Table, Customer, …) that **contradict** the ADOPTED Restaurant MVP Thesis.
->
-> - **Forbidden:** Exit Criteria · schema · APIs · Portal · S1 language driven from these files  
-> - **Allowed:** Historical reading only  
-> - **Replace later:** Index-canonical contract pack under an authorized phase — not by silently editing Product into these stubs
+**Phase:** Business Contracts (Phase 3)  
+**Status:** **LOCKED** — Business Authority (review PASS 2026-07-19)  
+**Evidence:** [restaurant-contracts-review-2026-07-19.md](../../../evidence/restaurant-contracts-review-2026-07-19.md)  
+**Authority:** These Contracts are business truth for Restaurant. Prisma/SQL/API/UI must **translate** them — never invent business rules.  
+**Litmus (Prisma Test):** If a new business decision appears while writing Prisma, Phase 3 was incomplete — stop and amend Contracts first.  
+**Reference Design:** [docs/modules/restaurant/](../../../modules/restaurant/README.md) *(Architecture Locked)*  
+**Contract template:** [CONTRACT.template.md](../../../templates/module-contract/CONTRACT.template.md)  
+**Module templates pack:** [docs/templates/module-reference/](../../../templates/module-reference/README.md)
+
+### Contract philosophy
+
+| Write this | Never write this |
+|------------|------------------|
+| Commands (`CreateOrder`, `ConfirmOrder`, `DispatchOrder`) | `POST /orders`, GraphQL, RPC |
+| Domain Events (`OrderCompleted`) | Webhooks, queues, topics |
+| Invariants & Responsibilities | Fields, tables, FKs, `createdAt` |
+| §13 References graph | ORM relation diagrams as authority |
 
 ---
 
-## Purpose (historical)
+## Reading order (mandatory)
 
-This directory contains the Domain Contracts for the `restaurant` module. It defines the business rules, entities, and aggregates that make up the restaurant vertical slice.
+| # | Contract | Kind |
+|---|----------|------|
+| 1 | [ORDER.md](./ORDER.md) | Aggregate Root — **primary Work Unit** |
+| 2 | [MENU.md](./MENU.md) | Aggregate Root (catalog) |
+| 3 | [FULFILLMENT.md](./FULFILLMENT.md) | Entity inside Order |
+| 4 | [SHIFT.md](./SHIFT.md) | Aggregate Root (MVP-local Pattern) |
+| 5 | [RESERVATION.md](./RESERVATION.md) | Aggregate Root (parallel) |
+| 6 | [PAYMENT.md](./PAYMENT.md) | Acceptance behavior on Order (v1) |
+| 7 | [GUEST.md](./GUEST.md) | Entity (not Root) |
+| 8 | [RESTAURANT_EMPLOYEE.md](./RESTAURANT_EMPLOYEE.md) | Assignment on Membership |
+| 9 | [SETTINGS.md](./SETTINGS.md) | Configuration behavior (thin) |
+| 10 | [REPORTING.md](./REPORTING.md) | Later / read-side stub |
 
-These contracts adhere strictly to the platform invariants (e.g., Tenant-scoping, explicit Roles) defined in the Core Contracts (`../../INDEX.md`).
+Each Contract uses **13 sections**: Purpose · Domain Language · Responsibilities · Aggregate Boundary · State Machine · Invariants · Commands · Domain Events · Relationships · Permissions · Out of Scope · Future Evolution · **References**.
 
-## Aggregate Map & Dependency Rules
+---
 
-The Restaurant domain is highly decoupled. Each aggregate has clear responsibilities and boundaries to prevent leakage.
+## Obsolete (must not exist as authority)
 
-| Aggregate | Owns | Depends On (Reads) |
-|-----------|------|---------------------|
-| **[ORDER](./ORDER.md)** | Order, OrderLineItem | Menu, Fulfillment |
-| **[PAYMENT](./PAYMENT.md)** | Payment, PaymentAttempt, Refund | Order |
-| **[FULFILLMENT](./FULFILLMENT.md)** | Fulfillment Policy, Windows, Readiness Rules | None |
-| **[KITCHEN](./KITCHEN.md)** | KitchenTicket, Prep Workflow, Assignment | Order |
-| **[DRIVER](./DRIVER.md)** | Driver, DeliveryAssignment | Fulfillment |
-| **[TABLE](./TABLE.md)** | Floor, Table, Reservation | Customer |
-| **[CUSTOMER](./CUSTOMER.md)** | Customer Profile, Address | None |
-| **[MENU](./MENU.md)** | Category, MenuItem, ModifierGroup | None |
-| **[EMPLOYEE](./EMPLOYEE.md)** | Employee, Role | None |
-| **[SHIFT](./SHIFT.md)** | Shift, TimeEntry | Employee |
+Do not restore as Contracts: Customer · Driver · Kitchen · Table · Status · Events · Employee.  
+See GUEST / RESTAURANT_EMPLOYEE / ORDER / RESERVATION instead.
 
-## Shared Concepts
+---
 
-| Concept | Purpose |
-|---------|---------|
-| **[STATUS](./STATUS.md)** | Defines the state machine transition rules for Orders, Payments, and Kitchen. |
-| **[EVENTS](./EVENTS.md)** | Canonical Domain Events published by this module for internal integrations. |
+## Before Phase 4
 
-## Out of Scope
-- **Inventory**: Stock management, recipes, and purchasing are explicitly excluded from this module to maintain focus and prevent the domain from expanding into a full supply-chain system.
+1. Phase 3 is **LOCKED** — do not casually edit; use an explicit delta if business rules must change.  
+2. Prisma/SQL/RLS/API/UI remain **blocked** until an authorizing OP opens Restaurant implementation.  
+3. Schema must derive from Contracts — never the reverse.  
+4. Vocabulary must match [DOMAIN_LANGUAGE.md](../../../modules/restaurant/DOMAIN_LANGUAGE.md).
+
+---
+
+## Core dependencies (not duplicated here)
+
+Identity · Tenant · Membership · Module · TenantModule · RBAC · Permission — see [docs/contracts/INDEX.md](../../INDEX.md).
