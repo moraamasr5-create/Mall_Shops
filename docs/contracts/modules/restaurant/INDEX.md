@@ -1,6 +1,20 @@
 # Restaurant Module Contracts — Index
 
-## Purpose
+> ## LEGACY (Read-only) — DO NOT USE AS PRODUCT SOURCE OF TRUTH
+>
+> **Canonical Rule:** [GOVERNANCE_FRAMEWORK.md](../../platform/GOVERNANCE_FRAMEWORK.md) — hierarchy beats banners; conflict with Thesis / Index / Canonical Contracts / Discovery ⇒ auto-Legacy.  
+> **Canonicalization Audit:** [restaurant-canonicalization-audit.md](../../evidence/restaurant-canonicalization-audit.md) (2026-07-20)  
+> **Product Constitution:** [MVP_THESIS.md](../../modules/restaurant/MVP_THESIS.md) (**ADOPTED**)  
+>
+> This entire folder is a **pre–Reference-Design stub pack**. It describes peer Aggregates (Payment, Fulfillment, KitchenTicket, Driver, Table, Customer, …) that **contradict** the ADOPTED Restaurant MVP Thesis.
+>
+> - **Forbidden:** Exit Criteria · schema · APIs · Portal · S1 language driven from these files  
+> - **Allowed:** Historical reading only  
+> - **Replace later:** Index-canonical contract pack under an authorized phase — not by silently editing Product into these stubs
+
+---
+
+## Purpose (historical)
 
 This directory contains the Domain Contracts for the `restaurant` module. It defines the business rules, entities, and aggregates that make up the restaurant vertical slice.
 
