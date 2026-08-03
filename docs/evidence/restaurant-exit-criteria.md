@@ -213,6 +213,7 @@ Do **not** cite as authority for gates or implementation:
 
 ```
 Foundation = FROZEN
-Exit Criteria = ADOPTED (governance only; Thesis is Product SoT)
-Phase A Assignment = PROPOSED → Founder ADOPT → then execution
+Exit Criteria = ADOPTED
+Phase A Assignment = ADOPTED (Execution Authority Granted)
+Kickoff = OPEN → Phase A Execution (A1–A8 · D1–D6)
 ```

@@ -1,15 +1,22 @@
 # Restaurant Phase A — Founder Assignment
 
 **Date:** 2026-07-20  
-**Status:** **PROPOSED** — awaiting Founder ADOPT (execution forbidden until ADOPT)  
-**Kind:** Founder Assignment only — **not** implementation · **not** Kickoff evidence · **not** Product redesign  
+**Status:** **ADOPTED**  
+**Kind:** Founder Assignment — authorizes Phase A Execution after Kickoff; **not** implementation itself · **not** Product redesign  
+
+| Field | Value |
+|-------|--------|
+| **Adopted By** | Founder |
+| **Date** | 2026-07-20 |
+| **Execution Authority** | **Granted** |
+
 **Bound by:**  
 - [MVP_THESIS.md](../modules/restaurant/MVP_THESIS.md) (**ADOPTED**)  
 - [restaurant-exit-criteria.md](./restaurant-exit-criteria.md) (**ADOPTED**) — Appendix A Phase A gates A1–A8  
 - [RESTAURANT_KNOWLEDGE_INDEX.md](../knowledge/RESTAURANT_KNOWLEDGE_INDEX.md)  
 - [GOVERNANCE_FRAMEWORK.md](../platform/GOVERNANCE_FRAMEWORK.md) Canonical Rule  
 
-**Authority:** This Assignment authorizes Phase A **work** only after status = **ADOPTED**. Until then: no schema, APIs, Portal, or Shared builds for Restaurant Success Loop.
+**Authority:** Phase A **execution** is open (Kickoff → implement → evidence → Founder Acceptance). Still forbidden: Architecture/Core redesign, Canonical Contract rewrite, Features outside A1–A8, Legacy stubs as SoT, Shared builds without Trigger+OP.
 
 ---
 
@@ -17,7 +24,7 @@
 
 Make Thesis **Success Loop** ([Thesis §4](../modules/restaurant/MVP_THESIS.md#4-compact-success-loop-normative-for-p0)) **operable** for a Tenant with Core + Restaurant Module only — enough to satisfy Exit Criteria Phase A gates **A1–A8**.
 
-Product meaning = Thesis. Gate IDs = Exit Criteria Appendix A. This file only **assigns work**.
+Product meaning = Thesis. Gate IDs = Exit Criteria Appendix A. This file **assigns and authorizes** work; it does not redefine Product.
 
 ---
 
@@ -34,47 +41,51 @@ Product meaning = Thesis. Gate IDs = Exit Criteria Appendix A. This file only **
 | **WP-A7** Portal: day center = Orders; mobile-usable §4 screens; single Module surface | A7 | Thesis §3.7 |
 | **WP-A8** Negative scope check (Explicit OUT / Never P0) | A8 | Thesis §3.4 · §3.6 · §4 failure clause |
 
-Implementation may use Canonical Contracts as **business language to translate** (ORDER, MENU, FULFILLMENT, GUEST, PAYMENT, RESTAURANT_EMPLOYEE, …) — not `_legacy_stubs/`.
+Translate Canonical Contracts (ORDER, MENU, FULFILLMENT, GUEST, PAYMENT, RESTAURANT_EMPLOYEE, …) — never `_legacy_stubs/`.
 
-**Permissions:** `restaurant:*` vocabulary per Thesis §3.5.
-
-**RLS / Identity:** existing platform two-layer rules (`withIdentityRls` / `getDb()`); no new auth architecture.
+**Permissions:** `restaurant:*` per Thesis §3.5.  
+**RLS / Identity:** existing two-layer rules (`withIdentityRls` / `getDb()`); no new auth architecture.
 
 ---
 
 ## 3. Scope (OUT) — reject and defer
 
-Anything not required for A1–A8 / Thesis §4 is **out**, including (non-exhaustive; Thesis §3.4–§3.6 win):
-
-| Out | Defer to |
-|-----|----------|
-| Shift Aggregate / Open–Close Shift | Later / Shared candidate |
-| Reservation | Later (Thesis OUT of P0 loop) |
-| Reporting / analytics | Later |
+| Out | Why / defer to |
+|-----|----------------|
+| **Shift** Aggregate / Open–Close | Opens period Domain; Shared candidate — not P0 |
+| **Reservation** | Independent lifecycle — Thesis OUT of P0 loop |
+| **Shared** services (print, notify, offline, realtime, …) | Platform Trigger + OP — not Restaurant Feature |
+| **Pilot** / dispatch / capacity product | Thesis Explicit OUT |
 | Settlement / refunds / Payment Aggregate / GL | Later |
-| Printing / Artifact Shared · Offline · Notifications · Realtime Shared | Trigger + OP |
-| Pilot / dispatch / capacity product | Later |
 | Inventory / CRM / Loyalty / KitchenTicket Aggregate | Never P0 |
-| Phase B clarity (B1–B4) | Phase B Assignment |
-| S1/S2 freeze / Reference Lock | After Founder Review |
-| Re-opening AbuKhater / Architecture / Product Philosophy | Forbidden |
+| **Phase B** (B1–B4) | Separate Phase B Assignment |
+| S1/S2 / Reference Lock | After Founder Review |
+| AbuKhater re-extract · Architecture · Product Philosophy | Forbidden |
 
 **Rule:** If a PR or task cannot cite A1–A8 + Thesis §, it is **rejected** from Phase A.
 
 ---
 
-## 4. Deliverables
+## 4. Deliverables = Evidence (not files alone)
 
-| # | Deliverable | Notes |
-|---|-------------|--------|
-| D1 | Runnable Tenant path covering WP-A1…WP-A7 | Code + migrations as needed for Thesis loop only |
-| D2 | Portal surfaces required for Thesis §4 + §3.7 | Day center = Orders; no dual-app-as-architecture |
-| D3 | `restaurant-phase-a-kickoff.md` | Start note after Assignment ADOPT |
-| D4 | `restaurant-phase-a-baseline.md` (optional but recommended) | Pre-change snapshot |
-| D5 | `restaurant-phase-a-evidence.md` | Mandatory — A1–A8 done/not-done |
-| D6 | Founder Check request | PASS / FAIL on evidence |
+Phase A is Evidence/Gates-driven. Artifacts may include code, but **acceptance is evidence**, not “code exists.”
 
-No separate “design thesis” or new contracts pack in Phase A unless a Canonical Contract gap **blocks** A1–A8 — then stop and escalate to Founder (do not invent Product).
+| ID | Evidence kind | Proves | Typical artifact(s) |
+|----|---------------|--------|---------------------|
+| **D1** | **Domain Contract Evidence** | Implementation translates Canonical Contracts for A1–A8; no Domain invention; no Legacy stubs | Mapping note A1–A8 → Contract clauses · gap list (empty or escalated) |
+| **D2** | **API Boundary Evidence** | Module APIs/commands stay inside Thesis Success Loop; no Shared/Core leakage | Endpoint/command list tagged A1–A8 · out-of-scope rejected |
+| **D3** | **Persistence Evidence** | Schema/migrations (if any) justified by Contracts + Thesis loop only; RLS-capable | Migration refs · table/aggregate map to ORDER/MENU/… · no OUT tables |
+| **D4** | **Permission / RLS Evidence** | `restaurant:*` + Layer-1 RLS + Layer-2 RBAC on user paths; `withIdentityRls` / `getDb()` | Permission matrix · RLS check notes · no PIN/open-RLS patterns |
+| **D5** | **Runtime Evidence** | Tenant can run Thesis §4 (gates A1–A7) at runtime | Demo script / smoke / screenshots · A1–A7 PASS rows |
+| **D6** | **Founder Acceptance** | Founder Check PASS on D1–D5 + A8 negative checklist | `restaurant-phase-a-evidence.md` Founder section |
+
+**Process artifacts (supporting, not substitutes for D1–D6):**
+
+| File | Role |
+|------|------|
+| [restaurant-phase-a-kickoff.md](./restaurant-phase-a-kickoff.md) | Opens execution window |
+| `restaurant-phase-a-baseline.md` | Optional pre-change snapshot |
+| `restaurant-phase-a-evidence.md` | Rolls up A1–A8 + D1–D6 for Founder Acceptance |
 
 ---
 
@@ -82,80 +93,75 @@ No separate “design thesis” or new contracts pack in Phase A unless a Canoni
 
 Phase A is **done** when **all** are true:
 
-1. Exit Criteria **A1–A8** are evidenced as PASS in `restaurant-phase-a-evidence.md` by **reference to Thesis clauses** (not by restating Product).  
-2. No deliverable depends on Thesis Explicit OUT / Never P0 / Legacy stubs.  
-3. Founder Check = **PASS**.  
+1. Exit Criteria **A1–A8** PASS by reference to Thesis (in evidence rollup).  
+2. **D1–D5** evidence present and fail-closed (missing = FAIL).  
+3. **D6 Founder Acceptance** = **PASS**.  
+4. No deliverable depends on Thesis Explicit OUT / Never P0 / Legacy stubs.
 
 Phase A is **not** done if Success Loop completion requires Shift, Reservation, Shared products, Pilot dispatch, or any item in Thesis §4 “P0 has failed as a definition.”
 
 ---
 
-## 6. Evidence required
+## 6. Evidence rollup rules
 
-| Artifact | Required content |
-|----------|------------------|
-| `restaurant-phase-a-evidence.md` | Table A1–A8: Status (PASS/FAIL) · pointer to demo/test/commit · Thesis § cited |
-| Negative checklist (A8) | Explicit confirmation that OUT items were not built |
-| Founder Check | Recorded PASS/FAIL + date |
-
-Fail closed: missing row = FAIL.
+| Rule | Requirement |
+|------|-------------|
+| Traceability | Every A-gate and D-evidence cites Thesis § / Contract — not archive |
+| Fail closed | Missing D1–D6 section = FAIL |
+| A8 negative | Explicit “not built” for OUT list |
+| No philosophy | Evidence = done/not-done |
 
 ---
 
-## 7. Execution sequence (after this Assignment is ADOPTED)
+## 7. Execution sequence (now authorized)
 
 ```
-Assignment ADOPT
-  → Kickoff (D3)
-  → Baseline optional (D4)
-  → Implement WP-A1…WP-A7 (D1–D2)
-  → Evidence A1–A8 (D5) including A8 negative check
-  → Founder Check (D6)
+Assignment ADOPTED + Execution Authority Granted
+  → Kickoff (opens Phase A Execution)
+  → Baseline optional
+  → Implement WP-A1…WP-A7 producing D1–D5
+  → Evidence rollup A1–A8 + D1–D5
+  → D6 Founder Acceptance
   → if PASS: stop Phase A (await Phase B Assignment)
-  → if FAIL: corrections inside A1–A8 only — no scope expansion
+  → if FAIL: corrections inside A1–A8 only
 ```
 
 ---
 
-## 8. Constraints (hard)
+## 8. Constraints (hard) during Phase A Execution
 
-| Constraint | Source |
-|------------|--------|
-| No new Feature / Product decision | Thesis ADOPTED · Exit Criteria |
-| No Architecture redesign | Salon Locked · Architecture Lock |
-| No Canonical Contract rewrite as “improvement” | Contracts = language to translate |
-| No Legacy stubs as SoT | Canonical Rule · Exit Criteria Appendix B |
-| No Shared Capability builds | Thesis §3.6 · Trigger + OP |
-| UI may be modern/mobile-usable for §4 only | Thesis §3.7 — not a Domain expansion license |
+| Forbidden | Allowed |
+|-----------|---------|
+| Modify Architecture Lock / Core redesign | Translate Thesis §4 into Module code |
+| Re-design Canonical Contracts | Cite Contracts; escalate true gaps to Founder |
+| Features outside A1–A8 | WP-A1…WP-A8 only |
+| Shared Capability builds | — |
+| Legacy stubs as SoT | Canonical Contracts only |
 
 ---
 
-## 9. Adoption
+## 9. Adoption record
 
 | State | Meaning |
 |-------|---------|
-| **PROPOSED** | Written; execution **forbidden** |
-| **ADOPTED** | Phase A execution **authorized** |
+| **ADOPTED** | Binding; Execution Authority Granted |
 | **SUPERSEDED** | Only by Founder Decision |
 
-**Founder ADOPT checklist:**
+**ADOPT checklist (satisfied):**
 
-| # | Question | Required |
-|---|----------|----------|
-| 1 | Assignment adds Product scope beyond Thesis / Exit Criteria A1–A8? | **لا** |
-| 2 | Every WP maps to an Exit Criteria gate + Thesis §? | **نعم** |
-| 3 | OUT list defers correctly (no silent exceptions)? | **نعم** |
-| 4 | Evidence + DoD fail-closed? | **نعم** |
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | Scope beyond Thesis / Exit Criteria A1–A8? | **لا** |
+| 2 | Every WP maps to gate + Thesis §? | **نعم** |
+| 3 | OUT defers Shift/Reservation/Shared/Pilot/Phase B? | **نعم** |
+| 4 | Deliverables = Evidence D1–D6 fail-closed? | **نعم** |
 
 ---
 
 ## 10. Closing
 
 ```
-Exit Criteria = ADOPTED
-Phase A Assignment = PROPOSED → (Founder) ADOPT
-Then and only then = Product Execution for A1–A8
+Architecture / Knowledge / Thesis / Exit Criteria = FROZEN
+Phase A Assignment = ADOPTED (Execution Authority Granted)
+Next = Kickoff → Phase A Execution (A1–A8 only)
 ```
-
-**Next after this file ADOPT:** Phase A Kickoff → implement → Evidence → Founder Check.  
-**Not next:** Phase B · S1 · AbuKhater · Shared · Reservation · Shift.

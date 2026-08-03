@@ -178,10 +178,11 @@ Activate restaurant Module
 **Phase closure:** [restaurant-governance-product-phase-closed.md](../../evidence/restaurant-governance-product-phase-closed.md) — Governance + Product Constitution **CLOSED**  
 
 **Exit Criteria:** [restaurant-exit-criteria.md](../../evidence/restaurant-exit-criteria.md) — **ADOPTED**  
-**Phase A Assignment:** [restaurant-phase-a-assignment.md](../../evidence/restaurant-phase-a-assignment.md) — **PROPOSED** (execution forbidden until ADOPT)  
-**Next Founder command:** **ADOPT** Phase A Assignment.  
+**Phase A Assignment:** [restaurant-phase-a-assignment.md](../../evidence/restaurant-phase-a-assignment.md) — **ADOPTED** (Execution Authority Granted)  
+**Phase A Kickoff:** [restaurant-phase-a-kickoff.md](../../evidence/restaurant-phase-a-kickoff.md) — **OPEN**  
 
-**Forbidden until Phase A Assignment ADOPT:** schema · APIs · Portal build · Shared builds · archive re-extraction · Architecture redesign.  
+**Phase A Execution:** authorized for A1–A8 / evidence D1–D6 only.  
+**Forbidden:** Architecture/Core redesign · Contract redesign · Features outside A1–A8 · Shared without Trigger+OP.  
 **Executive rule:** conflict with this sequence ⇒ auto-Legacy — [GOVERNANCE_FRAMEWORK §1b](../../platform/GOVERNANCE_FRAMEWORK.md#1b-executive-sequence-rule-permanent--no-silent-exceptions).
 
 ---

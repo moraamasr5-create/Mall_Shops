@@ -128,3 +128,41 @@ export type SalonVisit = {
   closedAt: string | null;
   services: SalonVisitServiceLine[];
 };
+
+export type RestaurantMenuItem = {
+  id: string;
+  tenantId: string;
+  categoryId: string;
+  name: string;
+  description: string | null;
+  priceCents: number;
+  currency: string;
+  available: boolean;
+  retired: boolean;
+};
+
+export type RestaurantOrderLine = {
+  id: string;
+  tenantId: string;
+  orderId: string;
+  menuItemId: string;
+  name: string;
+  quantity: number;
+  priceCents: number;
+  currency: string;
+  sortOrder: number;
+};
+
+export type RestaurantOrder = {
+  id: string;
+  tenantId: string;
+  status: string;
+  fulfillmentMode: "dine_in" | "pickup" | "delivery" | string;
+  guestName: string | null;
+  paymentAccepted: boolean;
+  paymentMethod: string | null;
+  paymentAcceptedAt: string | null;
+  openedAt: string;
+  completedAt: string | null;
+  lines: RestaurantOrderLine[];
+};

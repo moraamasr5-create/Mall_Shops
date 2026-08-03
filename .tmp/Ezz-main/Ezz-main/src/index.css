@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0a0a0a; /* أغمق قليلاً لمظهر فاخر */
+  color: #e5e5e5;
+}
+
+/* Custom Scrollbar for Dark Mode */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B08D57;
+}
+
+/* Golden Glow Effects */
+.gold-glow {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.gold-glow:hover {
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+}
+
+/* ========================================== */
+/* إعدادات الطباعة للفاتورة الحرارية 80mm */
+/* ========================================== */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  .receipt-container, .receipt-container * {
+    visibility: visible;
+  }
+  
+  .receipt-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    padding: 5mm; /* هامش داخلي لمنع القص */
+    margin: 0;
+    font-size: 14px; /* خط واضح للطباعة */
+    font-family: sans-serif;
+    color: black !important;
+    background: white !important;
+  }
+
+  .receipt-container .font-bold {
+    font-weight: 900 !important;
+  }
+  
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  @page {
+    margin: 0;
+    size: 80mm auto; 
+  }
+}

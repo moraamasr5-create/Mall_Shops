@@ -6,7 +6,8 @@
 **AbuKhater role:** Operational Knowledge Base only.  
 **Confidence definitions:** [abukhater-knowledge-inventory.md](../evidence/abukhater-knowledge-inventory.md) §10.
 
-**Next Founder command:** **ADOPT** [Phase A Assignment](../evidence/restaurant-phase-a-assignment.md) (**PROPOSED**) → then Phase A Kickoff / execution.  
+**Next Founder / executor step:** Phase A Execution per [Kickoff](../evidence/restaurant-phase-a-kickoff.md) (**OPEN**) — evidence D1–D6; gates A1–A8.  
+**Phase A Assignment:** [restaurant-phase-a-assignment.md](../evidence/restaurant-phase-a-assignment.md) — **ADOPTED** (Execution Authority Granted)  
 **Exit Criteria:** [restaurant-exit-criteria.md](../evidence/restaurant-exit-criteria.md) — **ADOPTED**  
 **Product Constitution:** [MVP_THESIS.md](../modules/restaurant/MVP_THESIS.md) — **ADOPTED**
 
