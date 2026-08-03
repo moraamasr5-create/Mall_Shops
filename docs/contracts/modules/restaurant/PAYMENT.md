@@ -1,35 +1,132 @@
 # Payment Contract
 
-## Definition
+**Module:** `restaurant`  
+**Concept:** Payment (v1: acceptance behavior)  
+**Status:** Accepted (Phase 3) — behavior Contract (thin)  
+**Parents:** [ORDER](./ORDER.md) · [MVP_BOUNDARY](../../../modules/restaurant/MVP_BOUNDARY.md)  
+**Template:** [CONTRACT.template.md](../../../templates/module-contract/CONTRACT.template.md)
 
-The **Payment** domain handles all financial transactions, attempts, and refunds. It exists as an independent domain to support complex payment strategies without complicating the Order aggregate.
+---
 
-## Entities
+## 1. Purpose
 
-### Payment
-A financial transaction intent to settle a specific amount.
+Payment in v1 records whether and how money was accepted for an Order so the day can run. It is not a billing engine and not Settlement.
 
-### PaymentAttempt
-A specific attempt to capture funds (e.g., a card authorization request). A Payment can have multiple failed attempts before a successful one.
+---
 
-### Refund
-A reversal of a previously successful Payment.
+## 2. Domain Language
 
-## Supported Strategies
-- Cash
-- Credit/Debit Card
-- Online Payment Gateways
-- Digital Wallets
-- Split Payments
-- Partial Payments
+| Term | Meaning |
+|------|---------|
+| **PaymentAcceptance** | Business fact that money was accepted / remains due on an Order |
+| **Settlement** | Later economic close Pattern — not this Contract’s v1 duty |
 
-## Invariants
+**Forbidden:** Invoice as Work Unit · refund suite in v1
 
-1. **Independent Lifecycle**: A Payment's success or failure is tracked independently of the Order's preparation or fulfillment status.
-2. **Cardinality (Zero to Many)**: An Order may have **zero, one, or multiple** Payments depending on the payment policy. It is strictly forbidden to assume a 1:1 relationship between an Order and a Payment.
-3. **Immutability of Success**: Once a PaymentAttempt is successful, it cannot be deleted. It can only be negated via a formal `Refund`.
-4. **Audit Trail**: Every attempt, whether failed or successful, must be permanently recorded for reconciliation and auditing.
+---
 
-## Relationships
-- **Order**: Payments are typically associated with an Order, though the domain allows for standalone transactions.
-- **Status**: Payment state transitions are defined in [STATUS.md](./STATUS.md).
+## 3. Responsibilities
+
+**Responsible for:**
+
+- Recording that payment was accepted (method and paid vs remaining as business meaning)  
+- Allowing staff to update acceptance before the Order is terminal (per policy)  
+
+**Not responsible for:**
+
+- Refunds, capture rails, tax, GL  
+- Blocking Confirm on a full Payment Aggregate in MVP  
+
+---
+
+## 4. Aggregate Boundary
+
+| Kind | Role |
+|------|------|
+| Aggregate Root | **None in v1** |
+| Lives on | Order (acceptance behavior) |
+| Future | Payment Root may reference Order |
+
+**Consistency rule:** Acceptance changes accompany Order work; they do not invent a second primary unit.
+
+---
+
+## 5. State Machine
+
+**None** in v1 (acceptance is a fact on the Order, not a bank-grade lifecycle).
+
+---
+
+## 6. Invariants
+
+1. Acceptance does not replace Order as the Work Unit.  
+2. ConfirmOrder does not require a full Payment Aggregate in MVP.  
+3. Refunds are out of scope for v1.  
+4. Accepted methods must be allowed by Settings / Currency Policy.
+
+---
+
+## 7. Commands
+
+| Command | Who may intend it | Preconditions | Business result |
+|---------|-------------------|---------------|-----------------|
+| **AcceptPayment** | cashier, manager | Order non-terminal | Business records money accepted / remaining |
+| **RevisePaymentAcceptance** | cashier, manager | Order non-terminal; policy | Acceptance updated |
+
+---
+
+## 8. Domain Events
+
+| Domain Event | After | Business meaning |
+|--------------|-------|------------------|
+| **PaymentAccepted** | AcceptPayment | Money acceptance recorded |
+| **PaymentAcceptanceRevised** | RevisePaymentAcceptance | Acceptance changed |
+
+---
+
+## 9. Relationships
+
+| Other | Business rule |
+|-------|---------------|
+| Order | Acceptance belongs with the Order in v1 |
+| Settings | Allowed methods |
+| Reservation | Deposit on Reservation is separate behavior |
+
+---
+
+## 10. Permissions
+
+| Permission | Authorizes |
+|------------|------------|
+| `restaurant.payments.accept` | AcceptPayment, RevisePaymentAcceptance |
+
+---
+
+## 11. Out of Scope
+
+- Refunds, PSP, tips engine, accounting exports  
+
+---
+
+## 12. Future Evolution
+
+| Change | Trigger |
+|--------|---------|
+| Payment Aggregate + refunds | Settlement necessity / Shared Trigger |
+
+---
+
+## 13. References
+
+| | Concepts |
+|--|----------|
+| **Depends On** | ORDER · SETTINGS |
+| **Uses** | — |
+| **Referenced By** | ORDER · REPORTING |
+
+---
+
+## Acceptance
+
+- [x] Thin behavior · not billing product  
+- [x] §13 filled  

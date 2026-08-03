@@ -51,25 +51,28 @@ If any document conflicts with, in this order:
 | Doc | Path | On this working tree |
 |-----|------|----------------------|
 | **MVP Thesis (Product Constitution)** | `docs/modules/restaurant/MVP_THESIS.md` | **PRESENT — ADOPTED** |
-| **Knowledge Index (entry point)** | `docs/knowledge/RESTAURANT_KNOWLEDGE_INDEX.md` | **MISSING** |
-| **VISION** | `docs/modules/restaurant/VISION.md` | **MISSING** |
-| **MVP Boundary** | `docs/modules/restaurant/MVP_BOUNDARY.md` | **MISSING** |
-| **Discovery** | `docs/evidence/restaurant-discovery-and-mapping.md` | **MISSING** |
-| **Anti-Patterns** | `docs/evidence/restaurant-anti-patterns.md` | **MISSING** |
-| **Operational Workflow** | `docs/evidence/restaurant-operational-workflow.md` | **MISSING** |
-| **Pattern Library** | `docs/evidence/restaurant-pattern-library.md` | **MISSING** |
-| **Gap Analysis** | `docs/evidence/restaurant-gap-analysis-salon.md` | **MISSING** |
-| **Aggregate Map** | `docs/evidence/restaurant-aggregate-map.md` | **MISSING** |
-| **Capability Classification** | `docs/evidence/restaurant-capability-classification.md` | **MISSING** |
-| **Knowledge Inventory (CLOSED)** | `docs/evidence/abukhater-knowledge-inventory.md` | **MISSING** |
-| **Traceability Verification** | `docs/evidence/restaurant-knowledge-traceability-verification.md` | **MISSING** |
-| **Canonical Contracts (Index-canonical)** | Expected: `ORDER` (PWU) · `MENU` · `FULFILLMENT` (Entity) · `GUEST` · `RESTAURANT_EMPLOYEE` · `PAYMENT` (Acceptance VO) · `SHIFT` · `RESERVATION` · `SETTINGS` · `REPORTING` + Contracts INDEX aligned with Thesis | **MISSING** (not present as PWU pack) |
-| **Module Reference Design pack** | Expected: `DOMAIN_LANGUAGE` · `AGGREGATE_BOUNDARIES` · `LIFECYCLE_MAP` · `CAPABILITY_MAP` · `PACKAGE_MANIFEST` · `README` | **MISSING** |
-| **Salon pattern (rename+apply)** | `docs/evidence/salon-module-reference-pattern.md` | check tree separately — Restaurant reads via Index when restored |
-| **Governance Framework** | `docs/platform/GOVERNANCE_FRAMEWORK.md` | check tree separately |
+| **Knowledge Index (entry point)** | `docs/knowledge/RESTAURANT_KNOWLEDGE_INDEX.md` | **PRESENT** |
+| **VISION** | `docs/modules/restaurant/VISION.md` | **PRESENT** |
+| **MVP Boundary** | `docs/modules/restaurant/MVP_BOUNDARY.md` | **PRESENT** |
+| **Discovery** | `docs/evidence/restaurant-discovery-and-mapping.md` | **PRESENT** |
+| **Anti-Patterns** | `docs/evidence/restaurant-anti-patterns.md` | **PRESENT** |
+| **Operational Workflow** | `docs/evidence/restaurant-operational-workflow.md` | **PRESENT** |
+| **Pattern Library** | `docs/evidence/restaurant-pattern-library.md` | **PRESENT** |
+| **Gap Analysis** | `docs/evidence/restaurant-gap-analysis-salon.md` | **PRESENT** |
+| **Aggregate Map** | `docs/evidence/restaurant-aggregate-map.md` | **PRESENT** |
+| **Capability Classification** | `docs/evidence/restaurant-capability-classification.md` | **PRESENT** |
+| **Knowledge Inventory (CLOSED)** | `docs/evidence/abukhater-knowledge-inventory.md` | **PRESENT** |
+| **Traceability Verification** | `docs/evidence/restaurant-knowledge-traceability-verification.md` | **PRESENT** |
+| **Canonical Contracts (Index-canonical)** | ORDER (PWU) · MENU · FULFILLMENT · GUEST · RESTAURANT_EMPLOYEE · PAYMENT · SHIFT · RESERVATION · SETTINGS · REPORTING + INDEX | **PRESENT** |
+| **Module Reference Design pack** | DOMAIN_LANGUAGE · AGGREGATE_BOUNDARIES · LIFECYCLE_MAP · CAPABILITY_MAP · PACKAGE_MANIFEST · README | **PRESENT** |
+| **Salon pattern (rename+apply)** | `docs/evidence/salon-module-reference-pattern.md` | **PRESENT** |
+| **Governance Framework** | `docs/platform/GOVERNANCE_FRAMEWORK.md` | **PRESENT** |
 
-**Product SoT today on this tree:** `MVP_THESIS.md` only.  
-**Do not write Exit Criteria until Missing Canonical rows are restored** (or Founder explicitly scopes Exit Criteria to Thesis-only with deferred citations).
+**Restore verification:** [restaurant-canonical-restore-verified.md](./restaurant-canonical-restore-verified.md) — **PASS**  
+**Product SoT:** ADOPTED Thesis. **Legacy stubs:** `docs/contracts/modules/restaurant/_legacy_stubs/`.  
+**Next:** write **Restaurant Exit Criteria** (translate Thesis only).
+
+~~**Do not write Exit Criteria until Missing Canonical rows are restored**~~ — restored 2026-07-20.
 
 ---
 
@@ -77,23 +80,9 @@ If any document conflicts with, in this order:
 
 ### A — Pre–Reference-Design contract stubs (HIGH RISK — AI trap)
 
-Banner applied on folder INDEX. **Do not use for Product, Exit Criteria, schema, or Portal.**
-
-| File | Why Legacy |
-|------|------------|
-| `docs/contracts/modules/restaurant/INDEX.md` | Peer Aggregates: Payment, Fulfillment, KitchenTicket, Driver, Table, Customer — contradicts ADOPTED Thesis |
-| `docs/contracts/modules/restaurant/ORDER.md` | Cart / transactional basket; decoupled Payment & Fulfillment Aggregates — not PWU Order |
-| `docs/contracts/modules/restaurant/PAYMENT.md` | Payment Aggregate + refunds — Thesis: snapshot VO only; Settlement OUT |
-| `docs/contracts/modules/restaurant/FULFILLMENT.md` | Fulfillment as independent Aggregate — Thesis: Entity inside Order |
-| `docs/contracts/modules/restaurant/KITCHEN.md` | **KitchenTicket** Aggregate / station routing — Thesis: Order states only; ticket OUT |
-| `docs/contracts/modules/restaurant/DRIVER.md` | Driver / DeliveryAssignment Aggregate — Thesis: delivery = mode; Pilot/dispatch OUT of P0 |
-| `docs/contracts/modules/restaurant/TABLE.md` | Floor / Table / Reservation Aggregate — Thesis: no table map; Reservation out of P0 loop |
-| `docs/contracts/modules/restaurant/CUSTOMER.md` | Customer profile Aggregate — Thesis: Guest Entity, not CRM Customer Root |
-| `docs/contracts/modules/restaurant/EMPLOYEE.md` | Employee Aggregate shape — Thesis: Membership + RestaurantEmployee assignment |
-| `docs/contracts/modules/restaurant/SHIFT.md` | Shift as first-class with TimeEntry — Thesis: Shift Aggregate خارج P0 |
-| `docs/contracts/modules/restaurant/MENU.md` | Stub-era menu — treat as Legacy until replaced by Index-canonical MENU |
-| `docs/contracts/modules/restaurant/STATUS.md` | Tied to stub state machines (Payment/Kitchen aggregates) |
-| `docs/contracts/modules/restaurant/EVENTS.md` | Tied to stub event model |
+**Quarantined to:** `docs/contracts/modules/restaurant/_legacy_stubs/`  
+Canonical PWU contracts now live in the parent folder (`ORDER.md` = Primary Work Unit, etc.).  
+Do **not** use `_legacy_stubs` for Product, Exit Criteria, schema, or Portal.
 
 ### B — Code scaffold (validation-only — not Product Constitution)
 

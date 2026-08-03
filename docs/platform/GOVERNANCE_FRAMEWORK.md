@@ -31,11 +31,12 @@ Salon demonstrated the cycle. Restaurant is the first Module expected to run it 
 
 **Official remaining sequence (execution only):**
 
-1. Restore Missing Canonical Documents on the working tree  
-2. Write **Restaurant Exit Criteria** (executive translation only — no new Product decisions)  
-3. Founder Review → **ADOPT** Exit Criteria  
-4. Phase A Assignment  
-5. Execute per Exit Criteria  
+1. ~~Restore Missing Canonical Documents on the working tree~~ → **PASS** ([restore verified](../evidence/restaurant-canonical-restore-verified.md))  
+2. ~~Write / ADOPT Restaurant Exit Criteria~~ → **ADOPTED** ([restaurant-exit-criteria.md](../evidence/restaurant-exit-criteria.md))  
+3. ~~**Phase A Assignment**~~ → **ADOPTED** ([restaurant-phase-a-assignment.md](../evidence/restaurant-phase-a-assignment.md)) — Execution Authority **Granted**  
+4. ~~Kickoff~~ → **OPEN** ([restaurant-phase-a-kickoff.md](../evidence/restaurant-phase-a-kickoff.md))  
+5. Phase A Execution (A1–A8 · evidence D1–D6) ← current  
+6. Continue per Exit Criteria stages  
 
 **After Exit Criteria is ADOPTED:** the Module is in **Product Execution** — not Discovery, not Architecture redesign, not Knowledge Extraction.
 

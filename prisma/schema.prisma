@@ -161,6 +161,95 @@ model RestaurantCategory {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  menuItems RestaurantMenuItem[]
+
   @@index([tenantId])
   @@map("restaurant_category")
+}
+
+/// Restaurant MenuItem Aggregate Root (MENU Contract) — Module-owned; not Core.
+model RestaurantMenuItem {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  categoryId  String   @map("category_id")
+  name        String
+  description String?
+  priceCents  Int      @map("price_cents")
+  currency    String   @default("SAR")
+  /// Available for new Orders (MENU availability).
+  available   Boolean  @default(true)
+  /// Retired = permanently not sellable for new Orders.
+  retired     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category RestaurantCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([tenantId, categoryId])
+  @@map("restaurant_menu_item")
+}
+
+/// RestaurantEmployee = assignment on Core Membership (not a Staff Aggregate).
+model RestaurantEmployeeAssignment {
+  id             String    @id @default(cuid())
+  tenantId       String    @map("tenant_id")
+  membershipId   String    @map("membership_id")
+  /// Module role: cashier | kitchen | manager | pilot (Contract vocabulary).
+  restaurantRole String    @map("restaurant_role")
+  status         String    @default("active")
+  assignedAt     DateTime  @default(now()) @map("assigned_at")
+  revokedAt      DateTime? @map("revoked_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@unique([tenantId, membershipId, restaurantRole])
+  @@index([tenantId])
+  @@index([membershipId])
+  @@map("restaurant_employee_assignment")
+}
+
+/// Restaurant Order — Primary Work Unit (ORDER Contract). Module-owned.
+model RestaurantOrder {
+  id                    String    @id @default(cuid())
+  tenantId              String    @map("tenant_id")
+  status                String    @default("created")
+  /// Fulfillment.mode on Order (Entity) — dine_in | pickup | delivery
+  fulfillmentMode       String    @map("fulfillment_mode")
+  guestName             String?   @map("guest_name")
+  /// PaymentAcceptance snapshot (v1 VO on Order — not Payment Aggregate)
+  paymentAccepted       Boolean   @default(false) @map("payment_accepted")
+  paymentMethod         String?   @map("payment_method")
+  paymentAcceptedAt     DateTime? @map("payment_accepted_at")
+  openedAt              DateTime  @default(now()) @map("opened_at")
+  completedAt           DateTime? @map("completed_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  lines RestaurantOrderLine[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, openedAt])
+  @@map("restaurant_order")
+}
+
+/// OrderLine — price/name snapshot at create/confirm (MENU does not rewrite history).
+model RestaurantOrderLine {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  orderId     String   @map("order_id")
+  menuItemId  String   @map("menu_item_id")
+  name        String
+  quantity    Int      @default(1)
+  priceCents  Int      @map("price_cents")
+  currency    String
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  order RestaurantOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([orderId])
+  @@map("restaurant_order_line")
 }

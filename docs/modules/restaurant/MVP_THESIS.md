@@ -174,15 +174,16 @@ Activate restaurant Module
 | **SUPERSEDED** | فقط بقرار مؤسسي صريح جديد |
 
 **Canonicalization:** [restaurant-canonicalization-audit.md](../../evidence/restaurant-canonicalization-audit.md) — **COMPLETE**  
+**Canonical restore:** [restaurant-canonical-restore-verified.md](../../evidence/restaurant-canonical-restore-verified.md) — **PASS**  
 **Phase closure:** [restaurant-governance-product-phase-closed.md](../../evidence/restaurant-governance-product-phase-closed.md) — Governance + Product Constitution **CLOSED**  
 
-**Next Founder commands (execution only):**  
-1. Restore Missing Canonical Documents  
-2. Write **Restaurant Exit Criteria** (translate this Thesis — no new Product decisions) → Founder ADOPT  
-3. Phase A Assignment  
+**Exit Criteria:** [restaurant-exit-criteria.md](../../evidence/restaurant-exit-criteria.md) — **ADOPTED**  
+**Phase A Assignment:** [restaurant-phase-a-assignment.md](../../evidence/restaurant-phase-a-assignment.md) — **ADOPTED** (Execution Authority Granted)  
+**Phase A Kickoff:** [restaurant-phase-a-kickoff.md](../../evidence/restaurant-phase-a-kickoff.md) — **OPEN**  
 
-**Forbidden until Exit Criteria ADOPT + Phase Assignment:** Order schema · APIs · Portal build · Shared builds · archive re-extraction · Architecture redesign.  
-**Executive rule:** conflict with this sequence ⇒ auto-Legacy; update Canonical first — [GOVERNANCE_FRAMEWORK §1b](../../platform/GOVERNANCE_FRAMEWORK.md#1b-executive-sequence-rule-permanent--no-silent-exceptions).
+**Phase A Execution:** authorized for A1–A8 / evidence D1–D6 only.  
+**Forbidden:** Architecture/Core redesign · Contract redesign · Features outside A1–A8 · Shared without Trigger+OP.  
+**Executive rule:** conflict with this sequence ⇒ auto-Legacy — [GOVERNANCE_FRAMEWORK §1b](../../platform/GOVERNANCE_FRAMEWORK.md#1b-executive-sequence-rule-permanent--no-silent-exceptions).
 
 ---
 
